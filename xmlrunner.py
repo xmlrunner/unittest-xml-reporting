@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 This is a Python unittest-based test runner that can export test results to
 JUnit like XML reporting.
