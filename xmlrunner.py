@@ -7,8 +7,8 @@ results to JUnit like XML reporting.
 import os
 import sys
 import time
-from StringIO import StringIO
 from unittest import TestResult, _TextTestResult, TextTestRunner
+from StringIO import StringIO
 
 
 class _TestInfo(object):
@@ -126,7 +126,10 @@ class _XMLTestResult(_TextTestResult):
         for tests in (self.successes, self.failures, self.errors):
             for test_info in tests:
                 testcase = type(test_info.test_method)
-                testcase_name = testcase.__module__ + '.' + testcase.__name__
+                module = testcase.__module__ + '.'
+                if module == '__main__.':
+                    module = ''
+                testcase_name = module + testcase.__name__
                 if not tests_by_testcase.has_key(testcase_name):
                     tests_by_testcase[testcase_name] = []
                 tests_by_testcase[testcase_name].append(test_info)
