@@ -44,7 +44,7 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     result = xmlrunner.XMLTestRunner(
         verbose=settings.TEST_OUTPUT_VERBOSE, \
         descriptions=settings.TEST_OUTPUT_DESCRIPTIONS, \
-        output_dir=settings.TEST_OUTPUT_DIR).run(suite)
+        output=settings.TEST_OUTPUT_DIR).run(suite)
     
     connection.creation.destroy_test_db(old_name, verbosity)
     teardown_test_environment()
