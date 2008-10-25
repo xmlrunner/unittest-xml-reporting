@@ -7,8 +7,8 @@ results to JUnit like XML reporting.
 import os
 import sys
 import time
-from unittest import TestResult, _TextTestResult, TextTestRunner
 from StringIO import StringIO
+from unittest import TestResult, _TextTestResult, TextTestRunner
 
 
 class _TestInfo(object):
