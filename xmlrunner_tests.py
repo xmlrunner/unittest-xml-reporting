@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """Executable module to test unittest-xml-reporting.
 """
@@ -29,6 +30,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
     _fixture = staticmethod(_fixture)
     
     def _run_test_class(self, test_class, expected=None):
+        "Run a test class and compare it to a given fixture."
         expected_xml = ''
         if expected:
             expected_xml = XMLTestRunnerTestCase._fixture(expected)

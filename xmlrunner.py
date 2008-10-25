@@ -218,7 +218,6 @@ class _XMLTestResult(_TextTestResult):
             for test in tests:
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
             _XMLTestResult._report_output(test_runner, testsuite, doc)
-            
             xml_content = doc.toprettyxml(indent='\t')
             
             if type(test_runner.output) is str:
@@ -228,7 +227,7 @@ class _XMLTestResult(_TextTestResult):
                 report_file.write(xml_content)
                 report_file.close()
             else:
-                # Assume test_runner.output is a stream
+                # Assume that test_runner.output is a stream
                 test_runner.output.write(xml_content)
 
 
