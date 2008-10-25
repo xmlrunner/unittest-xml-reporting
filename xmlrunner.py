@@ -126,10 +126,13 @@ class _XMLTestResult(_TextTestResult):
         for tests in (self.successes, self.failures, self.errors):
             for test_info in tests:
                 testcase = type(test_info.test_method)
+                
+                # Ignore module name if it is '__main__'
                 module = testcase.__module__ + '.'
                 if module == '__main__.':
                     module = ''
                 testcase_name = module + testcase.__name__
+                
                 if not tests_by_testcase.has_key(testcase_name):
                     tests_by_testcase[testcase_name] = []
                 tests_by_testcase[testcase_name].append(test_info)
