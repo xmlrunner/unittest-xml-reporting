@@ -27,9 +27,38 @@ Using unittest-xml-reporting
 If you have already used the well known TextTestRunner that comes with the
 built-in unittest module, then you probably know what to do.
 
-But here's what you have to do:
+Here goes a sample script similar to the one found on unittest documentation:
 
-<TODO: more detailed instructions here>
+import random
+import unittest
+
+class TestSequenceFunctions(unittest.TestCase):
+    
+    def setUp(self):
+        self.seq = range(10)
+    
+    def testshuffle(self):
+        # make sure the shuffled sequence does not lose any elements
+        random.shuffle(self.seq)
+        self.seq.sort()
+        self.assertEqual(self.seq, range(10))
+    
+    def testchoice(self):
+        element = random.choice(self.seq)
+        self.assert_(element in self.seq)
+    
+    def testsample(self):
+        self.assertRaises(ValueError, random.sample, self.seq, 20)
+        for element in random.sample(self.seq, 5):
+            self.assert_(element in self.seq)
+
+if __name__ == '__main__':
+    # Uncomment the line below to use the default unittest Test Runner:
+    # unittest.main()
+    
+    # Using XMLTestRunner to run the above test case:
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestSequenceFunctions)
+    xmlrunner.XMLTestRunner(output_dir='build/test-reports').run(suite)
 
 
 The 'examples' folder
@@ -72,7 +101,6 @@ Links
 [1] JUnit - http://junit.org/
 [2] CruiseControl - http://cruisecontrol.sourceforge.net/
 [3] Hudson - http://hudson.dev.java.net/
-
 [4] http://docs.djangoproject.com/en/dev/ref/settings/#test-runner
 
 
