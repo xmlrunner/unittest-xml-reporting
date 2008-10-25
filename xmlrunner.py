@@ -206,8 +206,9 @@ class _XMLTestResult(_TextTestResult):
         from xml.dom.minidom import Document
         all_results = self._get_info_by_testcase()
         
-        if not os.path.exists(test_runner.output_dir):
-            os.makedirs(test_runner.output_dir)
+        if type(test_runner.output) == str and not \
+            os.path.exists(test_runner.output):
+            os.makedirs(test_runner.output)
         
         for suite, tests in all_results.items():
             doc = Document()
@@ -218,23 +219,29 @@ class _XMLTestResult(_TextTestResult):
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
             _XMLTestResult._report_output(test_runner, testsuite, doc)
             
-            # Save the XML file to the disk
-            report_file = file('%s%sTEST-%s.xml' % \
-                (test_runner.output_dir, os.sep, suite), 'w')
-            report_file.write(doc.toprettyxml(indent='\t'))
-            report_file.close()
+            xml_content = doc.toprettyxml(indent='\t')
+            
+            if type(test_runner.output) is str:
+                # Save the XML file to the disk
+                report_file = file('%s%sTEST-%s.xml' % \
+                    (test_runner.output, os.sep, suite), 'w')
+                report_file.write(xml_content)
+                report_file.close()
+            else:
+                # Assume test_runner.output is a stream
+                test_runner.output.write(xml_content)
 
 
 class XMLTestRunner(TextTestRunner):
     """A test runner class that outputs the results in JUnit like XML files.
     """
     
-    def __init__(self, output_dir='.', stream=sys.stderr, descriptions=1, \
+    def __init__(self, output='.', stream=sys.stderr, descriptions=1, \
         verbose=False):
         "Create a new instance of XMLTestRunner."
         verbosity = (1, 2)[verbose]
         TextTestRunner.__init__(self, stream, descriptions, verbosity)
-        self.output_dir = output_dir
+        self.output = output
     
     def _make_result(self):
         """Create the TestResult object which will be used to store
