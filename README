@@ -66,9 +66,9 @@ if __name__ == '__main__':
 The 'examples' folder
 ---------------------
 
-The main reason that made come up with this project in the first place was to
-make it easier to manage the build cycle of my Django applications. Since I
-already use Hudson to build my JavaEE applications, it would be nice to
+The main reason that made me come up with this project in the first place was
+to make it easier to manage the build cycle of my Django applications. Since
+I already use Hudson to build my JavaEE applications, it would be nice to
 leverage my current setup to handle my Django applications as well.
 
 So in the 'examples' folder you can find the 'django_xmlrunner.py' script,
