@@ -31,6 +31,7 @@ Here goes a sample script similar to the one found on unittest documentation:
 
 import random
 import unittest
+import xmlrunner
 
 class TestSequenceFunctions(unittest.TestCase):
     
