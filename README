@@ -27,7 +27,8 @@ Using unittest-xml-reporting
 If you have already used the well known TextTestRunner that comes with the
 built-in unittest module, then you probably know what to do.
 
-Here goes a sample script similar to the one found on unittest documentation:
+Here goes a sample script similar to the one found on unittest
+documentation[5]:
 
 import random
 import unittest
@@ -103,6 +104,7 @@ Links
 [2] CruiseControl - http://cruisecontrol.sourceforge.net/
 [3] Hudson - http://hudson.dev.java.net/
 [4] http://docs.djangoproject.com/en/dev/ref/settings/#test-runner
+[5] http://www.python.org/doc/2.5.2/lib/minimal-example.html
 
 
 Authors
