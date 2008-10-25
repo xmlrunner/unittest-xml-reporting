@@ -87,6 +87,7 @@ class _XMLTestResult(_TextTestResult):
         "Called after execute each test method."
         _TextTestResult.stopTest(self, test)
         self.stop_time = time.time()
+        
         if self.callback and callable(self.callback):
             self.callback()
             self.callback = None
