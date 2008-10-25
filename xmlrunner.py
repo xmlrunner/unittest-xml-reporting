@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""
-This is a Python unittest-based test runner that can export test results to
-JUnit like XML reporting.
-
-Author: Daniel Fernandes Martins <daniel.tritone@gmail.com>
+"""This is a Python unittest-based test runner that can export test
+results to JUnit like XML reporting.
 """
 
 import os

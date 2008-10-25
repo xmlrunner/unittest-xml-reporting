@@ -1,7 +1,7 @@
-"""
-Custom Django test runner that runs the tests using the XMLTestRunner class.
+# -*- coding: utf-8 -*-
 
-Author: Daniel Fernandes Martins <daniel.tritone@gmail.com>
+"""Custom Django test runner that runs the tests using the
+XMLTestRunner class.
 """
 
 from django.test.simple import *
