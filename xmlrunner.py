@@ -11,7 +11,7 @@ from unittest import TestResult, _TextTestResult, TextTestRunner
 from StringIO import StringIO
 
 
-class TestInfo(object):
+class _TestInfo(object):
     """This class is used to keep useful information about the execution of a
     test method.
     """
@@ -20,7 +20,7 @@ class TestInfo(object):
     (SUCCESS, FAILURE, ERROR) = range(3)
     
     def __init__(self, test_result, test_method, outcome=SUCCESS, err=None):
-        "Create a new instance of TestInfo."
+        "Create a new instance of _TestInfo."
         self.test_result = test_result
         self.test_method = test_method
         self.outcome = outcome
@@ -59,7 +59,7 @@ class _XMLTestResult(_TextTestResult):
     
     def _prepare_callback(self, test_info, target_list, verbose_str,
         short_str):
-        """Append a TestInfo to the given target list and sets a callback
+        """Append a _TestInfo to the given target list and sets a callback
         method to be called by stopTest method.
         """
         target_list.append(test_info)
@@ -93,17 +93,17 @@ class _XMLTestResult(_TextTestResult):
     
     def addSuccess(self, test):
         "Called when a test executes successfully."
-        self._prepare_callback(TestInfo(self, test), \
+        self._prepare_callback(_TestInfo(self, test), \
             self.successes, 'OK', '.')
     
     def addFailure(self, test, err):
         "Called when a test method fails."
-        self._prepare_callback(TestInfo(self, test, TestInfo.FAILURE, err), \
+        self._prepare_callback(_TestInfo(self, test, _TestInfo.FAILURE, err), \
             self.failures, 'FAIL', 'F')
     
     def addError(self, test, err):
         "Called when a test method raises an error."
-        self._prepare_callback(TestInfo(self, test, TestInfo.ERROR, err), \
+        self._prepare_callback(_TestInfo(self, test, _TestInfo.ERROR, err), \
             self.errors, 'ERROR', 'E')
     
     def printErrorList(self, flavour, errors):
@@ -144,10 +144,10 @@ class _XMLTestResult(_TextTestResult):
         testsuite.setAttribute('time', '%.3f' % \
             sum(map(lambda e: e.get_elapsed_time(), tests)))
         
-        failures = filter(lambda e: e.outcome==TestInfo.FAILURE, tests)
+        failures = filter(lambda e: e.outcome==_TestInfo.FAILURE, tests)
         testsuite.setAttribute('failures', str(len(failures)))
         
-        errors = filter(lambda e: e.outcome==TestInfo.ERROR, tests)
+        errors = filter(lambda e: e.outcome==_TestInfo.ERROR, tests)
         testsuite.setAttribute('errors', str(len(errors)))
         
         return testsuite
@@ -163,7 +163,7 @@ class _XMLTestResult(_TextTestResult):
         testcase.setAttribute('name', test_result.test_method._testMethodName)
         testcase.setAttribute('time', '%.3f' % test_result.get_elapsed_time())
         
-        if (test_result.outcome != TestInfo.SUCCESS):
+        if (test_result.outcome != _TestInfo.SUCCESS):
             elem_name = ('failure', 'error')[test_result.outcome-1]
             failure = xml_document.createElement(elem_name)
             testcase.appendChild(failure)
