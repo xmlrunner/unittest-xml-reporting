@@ -41,7 +41,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         "Setup the objects needed to run the tests."
         self.stream = StringIO()
         self.runner = xmlrunner.XMLTestRunner(output=self.stream, \
-            stream=StringIO())
+            stream=StringIO(), elapsed_times=False)
     
     def test_empty_test_class(self):
         "Empty test class should not generate a XML file."
@@ -69,4 +69,11 @@ class XMLTestRunnerTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    import sys
+    if len(sys.argv) == 1:
+        unittest.main()
+    elif sys.argv[1] == '--xml' and len(sys.argv) == 3:
+        suite = unittest.TestLoader() \
+            .loadTestsFromTestCase(XMLTestRunnerTestCase)
+        xmlrunner.XMLTestRunner(output=sys.argv[2], elapsed_times=False) \
+            .run(suite)

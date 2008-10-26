@@ -1,2 +1,5 @@
 # Python bytecode
 *.pyc
+
+# Build directory
+build/*

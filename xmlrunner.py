@@ -51,11 +51,13 @@ class _XMLTestResult(_TextTestResult):
 
     Used by XMLTestRunner.
     """
-    def __init__(self, stream, descriptions, verbosity):
+    def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1, \
+        elapsed_times=True):
         "Create a new instance of _XMLTestResult."
         _TextTestResult.__init__(self, stream, descriptions, verbosity)
         self.successes = []
         self.callback = None
+        self.elapsed_times = elapsed_times
     
     def _prepare_callback(self, test_info, target_list, verbose_str,
         short_str):
@@ -67,6 +69,11 @@ class _XMLTestResult(_TextTestResult):
             """This callback prints the test method outcome to the stream,
             as well as the elapsed time.
             """
+            
+            # Ignore the elapsed times for a more reliable unit testing
+            if not self.elapsed_times:
+                self.start_time = self.stop_time = 0
+            
             if self.showAll:
                 self.stream.writeln('%s (%.3fs)' % \
                     (verbose_str, test_info.get_elapsed_time()))
@@ -236,18 +243,20 @@ class XMLTestRunner(TextTestRunner):
     """A test runner class that outputs the results in JUnit like XML files.
     """
     
-    def __init__(self, output='.', stream=sys.stderr, descriptions=1, \
-        verbose=False):
+    def __init__(self, output='.', stream=sys.stderr, descriptions=True, \
+        verbose=False, elapsed_times=True):
         "Create a new instance of XMLTestRunner."
         verbosity = (1, 2)[verbose]
         TextTestRunner.__init__(self, stream, descriptions, verbosity)
         self.output = output
+        self.elapsed_times = elapsed_times
     
     def _make_result(self):
         """Create the TestResult object which will be used to store
         information about the executed tests.
         """
-        return _XMLTestResult(self.stream, self.descriptions, self.verbosity)
+        return _XMLTestResult(self.stream, self.descriptions, \
+            self.verbosity, self.elapsed_times)
     
     def _patch_standard_output(self):
         """Replace the stdout and stderr streams with string-based streams
