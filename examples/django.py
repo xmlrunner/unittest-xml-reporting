@@ -8,10 +8,9 @@ to make it easier to manage the build cycle of my Django applications. Since
 I already use Hudson to build my JavaEE applications, it would be nice to
 leverage my current setup to handle my Django applications as well.
 
-So in the 'examples' folder you can find the 'django_xmlrunner.py' script,
-which shows how to use the XMLTestRunner in a Django project. The
-Django documentation shows how to configure your project to use a custom
-test runner.
+This script shows how to use the XMLTestRunner in a Django project. To know
+how to configure a custom TestRunner in a Django project, please read the
+Django docs website.
 
 To fine tune this script, put one or more of the following settings in your
 project's 'settings.py' file:
