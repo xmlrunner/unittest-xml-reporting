@@ -69,11 +69,4 @@ class XMLTestRunnerTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) == 1:
-        unittest.main()
-    elif sys.argv[1] == '--xml' and len(sys.argv) == 3:
-        suite = unittest.TestLoader() \
-            .loadTestsFromTestCase(XMLTestRunnerTestCase)
-        xmlrunner.XMLTestRunner(output=sys.argv[2], elapsed_times=False) \
-            .run(suite)
+    unittest.main()
