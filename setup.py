@@ -8,7 +8,6 @@ setup(
     author = 'Daniel Fernandes Martins',
     author_email = 'daniel.tritone@gmail.com',
     description = 'PyUnit-based test runner with JUnit like XML reporting.',
-    long_description = 'PyUnit-based test runner with JUnit like XML reporting.',
     license = 'LGPL',
     platforms = ['Any'],
     keywords = ['pyunit', 'unittest', 'junit xml', 'report', 'testrunner'],
