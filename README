@@ -2,10 +2,10 @@ unittest-xml-reporting
 ----------------------
 
 unittest-xml-reporting is a Python unittest-based test runner that can export
-test results to JUnit[1] like XML reports.
+test results to JUnit[2] like XML reports.
 
 The usefulness of such a thing becomes clear when we consider the use of
-Continous Integration servers (like Cruise Control[2] and Hudson[3]) to
+Continous Integration servers (like Cruise Control[3] and Hudson[4]) to
 control the build cycle of our applications.
 
 Since most CI servers are able to parse those JUnit XML reports to know
@@ -14,11 +14,29 @@ it would be nice if such features could work for regular Python unittest
 TestCases.
 
 
-Installation and usage
-----------------------
+Installation
+------------
 
-Just drop the 'xmlrunner.py' file somewhere inside your PYTHONPATH and you are
-ready to go.
+If you want to get the latest stable version and have setuptools installed in
+your machine, execute the following command to download and install
+unittest-xml-reporting:
+
+$ sudo easy_install unittest-xml-reporting
+
+To get the latest *development* version, access the project's website[1] in
+GitHub and download the current tarball. If you are familiar to Git, you can
+also clone the repository:
+
+$ git clone git://github.com/danielfm/unittest-xml-reporting.git
+
+Once you have downloaded the latest development version, you need to execute
+the following command to finish the installation:
+
+$ python setup.py install
+
+
+Usage
+-----
 
 To learn how to use the XMLTestRunner please take a look at the scripts
 inside the 'examples' folder.
@@ -27,9 +45,10 @@ inside the 'examples' folder.
 Links
 -----
 
-[1] JUnit - http://junit.org/
-[2] CruiseControl - http://cruisecontrol.sourceforge.net/
-[3] Hudson - http://hudson.dev.java.net/
+[1] Official website - http://github.com/danielfm/unittest-xml-reporting/tree/master/
+[2] JUnit            - http://junit.org/
+[3] CruiseControl    - http://cruisecontrol.sourceforge.net/
+[4] Hudson           - http://hudson.dev.java.net/
 
 
 Authors
