@@ -32,7 +32,7 @@ $ git clone git://github.com/danielfm/unittest-xml-reporting.git
 Once you have downloaded the latest development version, you need to execute
 the following command to finish the installation:
 
-$ python setup.py install
+$ sudo python setup.py install
 
 
 Usage
