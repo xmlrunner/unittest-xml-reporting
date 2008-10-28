@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
-<testsuite errors="0" failures="1" name="test.testcases.FailedTestCase" tests="1" time="0.000">
-	<testcase classname="test.testcases.FailedTestCase" name="test_failure" time="0.000">
+<testsuite errors="0" failures="1" name="tests.testsuite_cases.FailedTestCase" tests="1" time="0.000">
+	<testcase classname="tests.testsuite_cases.FailedTestCase" name="test_failure" time="0.000">
 		<failure message="" type="AssertionError">
 <![CDATA[Traceback (most recent call last):
-  File "{{PATH}}/test/testcases.py", line 21, in test_failure
+  File "{{PATH}}/tests/testsuite_cases.py", line 21, in test_failure
     self.assertTrue(None)
 AssertionError
 ]]>		</failure>

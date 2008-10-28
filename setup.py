@@ -20,10 +20,9 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Software Development :: Testing',
-        'Topic :: Text Processing :: Markup :: XML'
+        'Topic :: Software Development :: Testing'
     ],
     py_modules = ['xmlrunner'],
-    test_suite = 'xmlrunner_tests',
+    test_suite = 'tests.testsuite',
 )
 
