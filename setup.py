@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name = 'unittest-xml-reporting',
-    version = '1.0',
+    version = '1.0.1',
     author = 'Daniel Fernandes Martins',
     author_email = 'daniel.tritone@gmail.com',
     description = 'PyUnit-based test runner with JUnit like XML reporting.',
@@ -22,7 +22,8 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Testing'
     ],
-    py_modules = ['xmlrunner'],
-    test_suite = 'tests.testsuite',
+    packages = find_packages(),
+    include_package_data = True,
+    test_suite = 'xmlrunner.tests.testsuite',
 )
 

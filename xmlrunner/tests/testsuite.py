@@ -9,7 +9,7 @@ import unittest
 import os
 import xmlrunner
 from StringIO import StringIO
-import tests.testsuite_cases as testcases
+import testsuite_cases as testcases
 
 
 class XMLTestRunnerTestCase(unittest.TestCase):
@@ -17,7 +17,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
     """
     
     # Directory where the fixtures are placed
-    TEST_FIXTURES_DIR = 'tests/fixtures'
+    TEST_FIXTURES_DIR = 'xmlrunner/tests/fixtures'
     
     def _fixture(name):
         "Read the content of a XML fixture."

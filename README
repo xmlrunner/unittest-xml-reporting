@@ -1,45 +1,35 @@
 unittest-xml-reporting
 ----------------------
 
-unittest-xml-reporting is a Python unittest-based test runner that can export
-test results to JUnit[2] like XML reports.
-
-The usefulness of such a thing becomes clear when we consider the use of
-Continous Integration servers (like Cruise Control[3] and Hudson[4]) to
-control the build cycle of our applications.
-
-Since most CI servers are able to parse those JUnit XML reports to know
-whether a build fails (and display fancy graphics and statistics, of course),
-it would be nice if such features could work for regular Python unittest
-TestCases.
+unittest-xml-reporting is a PyUnit-based TestRunner that can export test
+results to XML files that can be consumed by a wide range of tools, such as
+build systems, IDEs and continuous integration servers.
 
 
 Installation
 ------------
 
-If you want to get the latest stable version and have setuptools installed in
-your machine, execute the following command to download and install
-unittest-xml-reporting:
+The easiest way to install unittest-xml-reporting is via EasyInstall[5].
+Follow these[6] instructions to install EasyInstall if you don't have it
+already.
 
-$ sudo easy_install unittest-xml-reporting
+Then, execute the following command line to install the latest stable version
+of unittest-xml-reporting:
 
-To get the latest *development* version, access the project's website[1] in
-GitHub and download the current tarball. If you are familiar to Git, you can
-also clone the repository:
+    $ sudo easy_install unittest-xml-reporting
 
-$ git clone git://github.com/danielfm/unittest-xml-reporting.git
+If you use Git and want to get the latest *development* version:
 
-Once you have downloaded the latest development version, you need to execute
-the following command to finish the installation:
+    $ git clone git://github.com/danielfm/unittest-xml-reporting.git
+    $ cd unittest-xml-reporting.git
+    $ sudo python setup.py install
 
-$ sudo python setup.py install
+Or get the latest *development* version as a tarball:
 
-
-Usage
------
-
-To learn how to use the XMLTestRunner please take a look at the scripts
-inside the 'examples' folder.
+    $ wget http://github.com/danielfm/unittest-xml-reporting/tarball/master
+    $ tar zxf danielfm-unittest-xml-reporting-XXXXXXXXXXXXXXXX.tar.gz
+    $ cd danielfm-unittest-xml-reporting-XXXXXXXXXXXXXXXX
+    $ sudo python setup.py install
 
 
 Links
@@ -49,6 +39,8 @@ Links
 [2] JUnit            - http://junit.org/
 [3] CruiseControl    - http://cruisecontrol.sourceforge.net/
 [4] Hudson           - http://hudson.dev.java.net/
+[5] EasyInstall      - http://peak.telecommunity.com/DevCenter/EasyInstall
+[6] Setuptools       - http://pypi.python.org/pypi/setuptools
 
 
 Authors

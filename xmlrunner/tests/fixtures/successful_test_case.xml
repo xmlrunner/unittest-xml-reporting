@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<testsuite errors="0" failures="0" name="xmlrunner.tests.testsuite_cases.SuccessfulTestCase" tests="1" time="0.000">
+	<testcase classname="xmlrunner.tests.testsuite_cases.SuccessfulTestCase" name="test_success" time="0.000"/>
+	<system-out>
+<![CDATA[some text
+]]>	</system-out>
+	<system-err>
+<![CDATA[]]>	</system-err>
+</testsuite>
