@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'unittest-xml-reporting',
-    version = '1.0.1',
+    version = '1.0.2',
     author = 'Daniel Fernandes Martins',
     author_email = 'daniel.tritone@gmail.com',
     description = 'PyUnit-based test runner with JUnit like XML reporting.',
@@ -22,7 +22,8 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Testing'
     ],
-    packages = find_packages(),
+    packages = find_packages('src'),
+    package_dir = {'':'src'},
     include_package_data = True,
     test_suite = 'xmlrunner.tests.testsuite',
 )

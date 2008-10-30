@@ -42,7 +42,7 @@ import os
 import sys
 import time
 from unittest import TestResult, _TextTestResult, TextTestRunner
-from StringIO import StringIO
+from cStringIO import StringIO
 
 
 class _TestInfo(object):
@@ -276,7 +276,6 @@ class _XMLTestResult(_TextTestResult):
 class XMLTestRunner(TextTestRunner):
     """A test runner class that outputs the results in JUnit like XML files.
     """
-    
     def __init__(self, output='.', stream=sys.stderr, descriptions=True, \
         verbose=False, elapsed_times=True):
         "Create a new instance of XMLTestRunner."
@@ -302,6 +301,7 @@ class XMLTestRunner(TextTestRunner):
     
     def _restore_standard_output(self):
         "Restore the stdout and stderr streams."
+        self.stderr.close()
         (sys.stdout, sys.stderr) = (self.old_stdout, self.old_stderr)
     
     def run(self, test):
@@ -344,12 +344,12 @@ class XMLTestRunner(TextTestRunner):
                 self.stream.writeln(")")
             else:
                 self.stream.writeln("OK")
+            
+            # Generate reports
+            self.stream.writeln()
+            self.stream.writeln('Generating XML reports...')
+            result.generate_reports(self)
         finally:
             self._restore_standard_output()
-        
-        # Generate reports
-        self.stream.writeln()
-        self.stream.writeln('Generating XML reports...')
-        result.generate_reports(self)
         
         return result

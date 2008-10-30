@@ -4,7 +4,7 @@
 	<testcase classname="xmlrunner.tests.testsuite_cases.MixedTestCase" name="test_failure" time="0.000">
 		<failure message="" type="AssertionError">
 <![CDATA[Traceback (most recent call last):
-  File "{{PATH}}/xmlrunner/tests/testsuite_cases.py", line 34, in test_failure
+  File "{{PATH}}/src/xmlrunner/tests/testsuite_cases.py", line 34, in test_failure
     self.assertTrue(None)
 AssertionError
 ]]>		</failure>
@@ -12,7 +12,7 @@ AssertionError
 	<testcase classname="xmlrunner.tests.testsuite_cases.MixedTestCase" name="test_errord" time="0.000">
 		<error message="unsupported operand type(s) for +: 'NoneType' and 'int'" type="TypeError">
 <![CDATA[Traceback (most recent call last):
-  File "{{PATH}}/xmlrunner/tests/testsuite_cases.py", line 37, in test_errord
+  File "{{PATH}}/src/xmlrunner/tests/testsuite_cases.py", line 37, in test_errord
     None + 1
 TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'
 ]]>		</error>

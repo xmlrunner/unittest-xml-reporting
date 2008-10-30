@@ -1,2 +1,2 @@
 # Test fixtures
-include xmlrunner/tests/fixtures/*
+include src/xmlrunner/tests/fixtures/*

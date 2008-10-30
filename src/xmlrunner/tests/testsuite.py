@@ -4,12 +4,11 @@
 """Executable module to test unittest-xml-reporting.
 """
 
-import unittest
-
 import os
-import xmlrunner
 from StringIO import StringIO
 import testsuite_cases as testcases
+import unittest
+import xmlrunner
 
 
 class XMLTestRunnerTestCase(unittest.TestCase):
@@ -17,7 +16,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
     """
     
     # Directory where the fixtures are placed
-    TEST_FIXTURES_DIR = 'xmlrunner/tests/fixtures'
+    TEST_FIXTURES_DIR = 'src/xmlrunner/tests/fixtures'
     
     def _fixture(name):
         "Read the content of a XML fixture."

@@ -1,6 +1,8 @@
 unittest-xml-reporting
 ----------------------
 
+    http://github.com/danielfm/unittest-xml-reporting/tree/master/
+
 unittest-xml-reporting is a PyUnit-based TestRunner that can export test
 results to XML files that can be consumed by a wide range of tools, such as
 build systems, IDEs and continuous integration servers.
@@ -9,8 +11,8 @@ build systems, IDEs and continuous integration servers.
 Installation
 ------------
 
-The easiest way to install unittest-xml-reporting is via EasyInstall[5].
-Follow these[6] instructions to install EasyInstall if you don't have it
+The easiest way to install unittest-xml-reporting is via EasyInstall[1].
+Follow these[2] instructions to install EasyInstall if you don't have it
 already.
 
 Then, execute the following command line to install the latest stable version
@@ -35,12 +37,8 @@ Or get the latest *development* version as a tarball:
 Links
 -----
 
-[1] Official website - http://github.com/danielfm/unittest-xml-reporting/tree/master/
-[2] JUnit            - http://junit.org/
-[3] CruiseControl    - http://cruisecontrol.sourceforge.net/
-[4] Hudson           - http://hudson.dev.java.net/
-[5] EasyInstall      - http://peak.telecommunity.com/DevCenter/EasyInstall
-[6] Setuptools       - http://pypi.python.org/pypi/setuptools
+[1] EasyInstall      - http://peak.telecommunity.com/DevCenter/EasyInstall
+[2] Setuptools       - http://pypi.python.org/pypi/setuptools
 
 
 Authors
