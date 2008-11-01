@@ -23,7 +23,7 @@ of unittest-xml-reporting:
 If you use Git and want to get the latest *development* version:
 
     $ git clone git://github.com/danielfm/unittest-xml-reporting.git
-    $ cd unittest-xml-reporting.git
+    $ cd unittest-xml-reporting
     $ sudo python setup.py install
 
 Or get the latest *development* version as a tarball:
