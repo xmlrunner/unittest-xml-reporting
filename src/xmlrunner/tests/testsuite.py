@@ -5,7 +5,7 @@
 """
 
 import os
-from StringIO import StringIO
+from cStringIO import StringIO
 import testsuite_cases as testcases
 import unittest
 import xmlrunner
@@ -40,8 +40,13 @@ class XMLTestRunnerTestCase(unittest.TestCase):
     def setUp(self):
         "Setup the objects needed to run the tests."
         self.stream = StringIO()
+        self.fake_stream = StringIO()
         self.runner = xmlrunner.XMLTestRunner(output=self.stream, \
-            stream=StringIO(), elapsed_times=False)
+            stream=self.fake_stream, elapsed_times=False)
+    
+    def tearDown(self):
+        self.stream.close()
+        self.fake_stream.close()
     
     def test_empty_test_class(self):
         "Empty test class should not generate a XML file."

@@ -263,11 +263,12 @@ class _XMLTestResult(_TextTestResult):
             xml_content = doc.toprettyxml(indent='\t')
             
             if type(test_runner.output) is str:
-                # Save the XML file to the disk
                 report_file = file('%s%sTEST-%s.xml' % \
                     (test_runner.output, os.sep, suite), 'w')
-                report_file.write(xml_content)
-                report_file.close()
+                try:
+                    report_file.write(xml_content)
+                finally:
+                    report_file.close()
             else:
                 # Assume that test_runner.output is a stream
                 test_runner.output.write(xml_content)
@@ -301,7 +302,6 @@ class XMLTestRunner(TextTestRunner):
     
     def _restore_standard_output(self):
         "Restore the stdout and stderr streams."
-        self.stderr.close()
         (sys.stdout, sys.stderr) = (self.old_stdout, self.old_stderr)
     
     def run(self, test):
