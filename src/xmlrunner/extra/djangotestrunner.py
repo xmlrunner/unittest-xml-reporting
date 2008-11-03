@@ -37,11 +37,6 @@ from django.test.simple import *
 import xmlrunner
 
 
-def default_settings(module, attr, default_value):
-    "Sets a value to the settings if it can't be found."
-    if not hasattr(module, attr):
-        setattr(module, attr, default_value)
-
 def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     """
     Run the unit tests for all the test labels in the provided list.
@@ -64,9 +59,11 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     setup_test_environment()
     
     settings.DEBUG = False
-    default_settings(settings, 'TEST_OUTPUT_VERBOSE', False)
-    default_settings(settings, 'TEST_OUTPUT_DESCRIPTIONS', False)
-    default_settings(settings, 'TEST_OUTPUT_DIR', '.')
+    
+    verbose = getattr(settings, 'TEST_OUTPUT_VERBOSE', False)
+    descriptions = getattr(settings, 'TEST_OUTPUT_DESCRIPTIONS', False)
+    output = getattr(settings, 'TEST_OUTPUT_DIR', '.')
+    
     suite = unittest.TestSuite()
     
     if test_labels:
@@ -88,9 +85,7 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     connection.creation.create_test_db(verbosity, autoclobber=not interactive)
     
     result = xmlrunner.XMLTestRunner(
-        verbose=settings.TEST_OUTPUT_VERBOSE, \
-        descriptions=settings.TEST_OUTPUT_DESCRIPTIONS, \
-        output=settings.TEST_OUTPUT_DIR).run(suite)
+        verbose=verbose, descriptions=descriptions, output=output).run(suite)
     
     connection.creation.destroy_test_db(old_name, verbosity)
     
