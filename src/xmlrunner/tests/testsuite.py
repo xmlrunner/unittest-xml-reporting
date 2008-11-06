@@ -45,6 +45,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             stream=self.fake_stream, elapsed_times=False)
     
     def tearDown(self):
+        "Free resources after each test."
         self.stream.close()
         self.fake_stream.close()
     
