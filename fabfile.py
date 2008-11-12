@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"Build script."
+
 set(
     project = 'unittest-xml-reporting',
     
