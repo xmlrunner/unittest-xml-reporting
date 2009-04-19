@@ -11,7 +11,7 @@ The script below, adapted from the unittest documentation, shows how to use
 XMLTestRunner in a very simple way. In fact, the only difference between this
 script and the original one is the last line:
 
-import random
+import random.
 import unittest
 import xmlrunner
 
@@ -202,13 +202,20 @@ class _XMLTestResult(_TextTestResult):
     
     _report_testsuite = staticmethod(_report_testsuite)
     
+    def _test_method_name(test_method):
+        "Returns the test method name."
+        test_id = test_method.id()
+        return test_id.split('.')[-1]
+    
+    _test_method_name = staticmethod(_test_method_name)
+    
     def _report_testcase(suite_name, test_result, xml_testsuite, xml_document):
         "Appends a testcase section to the XML document."
         testcase = xml_document.createElement('testcase')
         xml_testsuite.appendChild(testcase)
         
         testcase.setAttribute('classname', suite_name)
-        testcase.setAttribute('name', test_result.test_method._testMethodName)
+        testcase.setAttribute('name', _XMLTestResult._test_method_name(test_result.test_method))
         testcase.setAttribute('time', '%.3f' % test_result.get_elapsed_time())
         
         if (test_result.outcome != _TestInfo.SUCCESS):
@@ -217,7 +224,7 @@ class _XMLTestResult(_TextTestResult):
             testcase.appendChild(failure)
             
             failure.setAttribute('type', test_result.err[0].__name__)
-            failure.setAttribute('message', test_result.err[1].message)
+            failure.setAttribute('message', str(test_result.err[1]))
             
             error_info = test_result.get_error_info()
             failureText = xml_document.createCDATASection(error_info)
@@ -350,6 +357,7 @@ class XMLTestRunner(TextTestRunner):
             self.stream.writeln('Generating XML reports...')
             result.generate_reports(self)
         finally:
+            pass
             self._restore_standard_output()
         
         return result
