@@ -114,7 +114,7 @@ class _XMLTestResult(_TextTestResult):
                 self.start_time = self.stop_time = 0
             
             if self.showAll:
-                self.stream.writeln('%s (%.3fs)' % \
+                self.stream.writeln('   %s (%.3fs)\n' % \
                     (verbose_str, test_info.get_elapsed_time()))
             elif self.dots:
                 self.stream.write(short_str)
@@ -139,9 +139,9 @@ class _XMLTestResult(_TextTestResult):
         
         if self.showAll:
             self.stream.write('  ' + self.getDescription(test))
-            self.stream.write(" ... ")
+            self.stream.write(" ... \n")
 
-        self.patch_standard_output()
+        self._patch_standard_output()
 
     
     def stopTest(self, test):
@@ -231,36 +231,36 @@ class _XMLTestResult(_TextTestResult):
     
     _test_method_name = staticmethod(_test_method_name)
     
-    def _report_testcase(suite_name, test_result, xml_testsuite, xml_document):
+    def _report_testcase(suite_name, test_info, xml_testsuite, xml_document):
         "Appends a testcase section to the XML document."
         testcase = xml_document.createElement('testcase')
         xml_testsuite.appendChild(testcase)
         
         testcase.setAttribute('classname', suite_name)
-        testcase.setAttribute('name', _XMLTestResult._test_method_name(test_result.test_method))
-        testcase.setAttribute('time', '%.3f' % test_result.get_elapsed_time())
+        testcase.setAttribute('name', _XMLTestResult._test_method_name(test_info.test_method))
+        testcase.setAttribute('time', '%.3f' % test_info.get_elapsed_time())
         
-        if (test_result.outcome != _TestInfo.SUCCESS):
-            elem_name = ('failure', 'error')[test_result.outcome-1]
+        if (test_info.outcome != _TestInfo.SUCCESS):
+            elem_name = ('failure', 'error')[test_info.outcome-1]
             failure = xml_document.createElement(elem_name)
             testcase.appendChild(failure)
             
-            failure.setAttribute('type', test_result.err[0].__name__)
-            failure.setAttribute('message', str(test_result.err[1]))
+            failure.setAttribute('type', test_info.err[0].__name__)
+            failure.setAttribute('message', str(test_info.err[1]))
             
-            error_info = test_result.get_error_info()
+            error_info = test_info.get_error_info()
             failureText = xml_document.createCDATASection(error_info)
             failure.appendChild(failureText)
 
         systemout = xml_document.createElement('system-out')
 	testcase.appendChild(systemout)
-	stdout = test_result.stdout.getvalue()
+	stdout = test_info.test_result.stdout.getvalue()
 	systemout_text = xml_document.createCDATASection(stdout)
 	systemout.appendChild(systemout_text)
 	
 	systemerr = xml_document.createElement('system-err')
         testcase.appendChild(systemerr)
-        stderr = test_result.stderr.getvalue()
+        stderr = test_info.test_result.stderr.getvalue()
         systemerr_text = xml_document.createCDATASection(stderr)
         systemerr.appendChild(systemerr_text)
 	
