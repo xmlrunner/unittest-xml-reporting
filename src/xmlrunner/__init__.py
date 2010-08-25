@@ -92,6 +92,11 @@ class _XMLTestResult(_TextTestResult):
         self.successes = []
         self.callback = None
         self.elapsed_times = elapsed_times
+	self.output = None
+	self.old_stdout = None
+	self.old_stderr = None
+	self.stdout = None
+	self.stderr = None
     
     def _prepare_callback(self, test_info, target_list, verbose_str,
         short_str):
@@ -115,6 +120,18 @@ class _XMLTestResult(_TextTestResult):
                 self.stream.write(short_str)
         self.callback = callback
     
+    def _patch_standard_output(self):
+        """Replace the stdout and stderr streams with string-based streams
+        in order to capture the tests' output.
+        """
+        (self.old_stdout, self.old_stderr) = (sys.stdout, sys.stderr)
+        (sys.stdout, sys.stderr) = (self.stdout, self.stderr) = \
+            (StringIO(), StringIO())
+
+    def _restore_standard_output(self):
+        "Restore the stdout and stderr streams."
+        (sys.stdout, sys.stderr) = (self.old_stdout, self.old_stderr)
+
     def startTest(self, test):
         "Called before execute each test method."
         self.start_time = time.time()
@@ -123,11 +140,16 @@ class _XMLTestResult(_TextTestResult):
         if self.showAll:
             self.stream.write('  ' + self.getDescription(test))
             self.stream.write(" ... ")
+
+        self.patch_standard_output()
+
     
     def stopTest(self, test):
         "Called after execute each test method."
         _TextTestResult.stopTest(self, test)
         self.stop_time = time.time()
+
+	self._restore_standard_output()
         
         if self.callback and callable(self.callback):
             self.callback()
@@ -229,7 +251,19 @@ class _XMLTestResult(_TextTestResult):
             error_info = test_result.get_error_info()
             failureText = xml_document.createCDATASection(error_info)
             failure.appendChild(failureText)
-    
+
+        systemout = xml_document.createElement('system-out')
+	testcase.appendChild(systemout)
+	stdout = test_result.stdout.getvalue()
+	systemout_text = xml_document.createCDATASection(stdout)
+	systemout.appendChild(systemout_text)
+	
+	systemerr = xml_document.createElement('system-err')
+        testcase.appendChild(systemerr)
+        stderr = test_result.stderr.getvalue()
+        systemerr_text = xml_document.createCDATASection(stderr)
+        systemerr.appendChild(systemerr_text)
+	
     _report_testcase = staticmethod(_report_testcase)
     
     def _report_output(test_runner, xml_testsuite, xml_document):
