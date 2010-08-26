@@ -53,12 +53,14 @@ class _TestInfo(object):
     # Possible test outcomes
     (SUCCESS, FAILURE, ERROR) = range(3)
     
-    def __init__(self, test_result, test_method, outcome=SUCCESS, err=None):
+    def __init__(self, test_result, test_method, outcome=SUCCESS, err=None, stdout=StringIO(), stderr=StringIO()):
         "Create a new instance of _TestInfo."
         self.test_result = test_result
         self.test_method = test_method
         self.outcome = outcome
         self.err = err
+	self.stdout = stdout
+	self.stderr = stderr
     
     def get_elapsed_time(self):
         """Return the time that shows how long the test method took to
@@ -158,17 +160,17 @@ class _XMLTestResult(_TextTestResult):
     def addSuccess(self, test):
         "Called when a test executes successfully."
         self._prepare_callback(_TestInfo(self, test), \
-            self.successes, 'OK', '.')
+            self.successes, 'OK', '.', self.stdout, self.stderr)
     
     def addFailure(self, test, err):
         "Called when a test method fails."
         self._prepare_callback(_TestInfo(self, test, _TestInfo.FAILURE, err), \
-            self.failures, 'FAIL', 'F')
+            self.failures, 'FAIL', 'F', self.stdout, self.stderr)
     
     def addError(self, test, err):
         "Called when a test method raises an error."
         self._prepare_callback(_TestInfo(self, test, _TestInfo.ERROR, err), \
-            self.errors, 'ERROR', 'E')
+            self.errors, 'ERROR', 'E', self.stdout, self.stderr)
     
     def printErrorList(self, flavour, errors):
         "Write some information about the FAIL or ERROR to the stream."
