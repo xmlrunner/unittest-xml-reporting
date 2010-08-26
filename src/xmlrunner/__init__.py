@@ -61,7 +61,7 @@ class _TestInfo(object):
         self.err = err
 	self.stdout = stdout
 	self.stderr = stderr
-    
+
     def get_elapsed_time(self):
         """Return the time that shows how long the test method took to
         execute.
@@ -159,18 +159,19 @@ class _XMLTestResult(_TextTestResult):
     
     def addSuccess(self, test):
         "Called when a test executes successfully."
-        self._prepare_callback(_TestInfo(self, test), \
-            self.successes, 'OK', '.', self.stdout, self.stderr)
+
+        self._prepare_callback(_TestInfo(self, test, stdout = self.stdout, stderr = self.stderr), \
+            self.successes, 'OK', '.')
     
     def addFailure(self, test, err):
         "Called when a test method fails."
-        self._prepare_callback(_TestInfo(self, test, _TestInfo.FAILURE, err), \
-            self.failures, 'FAIL', 'F', self.stdout, self.stderr)
+        self._prepare_callback(_TestInfo(self, test, _TestInfo.FAILURE, err, stdout = self.stdout, stderr = self.stderr), \
+            self.failures, 'FAIL', 'F')
     
     def addError(self, test, err):
         "Called when a test method raises an error."
-        self._prepare_callback(_TestInfo(self, test, _TestInfo.ERROR, err), \
-            self.errors, 'ERROR', 'E', self.stdout, self.stderr)
+        self._prepare_callback(_TestInfo(self, test, _TestInfo.ERROR, err, stdout = self.stdout, stderr = self.stderr), \
+            self.errors, 'ERROR', 'E')
     
     def printErrorList(self, flavour, errors):
         "Write some information about the FAIL or ERROR to the stream."
@@ -256,13 +257,13 @@ class _XMLTestResult(_TextTestResult):
 
         systemout = xml_document.createElement('system-out')
 	testcase.appendChild(systemout)
-	stdout = test_info.test_result.stdout.getvalue()
+	stdout = test_info.stdout.getvalue()
 	systemout_text = xml_document.createCDATASection(stdout)
 	systemout.appendChild(systemout_text)
 	
 	systemerr = xml_document.createElement('system-err')
         testcase.appendChild(systemerr)
-        stderr = test_info.test_result.stderr.getvalue()
+        stderr = test_info.stderr.getvalue()
         systemerr_text = xml_document.createCDATASection(stderr)
         systemerr.appendChild(systemerr_text)
 	
