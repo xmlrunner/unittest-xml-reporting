@@ -1,41 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""unittest-xml-reporting is a PyUnit-based TestRunner that can export test
-results to XML files that can be consumed by a wide range of tools, such as
-build systems, IDEs and Continuous Integration servers.
-
-This module provides the XMLTestRunner class, which is heavily based on the
-default TextTestRunner. This makes the XMLTestRunner very simple to use.
-
-The script below, adapted from the unittest documentation, shows how to use
-XMLTestRunner in a very simple way. In fact, the only difference between this
-script and the original one is the last line:
-
-import random.
-import unittest
-import xmlrunner
-
-class TestSequenceFunctions(unittest.TestCase):
-    def setUp(self):
-        self.seq = range(10)
-
-    def test_shuffle(self):
-        # make sure the shuffled sequence does not lose any elements
-        random.shuffle(self.seq)
-        self.seq.sort()
-        self.assertEqual(self.seq, range(10))
-
-    def test_choice(self):
-        element = random.choice(self.seq)
-        self.assert_(element in self.seq)
-
-    def test_sample(self):
-        self.assertRaises(ValueError, random.sample, self.seq, 20)
-        for element in random.sample(self.seq, 5):
-            self.assert_(element in self.seq)
-
-if __name__ == '__main__':
-    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
+"""This module provides the XMLTestRunner class, which is heavily based on the
+default TextTestRunner.
 """
 
 import os
