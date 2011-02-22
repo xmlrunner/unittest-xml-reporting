@@ -8,7 +8,11 @@ how to configure a custom TestRunner in a Django project, please read the
 Django docs website.
 """
 
-from django.test.simple import *
+from django.conf import settings
+from django.utils import unittest
+from django.db.models import get_app, get_apps
+from django.test.utils import setup_test_environment, teardown_test_environment
+from django.test.simple import build_suite, build_test
 import xmlrunner
 
 class XMLTestRunner(DjangoTestSuiteRunner):
