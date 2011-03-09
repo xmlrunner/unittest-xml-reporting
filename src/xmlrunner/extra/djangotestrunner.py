@@ -12,7 +12,7 @@ from django.conf import settings
 from django.utils import unittest
 from django.db.models import get_app, get_apps
 from django.test.utils import setup_test_environment, teardown_test_environment
-from django.test.simple import build_suite, build_test
+from django.test.simple import build_suite, build_test, DjangoTestSuiteRunner
 import xmlrunner
 
 class XMLTestRunner(DjangoTestSuiteRunner):
