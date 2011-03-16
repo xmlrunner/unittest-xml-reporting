@@ -9,7 +9,11 @@ Django docs website.
 """
 
 from django.conf import settings
-from django.utils import unittest
+try:
+	from django.utils import unittest
+except ImportError: #only available in Django1.3+ http://docs.djangoproject.com/en/dev/topics/testing/#writing-unit-tests
+	import unittest #we just defeault to the basic unittest 
+	
 from django.db.models import get_app, get_apps
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.test.simple import build_suite, build_test, DjangoTestSuiteRunner
