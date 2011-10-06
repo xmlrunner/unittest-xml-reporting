@@ -73,6 +73,16 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self._run_test_class(testcases.MixedTestCase, \
             'mixed_test_case')
 
+    def test_unicode_exception_test_case(self):
+        "Check that unicode inside exception does not crash."
+
+        # 2.7+ and 3.2+ unittests module includes a diff with some assertions
+        if hasattr(self, "maxDiff"):
+            expected = 'unicode_error_diff'
+        else:
+            expected = 'unicode_error_nodiff'
+        self._run_test_class(testcases.UnicodeTestSuite, \
+            expected)
 
 if __name__ == '__main__':
     unittest.main()

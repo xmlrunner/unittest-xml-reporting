@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <testsuite errors="1" failures="0" name="xmlrunner.tests.testsuite_cases.ErrordTestCase" tests="1" time="0.000">
 	<testcase classname="xmlrunner.tests.testsuite_cases.ErrordTestCase" name="test_errord" time="0.000">
 		<error message="unsupported operand type(s) for +: 'NoneType' and 'int'" type="TypeError">

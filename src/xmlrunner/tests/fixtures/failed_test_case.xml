@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <testsuite errors="0" failures="1" name="xmlrunner.tests.testsuite_cases.FailedTestCase" tests="1" time="0.000">
 	<testcase classname="xmlrunner.tests.testsuite_cases.FailedTestCase" name="test_failure" time="0.000">
 		<failure message="" type="AssertionError">

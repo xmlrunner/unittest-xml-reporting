@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <testsuite errors="1" failures="1" name="xmlrunner.tests.testsuite_cases.MixedTestCase" tests="3" time="0.000">
 	<testcase classname="xmlrunner.tests.testsuite_cases.MixedTestCase" name="test_success" time="0.000"/>
 	<testcase classname="xmlrunner.tests.testsuite_cases.MixedTestCase" name="test_failure" time="0.000">
