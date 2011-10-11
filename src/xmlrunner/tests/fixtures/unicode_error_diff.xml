@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuite errors="0" failures="1" name="xmlrunner.tests.testsuite_cases.UnicodeTestSuite" tests="1" time="0.000">
+	<testcase classname="xmlrunner.tests.testsuite_cases.UnicodeTestSuite" name="test_pouet" time="0.000">
+		<failure message="u'caf\xe9' != u'caffe'
+- café
++ caffe
+" type="AssertionError">
+<![CDATA[Traceback (most recent call last):
+  File "{{PATH}}/src/xmlrunner/tests/testsuite_cases.py", line 41, in test_pouet
+    self.assertEqual(u"café", u"caffe")
+AssertionError: u'caf\xe9' != u'caffe'
+- caf\xe9
++ caffe
+
+]]>		</failure>
+	</testcase>
+	<system-out>
+<![CDATA[]]>	</system-out>
+	<system-err>
+<![CDATA[]]>	</system-err>
+</testsuite>

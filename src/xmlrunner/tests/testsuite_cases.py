@@ -35,3 +35,7 @@ class MixedTestCase(unittest.TestCase):
     
     def test_errord(self):
         None + 1
+
+class UnicodeTestSuite(unittest.TestCase):
+    def test_pouet(self):
+        self.assertEqual(u"café", u"caffe")

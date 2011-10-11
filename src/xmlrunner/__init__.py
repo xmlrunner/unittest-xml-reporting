@@ -190,9 +190,9 @@ class _XMLTestResult(_TextTestResult):
             testcase.appendChild(failure)
             
             failure.setAttribute('type', test_result.err[0].__name__)
-            failure.setAttribute('message', str(test_result.err[1]))
+            failure.setAttribute('message', unicode(test_result.err[1]))
             
-            error_info = test_result.get_error_info()
+            error_info = unicode(test_result.get_error_info(), "utf-8")
             failureText = xml_document.createCDATASection(error_info)
             failure.appendChild(failureText)
     
@@ -233,7 +233,7 @@ class _XMLTestResult(_TextTestResult):
             for test in tests:
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
             _XMLTestResult._report_output(test_runner, testsuite, doc)
-            xml_content = doc.toprettyxml(indent='\t')
+            xml_content = doc.toprettyxml(indent='\t', encoding="utf-8")
             
             if type(test_runner.output) is str:
                 report_file = file('%s%sTEST-%s.xml' % \
