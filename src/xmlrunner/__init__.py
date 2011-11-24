@@ -221,7 +221,7 @@ class _XMLTestResult(_TextTestResult):
         from xml.dom.minidom import Document
         all_results = self._get_info_by_testcase()
         
-        if type(test_runner.output) == str and not \
+        if isinstance(test_runner.output, basestring) and not \
             os.path.exists(test_runner.output):
             os.makedirs(test_runner.output)
         
