@@ -265,8 +265,8 @@ class _XMLTestResult(_TextTestResult):
             xml_content = doc.toprettyxml(indent='\t', encoding="utf-8")
 
             if type(test_runner.output) is str:
-                report_file = file('%s%sTEST-%s.xml' % \
-                    (test_runner.output, os.sep, suite), 'w')
+                report_file = file('%s%sTEST-%s-%s.xml' % \
+                    (test_runner.output, os.sep, suite, test_runner.outsuffix), 'w')
                 try:
                     report_file.write(xml_content)
                 finally:
@@ -279,11 +279,16 @@ class _XMLTestResult(_TextTestResult):
 class XMLTestRunner(TextTestRunner):
     """A test runner class that outputs the results in JUnit like XML files.
     """
-    def __init__(self, output='.', stream=sys.stderr, descriptions=True, \
-        verbose=1, elapsed_times=True):
-        TextTestRunner.__init__(self, stream, descriptions, verbose)
-        self.verbosity = verbose
+    def __init__(self, output='.', outsuffix = None, stream=sys.stderr, descriptions=True, \
+        verbose=False, elapsed_times=True):
+        "Create a new instance of XMLTestRunner."
+        verbosity = (1, 2)[verbose]
+        TextTestRunner.__init__(self, stream, descriptions, verbosity)
         self.output = output
+        if outsuffix:
+          self.outsuffix = outsuffix
+        else:
+          self.outsuffix = time.time()
         self.elapsed_times = elapsed_times
 
     def _make_result(self):
