@@ -24,13 +24,13 @@ class _TestInfo(object):
         self.test_result = test_result
         self.test_method = test_method
         self.outcome = outcome
+        self.elapsed_time = 0
         self.err = err
     
-    def get_elapsed_time(self):
-        """Return the time that shows how long the test method took to
-        execute.
-        """
-        return self.test_result.stop_time - self.test_result.start_time
+    def test_finished(self):
+        "Save info that can only be calculated once a test has run."
+        self.elapsed_time = \
+            self.test_result.stop_time - self.test_result.start_time
     
     def get_description(self):
         "Return a text representation of the test method."
@@ -70,13 +70,15 @@ class _XMLTestResult(_TextTestResult):
             as well as the elapsed time.
             """
             
+            test_info.test_finished()
+            
             # Ignore the elapsed times for a more reliable unit testing
             if not self.elapsed_times:
                 self.start_time = self.stop_time = 0
             
             if self.showAll:
                 self.stream.writeln('%s (%.3fs)' % \
-                    (verbose_str, test_info.get_elapsed_time()))
+                    (verbose_str, test_info.elapsed_time))
             elif self.dots:
                 self.stream.write(short_str)
         self.callback = callback
@@ -119,7 +121,7 @@ class _XMLTestResult(_TextTestResult):
         for test_info in errors:
             self.stream.writeln(self.separator1)
             self.stream.writeln('%s [%.3fs]: %s' % \
-                (flavour, test_info.get_elapsed_time(), \
+                (flavour, test_info.elapsed_time, \
                 test_info.get_description()))
             self.stream.writeln(self.separator2)
             self.stream.writeln('%s' % test_info.get_error_info())
@@ -156,7 +158,7 @@ class _XMLTestResult(_TextTestResult):
         testsuite.setAttribute('tests', str(len(tests)))
         
         testsuite.setAttribute('time', '%.3f' % \
-            sum(map(lambda e: e.get_elapsed_time(), tests)))
+            sum(map(lambda e: e.elapsed_time, tests)))
         
         failures = filter(lambda e: e.outcome==_TestInfo.FAILURE, tests)
         testsuite.setAttribute('failures', str(len(failures)))
@@ -182,7 +184,7 @@ class _XMLTestResult(_TextTestResult):
         
         testcase.setAttribute('classname', suite_name)
         testcase.setAttribute('name', _XMLTestResult._test_method_name(test_result.test_method))
-        testcase.setAttribute('time', '%.3f' % test_result.get_elapsed_time())
+        testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
         
         if (test_result.outcome != _TestInfo.SUCCESS):
             elem_name = ('failure', 'error')[test_result.outcome-1]
