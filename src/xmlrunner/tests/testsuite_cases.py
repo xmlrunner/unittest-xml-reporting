@@ -3,7 +3,7 @@
 """This module contains several test cases that is used to test the
 correctness of the XML output.
 """
-
+import time
 import unittest
 
 
@@ -39,3 +39,10 @@ class MixedTestCase(unittest.TestCase):
 class UnicodeTestSuite(unittest.TestCase):
     def test_pouet(self):
         self.assertEqual(u"café", u"caffe")
+
+class SeparateTimerTestCase(unittest.TestCase):
+    def test_run_for_100ms(self):
+        time.sleep(0.100)
+
+    def test_run_for_50ms(self):
+        time.sleep(0.050)
