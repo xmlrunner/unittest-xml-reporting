@@ -150,7 +150,7 @@ class _XMLTestResult(_TextTestResult):
             self.stream.writeln(self.separator2)
             self.stream.writeln('%s' % test_info.get_error_info())
 
-    def _get_info_by_testcase(self):
+    def _get_info_by_testcase(self, outsuffix):
         """Organizes test results by TestCase module. This information is
         used during the report generation, where a XML report will be created
         for each TestCase.
@@ -165,7 +165,7 @@ class _XMLTestResult(_TextTestResult):
                 module = testcase.__module__ + '.'
                 if module == '__main__.':
                     module = ''
-                testcase_name = module + testcase.__name__
+                testcase_name = module + testcase.__name__ + outsuffix
 
                 if not tests_by_testcase.has_key(testcase_name):
                     tests_by_testcase[testcase_name] = []
@@ -248,7 +248,7 @@ class _XMLTestResult(_TextTestResult):
         """Generates the XML reports to a given XMLTestRunner object.
         """
         from xml.dom.minidom import Document
-        all_results = self._get_info_by_testcase()
+        all_results = self._get_info_by_testcase(test_runner.outsuffix)
 
         if isinstance(test_runner.output, basestring) and not \
             os.path.exists(test_runner.output):
@@ -288,7 +288,7 @@ class XMLTestRunner(TextTestRunner):
         if outsuffix:
           self.outsuffix = outsuffix
         else:
-          self.outsuffix = time.time()
+          self.outsuffix = str(time.time())
         self.elapsed_times = elapsed_times
 
     def _make_result(self):
