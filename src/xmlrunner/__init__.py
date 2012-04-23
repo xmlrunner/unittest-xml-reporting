@@ -126,7 +126,7 @@ class _XMLTestResult(_TextTestResult):
             self.stream.writeln(self.separator2)
             self.stream.writeln('%s' % test_info.get_error_info())
     
-    def _get_info_by_testcase(self):
+    def _get_info_by_testcase(self, outsuffix):
         """This method organizes test results by TestCase module. This
         information is used during the report generation, where a XML report
         will be generated for each TestCase.
@@ -141,7 +141,7 @@ class _XMLTestResult(_TextTestResult):
                 module = testcase.__module__ + '.'
                 if module == '__main__.':
                     module = ''
-                testcase_name = module + testcase.__name__
+                testcase_name = module + testcase.__name__ + outsuffix
                 
                 if not tests_by_testcase.has_key(testcase_name):
                     tests_by_testcase[testcase_name] = []
@@ -221,7 +221,7 @@ class _XMLTestResult(_TextTestResult):
     def generate_reports(self, test_runner):
         "Generates the XML reports to a given XMLTestRunner object."
         from xml.dom.minidom import Document
-        all_results = self._get_info_by_testcase()
+        all_results = self._get_info_by_testcase(test_runner.outsuffix)
         
         if isinstance(test_runner.output, basestring) and not \
             os.path.exists(test_runner.output):
@@ -238,8 +238,8 @@ class _XMLTestResult(_TextTestResult):
             xml_content = doc.toprettyxml(indent='\t', encoding="utf-8")
             
             if type(test_runner.output) is str:
-                report_file = file('%s%sTEST-%s.xml' % \
-                    (test_runner.output, os.sep, suite), 'w')
+                report_file = file('%s%sTEST-%s-%s.xml' % \
+                    (test_runner.output, os.sep, suite, test_runner.outsuffix), 'w')
                 try:
                     report_file.write(xml_content)
                 finally:
@@ -252,12 +252,16 @@ class _XMLTestResult(_TextTestResult):
 class XMLTestRunner(TextTestRunner):
     """A test runner class that outputs the results in JUnit like XML files.
     """
-    def __init__(self, output='.', stream=sys.stderr, descriptions=True, \
+    def __init__(self, output='.', outsuffix = None, stream=sys.stderr, descriptions=True, \
         verbose=False, elapsed_times=True):
         "Create a new instance of XMLTestRunner."
         verbosity = (1, 2)[verbose]
         TextTestRunner.__init__(self, stream, descriptions, verbosity)
         self.output = output
+        if outsuffix:
+          self.outsuffix = outsuffix
+        else:
+          self.outsuffix = str(time.time())
         self.elapsed_times = elapsed_times
     
     def _make_result(self):
