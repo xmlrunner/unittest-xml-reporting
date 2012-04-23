@@ -253,9 +253,9 @@ class XMLTestRunner(TextTestRunner):
     """A test runner class that outputs the results in JUnit like XML files.
     """
     def __init__(self, output='.', stream=sys.stderr, descriptions=True, \
-        verbose=False, elapsed_times=True):
+        verbose=1, elapsed_times=True):
         "Create a new instance of XMLTestRunner."
-        verbosity = (1, 2)[verbose]
+        verbosity = verbose
         TextTestRunner.__init__(self, stream, descriptions, verbosity)
         self.output = output
         self.elapsed_times = elapsed_times
