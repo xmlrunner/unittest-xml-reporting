@@ -16,7 +16,10 @@ except ImportError: #only available in Django1.3+ http://docs.djangoproject.com/
 	
 from django.db.models import get_app, get_apps
 from django.test.utils import setup_test_environment, teardown_test_environment
-from django.test.simple import build_suite, build_test, DjangoTestSuiteRunner
+from django.test.simple import (
+        build_suite, build_test, DjangoTestSuiteRunner, reorder_suite
+)
+from django.test.testcases import TestCase
 import xmlrunner
 
 class XMLTestRunner(DjangoTestSuiteRunner):
@@ -62,6 +65,8 @@ class XMLTestRunner(DjangoTestSuiteRunner):
         
         for test in extra_tests:
             suite.addTest(test)
+
+        suite = reorder_suite(suite, (TestCase,))
 
         old_config = self.setup_databases()
 
