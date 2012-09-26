@@ -10,10 +10,12 @@ Django docs website.
 
 from django.conf import settings
 try:
-	from django.utils import unittest
-except ImportError: #only available in Django1.3+ http://docs.djangoproject.com/en/dev/topics/testing/#writing-unit-tests
-	import unittest #we just defeault to the basic unittest 
-	
+    # Only available in Django1.3+
+    # http://docs.djangoproject.com/en/dev/topics/testing/#writing-unit-tests
+    from django.utils import unittest
+except ImportError:
+    import unittest #we just defeault to the basic unittest
+
 from django.db.models import get_app, get_apps
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.test.simple import (
@@ -36,22 +38,22 @@ class XMLTestRunner(DjangoTestSuiteRunner):
 
         When looking for tests, the test runner will look in the models and
         tests modules for the application.
-        
+
         A list of 'extra' tests may also be provided; these tests
         will be added to the test suite.
-        
+
         Returns the number of tests that failed.
         """
         setup_test_environment()
-        
+
         settings.DEBUG = False
-        
+
         verbose = getattr(settings, 'TEST_OUTPUT_VERBOSE', False)
         descriptions = getattr(settings, 'TEST_OUTPUT_DESCRIPTIONS', False)
         output = getattr(settings, 'TEST_OUTPUT_DIR', '.')
-        
+
         suite = unittest.TestSuite()
-        
+
         if test_labels:
             for label in test_labels:
                 if '.' in label:
@@ -62,7 +64,7 @@ class XMLTestRunner(DjangoTestSuiteRunner):
         else:
             for app in get_apps():
                 suite.addTest(build_suite(app))
-        
+
         for test in extra_tests:
             suite.addTest(test)
 
@@ -72,8 +74,8 @@ class XMLTestRunner(DjangoTestSuiteRunner):
 
         result = xmlrunner.XMLTestRunner(
             verbose=verbose, descriptions=descriptions, output=output).run(suite)
-        
+
         self.teardown_databases(old_config)
         teardown_test_environment()
-        
+
         return len(result.failures) + len(result.errors)
