@@ -26,6 +26,5 @@ setup(
     package_dir = {'':'src'},
     zip_safe = False,
     include_package_data = True,
-    test_suite = 'xmlrunner.tests.testsuite',
+    test_suite = 'xmlrunner.tests.testsuite'
 )
-
