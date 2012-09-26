@@ -281,9 +281,8 @@ class XMLTestRunner(TextTestRunner):
     """
     def __init__(self, output='.', outsuffix = None, stream=sys.stderr, descriptions=True, \
         verbose=False, elapsed_times=True):
-        "Create a new instance of XMLTestRunner."
-        verbosity = verbose
-        TextTestRunner.__init__(self, stream, descriptions, verbosity)
+        TextTestRunner.__init__(self, stream, descriptions, verbose)
+        self.verbosity = verbose
         self.output = output
         if outsuffix:
           self.outsuffix = outsuffix
