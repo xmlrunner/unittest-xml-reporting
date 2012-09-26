@@ -283,9 +283,9 @@ class XMLTestRunner(TextTestRunner):
     """A test runner class that outputs the results in JUnit like XML files.
     """
     def __init__(self, output='.', outsuffix = None, stream=sys.stderr, \
-        descriptions=True, verbose=False, elapsed_times=True):
-        TextTestRunner.__init__(self, stream, descriptions, verbose)
-        self.verbosity = verbose
+        descriptions=True, verbosity=1, elapsed_times=True):
+        TextTestRunner.__init__(self, stream, descriptions, verbosity)
+        self.verbosity = verbosity
         self.output = output
         if outsuffix:
           self.outsuffix = outsuffix
