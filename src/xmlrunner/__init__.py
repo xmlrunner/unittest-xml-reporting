@@ -9,7 +9,13 @@ import os
 import sys
 import time
 from unittest import TestResult, _TextTestResult, TextTestRunner
-from cStringIO import StringIO
+
+try:
+    # Removed in Python 3
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 
 class _DelegateIO(object):
     """This class defines an object that captures whatever is written to
@@ -167,7 +173,7 @@ class _XMLTestResult(_TextTestResult):
                     module = ''
                 testcase_name = module + testcase.__name__
 
-                if not tests_by_testcase.has_key(testcase_name):
+                if not testcase_name in tests_by_testcase:
                     tests_by_testcase[testcase_name] = []
                 tests_by_testcase[testcase_name].append(test_info)
 
@@ -186,10 +192,10 @@ class _XMLTestResult(_TextTestResult):
             sum(map(lambda e: e.elapsed_time, tests)))
 
         failures = filter(lambda e: e.outcome==_TestInfo.FAILURE, tests)
-        testsuite.setAttribute('failures', str(len(failures)))
+        testsuite.setAttribute('failures', str(len(list(failures))))
 
         errors = filter(lambda e: e.outcome==_TestInfo.ERROR, tests)
-        testsuite.setAttribute('errors', str(len(errors)))
+        testsuite.setAttribute('errors', str(len(list(errors))))
 
         return testsuite
 
@@ -220,9 +226,9 @@ class _XMLTestResult(_TextTestResult):
             testcase.appendChild(failure)
 
             failure.setAttribute('type', test_result.err[0].__name__)
-            failure.setAttribute('message', unicode(test_result.err[1]))
+            failure.setAttribute('message', str(test_result.err[1]))
 
-            error_info = unicode(test_result.get_error_info(), "utf-8")
+            error_info = str(test_result.get_error_info())
             failureText = xml_document.createCDATASection(error_info)
             failure.appendChild(failureText)
 
@@ -251,7 +257,7 @@ class _XMLTestResult(_TextTestResult):
         from xml.dom.minidom import Document
         all_results = self._get_info_by_testcase(test_runner.outsuffix)
 
-        if isinstance(test_runner.output, basestring) and not \
+        if isinstance(test_runner.output, str) and not \
             os.path.exists(test_runner.output):
             os.makedirs(test_runner.output)
 
@@ -264,10 +270,10 @@ class _XMLTestResult(_TextTestResult):
             for test in tests:
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
             _XMLTestResult._report_output(test_runner, testsuite, doc)
-            xml_content = doc.toprettyxml(indent='\t', encoding="utf-8")
+            xml_content = doc.toprettyxml(indent='\t')
 
             if type(test_runner.output) is str:
-                report_file = file('%s%sTEST-%s-%s.xml' % \
+                report_file = open('%s%sTEST-%s-%s.xml' % \
                     (test_runner.output, os.sep, suite, \
                      test_runner.outsuffix), 'w')
                 try:
