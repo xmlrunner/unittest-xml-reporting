@@ -165,7 +165,7 @@ class _XMLTestResult(_TextTestResult):
                 module = testcase.__module__ + '.'
                 if module == '__main__.':
                     module = ''
-                testcase_name = module + testcase.__name__ + outsuffix
+                testcase_name = module + testcase.__name__
 
                 if not tests_by_testcase.has_key(testcase_name):
                     tests_by_testcase[testcase_name] = []
@@ -173,13 +173,13 @@ class _XMLTestResult(_TextTestResult):
 
         return tests_by_testcase
 
-    def _report_testsuite(suite_name, tests, xml_document):
+    def _report_testsuite(suite_name, outsuffix, tests, xml_document):
         """Appends the testsuite section to the XML document.
         """
         testsuite = xml_document.createElement('testsuite')
         xml_document.appendChild(testsuite)
 
-        testsuite.setAttribute('name', suite_name)
+        testsuite.setAttribute('name', "%s-%s" % (suite_name, outsuffix))
         testsuite.setAttribute('tests', str(len(tests)))
 
         testsuite.setAttribute('time', '%.3f' % \
@@ -210,7 +210,8 @@ class _XMLTestResult(_TextTestResult):
         xml_testsuite.appendChild(testcase)
 
         testcase.setAttribute('classname', suite_name)
-        testcase.setAttribute('name', _XMLTestResult._test_method_name(test_result.test_method))
+        testcase.setAttribute('name', \
+            _XMLTestResult._test_method_name(test_result.test_method))
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
 
         if (test_result.outcome != _TestInfo.SUCCESS):
@@ -258,7 +259,8 @@ class _XMLTestResult(_TextTestResult):
             doc = Document()
 
             # Build the XML file
-            testsuite = _XMLTestResult._report_testsuite(suite, tests, doc)
+            testsuite = _XMLTestResult._report_testsuite(suite, \
+                            test_runner.outsuffix, tests, doc)
             for test in tests:
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
             _XMLTestResult._report_output(test_runner, testsuite, doc)
@@ -266,7 +268,8 @@ class _XMLTestResult(_TextTestResult):
 
             if type(test_runner.output) is str:
                 report_file = file('%s%sTEST-%s-%s.xml' % \
-                    (test_runner.output, os.sep, suite, test_runner.outsuffix), 'w')
+                    (test_runner.output, os.sep, suite, \
+                     test_runner.outsuffix), 'w')
                 try:
                     report_file.write(xml_content)
                 finally:
@@ -279,15 +282,15 @@ class _XMLTestResult(_TextTestResult):
 class XMLTestRunner(TextTestRunner):
     """A test runner class that outputs the results in JUnit like XML files.
     """
-    def __init__(self, output='.', outsuffix = None, stream=sys.stderr, descriptions=True, \
-        verbose=False, elapsed_times=True):
+    def __init__(self, output='.', outsuffix = None, stream=sys.stderr, \
+        descriptions=True, verbose=False, elapsed_times=True):
         TextTestRunner.__init__(self, stream, descriptions, verbose)
         self.verbosity = verbose
         self.output = output
         if outsuffix:
           self.outsuffix = outsuffix
         else:
-          self.outsuffix = str(time.time())
+          self.outsuffix = time.strftime("%Y%m%d%H%M%S")
         self.elapsed_times = elapsed_times
 
     def _make_result(self):
