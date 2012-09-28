@@ -9,23 +9,13 @@ Django docs website.
 """
 
 from django.conf import settings
-try:
-    # Only available in Django1.3+
-    # http://docs.djangoproject.com/en/dev/topics/testing/#writing-unit-tests
-    from django.utils import unittest
-except ImportError:
-    import unittest #we just defeault to the basic unittest
-
-from django.db.models import get_app, get_apps
+from django.test.simple import DjangoTestSuiteRunner
 from django.test.utils import setup_test_environment, teardown_test_environment
-from django.test.simple import (
-        build_suite, build_test, DjangoTestSuiteRunner, reorder_suite
-)
-from django.test.testcases import TestCase
 import xmlrunner
 
+
 class XMLTestRunner(DjangoTestSuiteRunner):
-    def run_tests(self, test_labels, verbosity=1, interactive=True, extra_tests=[]):
+    def run_tests(self, test_labels, extra_tests=None, **kwargs):
         """
         Run the unit tests for all the test labels in the provided list.
         Labels must be of the form:
@@ -54,23 +44,7 @@ class XMLTestRunner(DjangoTestSuiteRunner):
         descriptions = getattr(settings, 'TEST_OUTPUT_DESCRIPTIONS', False)
         output = getattr(settings, 'TEST_OUTPUT_DIR', '.')
 
-        suite = unittest.TestSuite()
-
-        if test_labels:
-            for label in test_labels:
-                if '.' in label:
-                    suite.addTest(build_test(label))
-                else:
-                    app = get_app(label)
-                    suite.addTest(build_suite(app))
-        else:
-            for app in get_apps():
-                suite.addTest(build_suite(app))
-
-        for test in extra_tests:
-            suite.addTest(test)
-
-        suite = reorder_suite(suite, (TestCase,))
+        suite = self.build_suite(test_labels, extra_tests)
 
         old_config = self.setup_databases()
 
