@@ -48,7 +48,7 @@ class XMLTestRunner(DjangoTestSuiteRunner):
 
         settings.DEBUG = False
 
-        verbose = getattr(settings, 'TEST_OUTPUT_VERBOSE', False)
+        verbosity = getattr(settings, 'TEST_OUTPUT_VERBOSE', 1)
         descriptions = getattr(settings, 'TEST_OUTPUT_DESCRIPTIONS', False)
         output = getattr(settings, 'TEST_OUTPUT_DIR', '.')
 
@@ -73,7 +73,8 @@ class XMLTestRunner(DjangoTestSuiteRunner):
         old_config = self.setup_databases()
 
         result = xmlrunner.XMLTestRunner(
-            verbose=verbose, descriptions=descriptions, output=output).run(suite)
+            verbosity=verbosity, descriptions=descriptions,
+            output=output).run(suite)
 
         self.teardown_databases(old_config)
         teardown_test_environment()
