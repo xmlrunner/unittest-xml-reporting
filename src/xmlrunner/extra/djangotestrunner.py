@@ -49,6 +49,8 @@ class XMLTestRunner(DjangoTestSuiteRunner):
         settings.DEBUG = False
 
         verbosity = getattr(settings, 'TEST_OUTPUT_VERBOSE', 1)
+        if isinstance(verbosity, bool):
+            verbosity = (1, 2)[verbosity]
         descriptions = getattr(settings, 'TEST_OUTPUT_DESCRIPTIONS', False)
         output = getattr(settings, 'TEST_OUTPUT_DIR', '.')
 
