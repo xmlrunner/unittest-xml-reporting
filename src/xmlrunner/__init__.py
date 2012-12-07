@@ -31,8 +31,8 @@ class _DelegateIO(object):
         self.delegate.write(text)
 
     def __getattr__(self, attr):
-	return getattr(self._captured, attr)
-	
+        return getattr(self._captured, attr)
+
 
 class _TestInfo(object):
     """This class keeps useful information about the execution of a
