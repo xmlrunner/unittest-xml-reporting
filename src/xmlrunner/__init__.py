@@ -17,6 +17,10 @@ except ImportError:
     from io import StringIO
 
 
+# Allow version to be detected at runtime.
+from .version import __version__, __version_info__
+
+
 class _DelegateIO(object):
     """This class defines an object that captures whatever is written to
     a stream or file.

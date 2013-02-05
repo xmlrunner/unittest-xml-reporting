@@ -1,10 +1,19 @@
 #!/usr/bin/env python
 
+import os
 from setuptools import setup, find_packages
+
+# Load version information
+xmlrunner_version = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    'src', 'xmlrunner', 'version.py'
+)
+exec(compile(open(xmlrunner_version).read(), xmlrunner_version, 'exec'))
+
 
 setup(
     name = 'unittest-xml-reporting',
-    version = '1.4.3',
+    version = __version__,
     author = 'Daniel Fernandes Martins',
     author_email = 'daniel.tritone@gmail.com',
     description = 'PyUnit-based test runner with JUnit like XML reporting.',
