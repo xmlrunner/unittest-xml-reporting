@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""Custom Django test runner that runs the tests using the
+"""
+Custom Django test runner that runs the tests using the
 XMLTestRunner class.
 
 This script shows how to use the XMLTestRunner in a Django project. To learn
