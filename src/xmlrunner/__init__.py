@@ -40,7 +40,7 @@ class _TestInfo(object):
     """
 
     # Possible test outcomes
-    (SUCCESS, FAILURE, ERROR) = range(3)
+    (SUCCESS, FAILURE, ERROR, SKIP) = range(4)
 
     def __init__(self, test_result, test_method, outcome=SUCCESS, err=None):
         self.test_result = test_result
@@ -144,6 +144,12 @@ class _XMLTestResult(_TextTestResult):
         """
         self._prepare_callback(_TestInfo(self, test, _TestInfo.ERROR, err), \
             self.errors, 'ERROR', 'E')
+    
+    def addSkip(self, test, err):
+        """Called when a test method was skipped.
+        """
+        self._prepare_callback(_TestInfo(self, test, _TestInfo.SKIP, err), \
+            self.skipped, 'SKIP', 'S')
 
     def printErrorList(self, flavour, errors):
         """Writes information about the FAIL or ERROR to the stream.
