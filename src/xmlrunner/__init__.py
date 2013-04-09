@@ -30,6 +30,9 @@ class _DelegateIO(object):
         self._captured.write(text)
         self.delegate.write(text)
 
+    def reset(self):
+        self._captured = StringIO()
+        
     def __getattr__(self, attr):
         return getattr(self._captured, attr)
 
@@ -169,7 +172,7 @@ class _XMLTestResult(_TextTestResult):
         """
         tests_by_testcase = {}
 
-        for tests in (self.successes, self.failures, self.errors):
+        for tests in (self.successes, self.failures, self.errors, self.skipped):
             for test_info in tests:
                 testcase = type(test_info.test_method)
 
@@ -202,6 +205,9 @@ class _XMLTestResult(_TextTestResult):
 
         errors = filter(lambda e: e.outcome==_TestInfo.ERROR, tests)
         testsuite.setAttribute('errors', str(len(list(errors))))
+        
+        skipped = filter(lambda e: e.outcome==_TestInfo.SKIP, tests)
+        testsuite.setAttribute('skipped', str(len(list(skipped))))
 
         return testsuite
 
@@ -227,16 +233,23 @@ class _XMLTestResult(_TextTestResult):
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
 
         if (test_result.outcome != _TestInfo.SUCCESS):
-            elem_name = ('failure', 'error')[test_result.outcome-1]
+            elem_name = ('failure', 'error','skipped')[test_result.outcome-1]
             failure = xml_document.createElement(elem_name)
             testcase.appendChild(failure)
+            
+            if test_result.outcome == _TestInfo.SKIP:
+                # TODO: Is this the right attribute?
+                failure.setAttribute('message', test_result.err)
+                # Force the skip reason into the standard output
+                sys.stdout.write(test_result.err)
+                
+            else:
+                failure.setAttribute('type', test_result.err[0].__name__)
+                failure.setAttribute('message', str(test_result.err[1]))
 
-            failure.setAttribute('type', test_result.err[0].__name__)
-            failure.setAttribute('message', str(test_result.err[1]))
-
-            error_info = str(test_result.get_error_info())
-            failureText = xml_document.createCDATASection(error_info)
-            failure.appendChild(failureText)
+                error_info = str(test_result.get_error_info())
+                failureText = xml_document.createCDATASection(error_info)
+                failure.appendChild(failureText)
 
     _report_testcase = staticmethod(_report_testcase)
 
@@ -247,12 +260,14 @@ class _XMLTestResult(_TextTestResult):
         xml_testsuite.appendChild(systemout)
 
         systemout_text = xml_document.createCDATASection(sys.stdout.getvalue())
+        sys.stdout.reset()
         systemout.appendChild(systemout_text)
 
         systemerr = xml_document.createElement('system-err')
         xml_testsuite.appendChild(systemerr)
 
         systemerr_text = xml_document.createCDATASection(sys.stderr.getvalue())
+        sys.stderr.reset()
         systemerr.appendChild(systemerr_text)
 
     _report_output = staticmethod(_report_output)
