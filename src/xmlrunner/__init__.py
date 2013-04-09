@@ -294,9 +294,14 @@ class _XMLTestResult(_TextTestResult):
             xml_content = doc.toprettyxml(indent='\t')
 
             if type(test_runner.output) is str:
-                report_file = open('%s%sTEST-%s-%s.xml' % \
-                    (test_runner.output, os.sep, suite, \
-                     test_runner.outsuffix), 'w')
+                if test_runner.outsuffix:
+                    report_file = open('%s%sTEST-%s-%s.xml' % \
+                        (test_runner.output, os.sep, suite, \
+                         test_runner.outsuffix), 'w')
+                else:
+                    report_file = open('%s%sTEST-%s.xml' % \
+                        (test_runner.output, os.sep, suite), 'w')
+                
                 try:
                     report_file.write(xml_content)
                 finally:
@@ -314,7 +319,7 @@ class XMLTestRunner(TextTestRunner):
         TextTestRunner.__init__(self, stream, descriptions, verbosity)
         self.verbosity = verbosity
         self.output = output
-        if outsuffix:
+        if outsuffix!=None:
           self.outsuffix = outsuffix
         else:
           self.outsuffix = time.strftime("%Y%m%d%H%M%S")
