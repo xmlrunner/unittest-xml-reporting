@@ -322,6 +322,7 @@ class _XMLTestResult(_TextTestResult):
 class XMLTestRunner(TextTestRunner):
     """A test runner class that outputs the results in JUnit like XML files.
     """
+    resultclass = _XMLTestResult
     def __init__(self, output='.', outsuffix = None, stream=sys.stderr, \
         descriptions=True, verbosity=1, elapsed_times=True):
         TextTestRunner.__init__(self, stream, descriptions, verbosity)
@@ -337,8 +338,9 @@ class XMLTestRunner(TextTestRunner):
         """Creates a TestResult object which will be used to store
         information about the executed tests.
         """
-        return _XMLTestResult(self.stream, self.descriptions, \
-            self.verbosity, self.elapsed_times)
+        result = self.resultclass(self.stream, self.descriptions, self.verbosity)
+        result.elapsed_times = self.elapsed_times 
+        return result
 
     def _patch_standard_output(self):
         """Replaces stdout and stderr streams with string-based streams
