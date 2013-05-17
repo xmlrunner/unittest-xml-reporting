@@ -30,6 +30,9 @@ class _DelegateIO(object):
         self._captured.write(text)
         self.delegate.write(text)
 
+    def reset(self):
+        self._captured = StringIO()
+        
     def __getattr__(self, attr):
         return getattr(self._captured, attr)
 
@@ -40,7 +43,7 @@ class _TestInfo(object):
     """
 
     # Possible test outcomes
-    (SUCCESS, FAILURE, ERROR) = range(3)
+    (SUCCESS, FAILURE, ERROR, SKIP) = range(4)
 
     def __init__(self, test_result, test_method, outcome=SUCCESS, err=None):
         self.test_result = test_result
@@ -48,12 +51,19 @@ class _TestInfo(object):
         self.outcome = outcome
         self.elapsed_time = 0
         self.err = err
+        self.stderr = ""
+        self.stdout = ""
 
     def test_finished(self):
         """Save info that can only be calculated once a test has run.
         """
         self.elapsed_time = \
             self.test_result.stop_time - self.test_result.start_time
+        
+        self.stdout = sys.stdout.getvalue()
+        sys.stdout.reset()
+        self.stderr = sys.stderr.getvalue()
+        sys.stderr.reset()
 
     def get_description(self):
         """Return a text representation of the test method.
@@ -144,6 +154,12 @@ class _XMLTestResult(_TextTestResult):
         """
         self._prepare_callback(_TestInfo(self, test, _TestInfo.ERROR, err), \
             self.errors, 'ERROR', 'E')
+    
+    def addSkip(self, test, err):
+        """Called when a test method was skipped.
+        """
+        self._prepare_callback(_TestInfo(self, test, _TestInfo.SKIP, err), \
+            self.skipped, 'SKIP', 'S')
 
     def printErrorList(self, flavour, errors):
         """Writes information about the FAIL or ERROR to the stream.
@@ -163,7 +179,7 @@ class _XMLTestResult(_TextTestResult):
         """
         tests_by_testcase = {}
 
-        for tests in (self.successes, self.failures, self.errors):
+        for tests in (self.successes, self.failures, self.errors, self.skipped):
             for test_info in tests:
                 testcase = type(test_info.test_method)
 
@@ -196,6 +212,9 @@ class _XMLTestResult(_TextTestResult):
 
         errors = filter(lambda e: e.outcome==_TestInfo.ERROR, tests)
         testsuite.setAttribute('errors', str(len(list(errors))))
+        
+        skipped = filter(lambda e: e.outcome==_TestInfo.SKIP, tests)
+        testsuite.setAttribute('skipped', str(len(list(skipped))))
 
         return testsuite
 
@@ -209,7 +228,7 @@ class _XMLTestResult(_TextTestResult):
 
     _test_method_name = staticmethod(_test_method_name)
 
-    def _report_testcase(suite_name, test_result, xml_testsuite, xml_document):
+    def _report_testcase(suite_name, test_result, xml_testsuite, xml_document, stdout, stderr):
         """Appends a testcase section to the XML document.
         """
         testcase = xml_document.createElement('testcase')
@@ -219,34 +238,41 @@ class _XMLTestResult(_TextTestResult):
         testcase.setAttribute('name', \
             _XMLTestResult._test_method_name(test_result.test_method))
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
+        stdout.write(test_result.stdout)
+        stderr.write(test_result.stderr)
+        
 
         if (test_result.outcome != _TestInfo.SUCCESS):
-            elem_name = ('failure', 'error')[test_result.outcome-1]
+            elem_name = ('failure', 'error','skipped')[test_result.outcome-1]
             failure = xml_document.createElement(elem_name)
             testcase.appendChild(failure)
+            
+            if test_result.outcome == _TestInfo.SKIP:
+                failure.setAttribute('message', test_result.err)
+                stderr.write(test_result.err)
+            else:
+                failure.setAttribute('type', test_result.err[0].__name__)
+                failure.setAttribute('message', str(test_result.err[1]))
 
-            failure.setAttribute('type', test_result.err[0].__name__)
-            failure.setAttribute('message', str(test_result.err[1]))
-
-            error_info = str(test_result.get_error_info())
-            failureText = xml_document.createCDATASection(error_info)
-            failure.appendChild(failureText)
+                error_info = str(test_result.get_error_info())
+                failureText = xml_document.createCDATASection(error_info)
+                failure.appendChild(failureText)
 
     _report_testcase = staticmethod(_report_testcase)
 
-    def _report_output(test_runner, xml_testsuite, xml_document):
+    def _report_output(test_runner, xml_testsuite, xml_document, stdout, stderr):
         """Appends the system-out and system-err sections to the XML document.
         """
         systemout = xml_document.createElement('system-out')
         xml_testsuite.appendChild(systemout)
 
-        systemout_text = xml_document.createCDATASection(sys.stdout.getvalue())
+        systemout_text = xml_document.createCDATASection(stdout.getvalue())
         systemout.appendChild(systemout_text)
 
         systemerr = xml_document.createElement('system-err')
         xml_testsuite.appendChild(systemerr)
 
-        systemerr_text = xml_document.createCDATASection(sys.stderr.getvalue())
+        systemerr_text = xml_document.createCDATASection(stderr.getvalue())
         systemerr.appendChild(systemerr_text)
 
     _report_output = staticmethod(_report_output)
@@ -267,15 +293,23 @@ class _XMLTestResult(_TextTestResult):
             # Build the XML file
             testsuite = _XMLTestResult._report_testsuite(suite, \
                             test_runner.outsuffix, tests, doc)
+            
+            stdout = StringIO()
+            stderr = StringIO()
             for test in tests:
-                _XMLTestResult._report_testcase(suite, test, testsuite, doc)
-            _XMLTestResult._report_output(test_runner, testsuite, doc)
+                _XMLTestResult._report_testcase(suite, test, testsuite, doc, stdout, stderr)
+            _XMLTestResult._report_output(test_runner, testsuite, doc, stdout, stderr)
             xml_content = doc.toprettyxml(indent='\t')
 
             if type(test_runner.output) is str:
-                report_file = open('%s%sTEST-%s-%s.xml' % \
-                    (test_runner.output, os.sep, suite, \
-                     test_runner.outsuffix), 'w')
+                if test_runner.outsuffix:
+                    report_file = open('%s%sTEST-%s-%s.xml' % \
+                        (test_runner.output, os.sep, suite, \
+                         test_runner.outsuffix), 'w')
+                else:
+                    report_file = open('%s%sTEST-%s.xml' % \
+                        (test_runner.output, os.sep, suite), 'w')
+                
                 try:
                     report_file.write(xml_content)
                 finally:
@@ -288,12 +322,13 @@ class _XMLTestResult(_TextTestResult):
 class XMLTestRunner(TextTestRunner):
     """A test runner class that outputs the results in JUnit like XML files.
     """
+    resultclass = _XMLTestResult
     def __init__(self, output='.', outsuffix = None, stream=sys.stderr, \
         descriptions=True, verbosity=1, elapsed_times=True):
         TextTestRunner.__init__(self, stream, descriptions, verbosity)
         self.verbosity = verbosity
         self.output = output
-        if outsuffix:
+        if outsuffix!=None:
           self.outsuffix = outsuffix
         else:
           self.outsuffix = time.strftime("%Y%m%d%H%M%S")
@@ -303,8 +338,9 @@ class XMLTestRunner(TextTestRunner):
         """Creates a TestResult object which will be used to store
         information about the executed tests.
         """
-        return _XMLTestResult(self.stream, self.descriptions, \
-            self.verbosity, self.elapsed_times)
+        result = self.resultclass(self.stream, self.descriptions, self.verbosity)
+        result.elapsed_times = self.elapsed_times 
+        return result
 
     def _patch_standard_output(self):
         """Replaces stdout and stderr streams with string-based streams
