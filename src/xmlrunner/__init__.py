@@ -39,6 +39,17 @@ class _DelegateIO(object):
         return getattr(self._captured, attr)
 
 
+def testcase_name(test_method):
+    testcase = type(test_method)
+
+    # Ignore module name if it is '__main__'
+    module = testcase.__module__ + '.'
+    if module == '__main__.':
+        module = ''
+    result = module + testcase.__name__
+    return result
+
+
 class _TestInfo(object):
     """
     This class keeps useful information about the execution of a
@@ -50,10 +61,19 @@ class _TestInfo(object):
 
     def __init__(self, test_result, test_method, outcome=SUCCESS, err=None):
         self.test_result = test_result
-        self.test_method = test_method
         self.outcome = outcome
         self.elapsed_time = 0
         self.err = err
+
+        self.test_description = self.test_result.getDescription(test_method)
+        self.test_exception_info = (
+            '' if not self.err
+            else self.test_result._exc_info_to_string(
+                    self.err, test_method)
+        )
+
+        self.test_name = testcase_name(test_method)
+        self.test_id = test_method.id()
 
     def test_finished(self):
         """Save info that can only be calculated once a test has run.
@@ -65,16 +85,14 @@ class _TestInfo(object):
         """
         Return a text representation of the test method.
         """
-        return self.test_result.getDescription(self.test_method)
+        return self.test_description
 
     def get_error_info(self):
         """
         Return a text representation of an exception thrown by a test
         method.
         """
-        if not self.err:
-            return ''
-        return self.test_result._exc_info_to_string(self.err, self.test_method)
+        return self.test_exception_info
 
 
 class _XMLTestResult(_TextTestResult):
@@ -197,14 +215,7 @@ class _XMLTestResult(_TextTestResult):
 
         for tests in (self.successes, self.failures, self.errors):
             for test_info in tests:
-                testcase = type(test_info.test_method)
-
-                # Ignore module name if it is '__main__'
-                module = testcase.__module__ + '.'
-                if module == '__main__.':
-                    module = ''
-                testcase_name = module + testcase.__name__
-
+                testcase_name = test_info.test_name
                 if not testcase_name in tests_by_testcase:
                     tests_by_testcase[testcase_name] = []
                 tests_by_testcase[testcase_name].append(test_info)
@@ -234,11 +245,10 @@ class _XMLTestResult(_TextTestResult):
 
     _report_testsuite = staticmethod(_report_testsuite)
 
-    def _test_method_name(test_method):
+    def _test_method_name(test_id):
         """
         Returns the test method name.
         """
-        test_id = test_method.id()
         return test_id.split('.')[-1]
 
     _test_method_name = staticmethod(_test_method_name)
@@ -252,7 +262,7 @@ class _XMLTestResult(_TextTestResult):
 
         testcase.setAttribute('classname', suite_name)
         testcase.setAttribute(
-            'name', _XMLTestResult._test_method_name(test_result.test_method)
+            'name', _XMLTestResult._test_method_name(test_result.test_id)
         )
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
 
