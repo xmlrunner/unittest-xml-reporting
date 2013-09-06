@@ -8,7 +8,12 @@ default TextTestRunner.
 import os
 import sys
 import time
-from unittest import TestResult, _TextTestResult, TextTestRunner
+try:
+    from unittest2.runner import TextTestRunner
+    from unittest2.runner import TextTestResult as _TextTestResult
+    from unittest2.result import TestResult
+except ImportError:
+    from unittest import TestResult, _TextTestResult, TextTestRunner
 
 try:
     # Removed in Python 3
