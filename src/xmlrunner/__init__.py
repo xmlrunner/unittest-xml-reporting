@@ -61,6 +61,7 @@ class _TestInfo(object):
 
     def __init__(self, test_result, test_method, outcome=SUCCESS, err=None):
         self.test_result = test_result
+        self.test_method = test_method
         self.outcome = outcome
         self.elapsed_time = 0
         self.err = err
@@ -74,6 +75,9 @@ class _TestInfo(object):
 
         self.test_name = testcase_name(test_method)
         self.test_id = test_method.id()
+
+    def id(self):
+        return self.test_method.id()
 
     def test_finished(self):
         """Save info that can only be calculated once a test has run.
@@ -183,14 +187,13 @@ class _XMLTestResult(_TextTestResult):
             self.errors, 'ERROR', 'E'
         )
 
-    def addSkip(self, test, err):
+    def addSkip(self, test, reason):
         """
         Called when a test method was skipped.
         """
-        self._prepare_callback(
-            _TestInfo(self, test, _TestInfo.SKIP, err),
-            self.skipped, 'SKIP', 'S'
-        )
+        testinfo = _TestInfo(self, test, _TestInfo.SKIP, reason)
+        self.skipped.append((testinfo, reason))
+        self._prepare_callback(testinfo, [], 'SKIP', 'S')
 
     def printErrorList(self, flavour, errors):
         """
@@ -215,6 +218,9 @@ class _XMLTestResult(_TextTestResult):
 
         for tests in (self.successes, self.failures, self.errors, self.skipped):
             for test_info in tests:
+                if isinstance(test_info, tuple):
+                    # This is a skipped test case
+                    test_info = test_info[0]
                 testcase_name = test_info.test_name
                 if not testcase_name in tests_by_testcase:
                     tests_by_testcase[testcase_name] = []
