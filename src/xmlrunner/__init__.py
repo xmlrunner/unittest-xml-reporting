@@ -213,7 +213,7 @@ class _XMLTestResult(_TextTestResult):
         """
         tests_by_testcase = {}
 
-        for tests in (self.successes, self.failures, self.errors):
+        for tests in (self.successes, self.failures, self.errors, self.skipped):
             for test_info in tests:
                 testcase_name = test_info.test_name
                 if not testcase_name in tests_by_testcase:
@@ -267,16 +267,19 @@ class _XMLTestResult(_TextTestResult):
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
 
         if (test_result.outcome != _TestInfo.SUCCESS):
-            elem_name = ('failure', 'error')[test_result.outcome - 1]
+            elem_name = ('failure', 'error', 'skip')[test_result.outcome - 1]
             failure = xml_document.createElement(elem_name)
             testcase.appendChild(failure)
+            if test_result.outcome != _TestInfo.SKIP:
+                failure.setAttribute('type', test_result.err[0].__name__)
+                failure.setAttribute('message', str(test_result.err[1]))
+                error_info = str(test_result.get_error_info())
+                failureText = xml_document.createCDATASection(error_info)
+                failure.appendChild(failureText)
+            else:
+                failure.setAttribute('type', 'skipped')
+                failure.setAttribute('message', test_result.err)
 
-            failure.setAttribute('type', test_result.err[0].__name__)
-            failure.setAttribute('message', str(test_result.err[1]))
-
-            error_info = str(test_result.get_error_info())
-            failureText = xml_document.createCDATASection(error_info)
-            failure.appendChild(failureText)
 
     _report_testcase = staticmethod(_report_testcase)
 
