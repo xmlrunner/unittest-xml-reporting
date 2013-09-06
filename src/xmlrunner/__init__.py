@@ -67,7 +67,7 @@ class _TestInfo(object):
 
         self.test_description = self.test_result.getDescription(test_method)
         self.test_exception_info = (
-            '' if not self.err
+            '' if outcome in (self.SUCCESS, self.SKIP)
             else self.test_result._exc_info_to_string(
                     self.err, test_method)
         )
