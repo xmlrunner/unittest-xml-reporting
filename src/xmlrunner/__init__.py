@@ -405,19 +405,39 @@ class XMLTestRunner(TextTestRunner):
             )
             self.stream.writeln()
 
-            # Error traces
-            if not result.wasSuccessful():
-                self.stream.write("FAILED (")
-                failed, errored = (len(result.failures), len(result.errors))
-                if failed:
-                    self.stream.write("failures=%d" % failed)
-                if errored:
-                    if failed:
-                        self.stream.write(", ")
-                    self.stream.write("errors=%d" % errored)
-                self.stream.writeln(")")
+            expectedFails = unexpectedSuccesses = skipped = 0
+            try:
+                results = map(len, (result.expectedFailures,
+                                    result.unexpectedSuccesses,
+                                    result.skipped))
+            except AttributeError:
+                pass
             else:
-                self.stream.writeln("OK")
+                expectedFails, unexpectedSuccesses, skipped = results
+
+            # Error traces
+            infos = []
+            if not result.wasSuccessful():
+                self.stream.write("FAILED")
+                failed, errored = map(len, (result.failures, result.errors))
+                if failed:
+                    infos.append("failures={0}".format(failed))
+                if errored:
+                    infos.append("errors={0}".format(errored))
+            else:
+                self.stream.write("OK")
+
+            if skipped:
+                infos.append("skipped={0}".format(skipped))
+            if expectedFails:
+                infos.append("expected failures={0}".format(expectedFails))
+            if unexpectedSuccesses:
+                infos.append("unexpected successes={0}".fornat(unexpectedSuccesses))
+
+            if infos:
+                self.stream.writeln(" ({0})".format(", ".join(infos)))
+            else:
+                self.stream.write("\n")
 
             # Generate reports
             self.stream.writeln()
