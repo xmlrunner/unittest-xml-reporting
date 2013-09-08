@@ -181,7 +181,7 @@ class _XMLTestResult(_TextTestResult):
         testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
         self.errors.append((
             test,
-            self.test_result._exc_info_to_string(err, test)
+            self._exc_info_to_string(err, test)
         ))
         self._prepare_callback(test_info, [], 'FAIL', 'F')
 
@@ -192,7 +192,7 @@ class _XMLTestResult(_TextTestResult):
         testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
         self.errors.append((
             test,
-            self.test_result._exc_info_to_string(err, test)
+            self._exc_info_to_string(err, test)
         ))
         self._prepare_callback(test_info, [], 'ERROR', 'E')
 
