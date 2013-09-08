@@ -178,19 +178,23 @@ class _XMLTestResult(_TextTestResult):
         """
         Called when a test method fails.
         """
-        self._prepare_callback(
-            _TestInfo(self, test, _TestInfo.FAILURE, err),
-            self.failures, 'FAIL', 'F'
-        )
+        testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
+        self.errors.append((
+            test,
+            self.test_result._exc_info_to_string(err, test)
+        ))
+        self._prepare_callback(test_info, [], 'FAIL', 'F')
 
     def addError(self, test, err):
         """
         Called when a test method raises an error.
         """
-        self._prepare_callback(
-            _TestInfo(self, test, _TestInfo.ERROR, err),
-            self.errors, 'ERROR', 'E'
-        )
+        testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
+        self.errors.append((
+            test,
+            self.test_result._exc_info_to_string(err, test)
+        ))
+        self._prepare_callback(test_info, [], 'ERROR', 'E')
 
     def addSkip(self, test, reason):
         """
