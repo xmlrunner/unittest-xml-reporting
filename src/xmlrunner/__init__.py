@@ -183,7 +183,7 @@ class _XMLTestResult(_TextTestResult):
             test,
             self._exc_info_to_string(err, test)
         ))
-        self._prepare_callback(test_info, [], 'FAIL', 'F')
+        self._prepare_callback(testinfo, [], 'FAIL', 'F')
 
     def addError(self, test, err):
         """
@@ -194,7 +194,7 @@ class _XMLTestResult(_TextTestResult):
             test,
             self._exc_info_to_string(err, test)
         ))
-        self._prepare_callback(test_info, [], 'ERROR', 'E')
+        self._prepare_callback(testinfo, [], 'ERROR', 'E')
 
     def addSkip(self, test, reason):
         """
