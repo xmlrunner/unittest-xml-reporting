@@ -8,7 +8,12 @@ default TextTestRunner.
 import os
 import sys
 import time
-from unittest import TestResult, _TextTestResult, TextTestRunner
+try:
+    from unittest2.runner import TextTestRunner
+    from unittest2.runner import TextTestResult as _TextTestResult
+    from unittest2.result import TestResult
+except ImportError:
+    from unittest import TestResult, _TextTestResult, TextTestRunner
 
 try:
     # Removed in Python 3
@@ -61,19 +66,23 @@ class _TestInfo(object):
 
     def __init__(self, test_result, test_method, outcome=SUCCESS, err=None):
         self.test_result = test_result
+        self.test_method = test_method
         self.outcome = outcome
         self.elapsed_time = 0
         self.err = err
 
         self.test_description = self.test_result.getDescription(test_method)
         self.test_exception_info = (
-            '' if not self.err
+            '' if outcome in (self.SUCCESS, self.SKIP)
             else self.test_result._exc_info_to_string(
                     self.err, test_method)
         )
 
         self.test_name = testcase_name(test_method)
         self.test_id = test_method.id()
+
+    def id(self):
+        return self.test_method.id()
 
     def test_finished(self):
         """Save info that can only be calculated once a test has run.
@@ -169,34 +178,37 @@ class _XMLTestResult(_TextTestResult):
         """
         Called when a test method fails.
         """
-        self._prepare_callback(
-            _TestInfo(self, test, _TestInfo.FAILURE, err),
-            self.failures, 'FAIL', 'F'
-        )
+        testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
+        self.errors.append((
+            testinfo,
+            self._exc_info_to_string(err, test)
+        ))
+        self._prepare_callback(testinfo, [], 'FAIL', 'F')
 
     def addError(self, test, err):
         """
         Called when a test method raises an error.
         """
-        self._prepare_callback(
-            _TestInfo(self, test, _TestInfo.ERROR, err),
-            self.errors, 'ERROR', 'E'
-        )
+        testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
+        self.errors.append((
+            testinfo,
+            self._exc_info_to_string(err, test)
+        ))
+        self._prepare_callback(testinfo, [], 'ERROR', 'E')
 
-    def addSkip(self, test, err):
+    def addSkip(self, test, reason):
         """
         Called when a test method was skipped.
         """
-        self._prepare_callback(
-            _TestInfo(self, test, _TestInfo.SKIP, err),
-            self.skipped, 'SKIP', 'S'
-        )
+        testinfo = _TestInfo(self, test, _TestInfo.SKIP, reason)
+        self.skipped.append((testinfo, reason))
+        self._prepare_callback(testinfo, [], 'SKIP', 'S')
 
     def printErrorList(self, flavour, errors):
         """
         Writes information about the FAIL or ERROR to the stream.
         """
-        for test_info in errors:
+        for test_info, error in errors:
             self.stream.writeln(self.separator1)
             self.stream.writeln(
                 '%s [%.3fs]: %s' % (flavour, test_info.elapsed_time,
@@ -213,8 +225,11 @@ class _XMLTestResult(_TextTestResult):
         """
         tests_by_testcase = {}
 
-        for tests in (self.successes, self.failures, self.errors):
+        for tests in (self.successes, self.failures, self.errors, self.skipped):
             for test_info in tests:
+                if isinstance(test_info, tuple):
+                    # This is a skipped, error or a failure test case
+                    test_info = test_info[0]
                 testcase_name = test_info.test_name
                 if not testcase_name in tests_by_testcase:
                     tests_by_testcase[testcase_name] = []
@@ -267,16 +282,19 @@ class _XMLTestResult(_TextTestResult):
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
 
         if (test_result.outcome != _TestInfo.SUCCESS):
-            elem_name = ('failure', 'error')[test_result.outcome - 1]
+            elem_name = ('failure', 'error', 'skipped')[test_result.outcome - 1]
             failure = xml_document.createElement(elem_name)
             testcase.appendChild(failure)
+            if test_result.outcome != _TestInfo.SKIP:
+                failure.setAttribute('type', test_result.err[0].__name__)
+                failure.setAttribute('message', str(test_result.err[1]))
+                error_info = str(test_result.get_error_info())
+                failureText = xml_document.createCDATASection(error_info)
+                failure.appendChild(failureText)
+            else:
+                failure.setAttribute('type', 'skip')
+                failure.setAttribute('message', test_result.err)
 
-            failure.setAttribute('type', test_result.err[0].__name__)
-            failure.setAttribute('message', str(test_result.err[1]))
-
-            error_info = str(test_result.get_error_info())
-            failureText = xml_document.createCDATASection(error_info)
-            failure.appendChild(failureText)
 
     _report_testcase = staticmethod(_report_testcase)
 
@@ -405,19 +423,39 @@ class XMLTestRunner(TextTestRunner):
             )
             self.stream.writeln()
 
-            # Error traces
-            if not result.wasSuccessful():
-                self.stream.write("FAILED (")
-                failed, errored = (len(result.failures), len(result.errors))
-                if failed:
-                    self.stream.write("failures=%d" % failed)
-                if errored:
-                    if failed:
-                        self.stream.write(", ")
-                    self.stream.write("errors=%d" % errored)
-                self.stream.writeln(")")
+            expectedFails = unexpectedSuccesses = skipped = 0
+            try:
+                results = map(len, (result.expectedFailures,
+                                    result.unexpectedSuccesses,
+                                    result.skipped))
+            except AttributeError:
+                pass
             else:
-                self.stream.writeln("OK")
+                expectedFails, unexpectedSuccesses, skipped = results
+
+            # Error traces
+            infos = []
+            if not result.wasSuccessful():
+                self.stream.write("FAILED")
+                failed, errored = map(len, (result.failures, result.errors))
+                if failed:
+                    infos.append("failures={0}".format(failed))
+                if errored:
+                    infos.append("errors={0}".format(errored))
+            else:
+                self.stream.write("OK")
+
+            if skipped:
+                infos.append("skipped={0}".format(skipped))
+            if expectedFails:
+                infos.append("expected failures={0}".format(expectedFails))
+            if unexpectedSuccesses:
+                infos.append("unexpected successes={0}".fornat(unexpectedSuccesses))
+
+            if infos:
+                self.stream.writeln(" ({0})".format(", ".join(infos)))
+            else:
+                self.stream.write("\n")
 
             # Generate reports
             self.stream.writeln()
