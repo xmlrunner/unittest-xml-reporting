@@ -180,7 +180,7 @@ class _XMLTestResult(_TextTestResult):
         """
         testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
         self.errors.append((
-            test,
+            testinfo,
             self._exc_info_to_string(err, test)
         ))
         self._prepare_callback(testinfo, [], 'FAIL', 'F')
@@ -191,7 +191,7 @@ class _XMLTestResult(_TextTestResult):
         """
         testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
         self.errors.append((
-            test,
+            testinfo,
             self._exc_info_to_string(err, test)
         ))
         self._prepare_callback(testinfo, [], 'ERROR', 'E')
@@ -208,7 +208,7 @@ class _XMLTestResult(_TextTestResult):
         """
         Writes information about the FAIL or ERROR to the stream.
         """
-        for test_info in errors:
+        for test_info, error in errors:
             self.stream.writeln(self.separator1)
             self.stream.writeln(
                 '%s [%.3fs]: %s' % (flavour, test_info.elapsed_time,
@@ -228,7 +228,7 @@ class _XMLTestResult(_TextTestResult):
         for tests in (self.successes, self.failures, self.errors, self.skipped):
             for test_info in tests:
                 if isinstance(test_info, tuple):
-                    # This is a skipped test case
+                    # This is a skipped, error or a failure test case
                     test_info = test_info[0]
                 testcase_name = test_info.test_name
                 if not testcase_name in tests_by_testcase:
