@@ -282,7 +282,7 @@ class _XMLTestResult(_TextTestResult):
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
 
         if (test_result.outcome != _TestInfo.SUCCESS):
-            elem_name = ('failure', 'error', 'skip')[test_result.outcome - 1]
+            elem_name = ('failure', 'error', 'skipped')[test_result.outcome - 1]
             failure = xml_document.createElement(elem_name)
             testcase.appendChild(failure)
             if test_result.outcome != _TestInfo.SKIP:
@@ -292,7 +292,7 @@ class _XMLTestResult(_TextTestResult):
                 failureText = xml_document.createCDATASection(error_info)
                 failure.appendChild(failureText)
             else:
-                failure.setAttribute('type', 'skipped')
+                failure.setAttribute('type', 'skip')
                 failure.setAttribute('message', test_result.err)
 
 
