@@ -78,7 +78,7 @@ if __name__ == '__main__':
     unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
 ````
 
-### Django 1.2
+### Django
 
 In order to plug `XMLTestRunner` to a Django project, add the following
 to your `settings.py`:
