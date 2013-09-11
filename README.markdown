@@ -11,12 +11,7 @@ systems, IDEs and continuous integration servers.
 ## Installation
 
 The easiest way to install unittest-xml-reporting is via
-[EasyInstall](http://peak.telecommunity.com/DevCenter/EasyInstall). Follow
-[these instructions](http://pypi.python.org/pypi/setuptools) to install
-EasyInstall if you don't have it already.
-
-Then, execute the following command line to install the latest stable version
-of unittest-xml-reporting:
+[Pip](http://www.pip-installer.org):
 
 ````bash
 $ pip install unittest-xml-reporting
