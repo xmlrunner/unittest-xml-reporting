@@ -19,7 +19,7 @@ Then, execute the following command line to install the latest stable version
 of unittest-xml-reporting:
 
 ````bash
-$ sudo easy_install unittest-xml-reporting
+$ pip install unittest-xml-reporting
 ````
 
 If you use Git and want to get the latest *development* version:
