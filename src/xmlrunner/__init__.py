@@ -178,8 +178,8 @@ class _XMLTestResult(_TextTestResult):
         """
         Called when a test method fails.
         """
-        testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
-        self.errors.append((
+        testinfo = _TestInfo(self, test, _TestInfo.FAILURE, err)
+        self.failures.append((
             testinfo,
             self._exc_info_to_string(err, test)
         ))
@@ -450,7 +450,7 @@ class XMLTestRunner(TextTestRunner):
             if expectedFails:
                 infos.append("expected failures={0}".format(expectedFails))
             if unexpectedSuccesses:
-                infos.append("unexpected successes={0}".fornat(unexpectedSuccesses))
+                infos.append("unexpected successes={0}".format(unexpectedSuccesses))
 
             if infos:
                 self.stream.writeln(" ({0})".format(", ".join(infos)))
