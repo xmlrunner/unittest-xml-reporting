@@ -1,8 +1,10 @@
 from setuptools import setup, find_packages
 
+from xmlrunner import get_version
+
 setup(
     name = 'unittest-xml-reporting',
-    version = '2.0.0',
+    version = get_version(),
     author = 'Daniel Fernandes Martins',
     author_email = 'daniel.tritone@gmail.com',
     description = 'PyUnit-based test runner with JUnit like XML reporting.',
@@ -22,7 +24,6 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Testing'
     ],
-    package_dir = {'':'src'},
-    test_suite = 'xmlrunner.tests.testsuite',
+test_suite = 'tests.testsuite',
     tests_require = ['mock']
 )
