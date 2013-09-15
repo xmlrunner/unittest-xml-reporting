@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 from xmlrunner import get_version
 
@@ -24,6 +24,6 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Testing'
     ],
-test_suite = 'tests.testsuite',
+    test_suite = 'tests.testsuite',
     tests_require = ['mock']
 )
