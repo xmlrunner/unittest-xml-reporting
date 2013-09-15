@@ -35,7 +35,7 @@ class CompositeTestResult(unittest.TestResult):
         """
         return getattr(self.delegate, attr)
 
-    def _delegate_call(self, method_name, *args, **kwargs):
+    def _call_delegates(self, method_name, *args, **kwargs):
         """Calls `method_name` with the given args on all delegates.
         Returns `None`.
         """
@@ -47,44 +47,44 @@ class CompositeTestResult(unittest.TestResult):
 
     def startTestRun(self):
         super(CompositeTestResult, self).startTestRun()
-        self._delegate_call('startTestRun')
+        self._call_delegates('startTestRun')
 
     def stopTestRun(self):
         super(CompositeTestResult, self).stopTestRun()
-        self._delegate_call('stopTestRun')
+        self._call_delegates('stopTestRun')
 
     def startTest(self, test):
         super(CompositeTestResult, self).startTest(test)
-        self._delegate_call('startTest', test)
+        self._call_delegates('startTest', test)
 
     def stopTest(self, test):
         super(CompositeTestResult, self).stopTest(test)
-        self._delegate_call('stopTest', test)
+        self._call_delegates('stopTest', test)
 
     def printErrors(self):
         super(CompositeTestResult, self).printErrors()
-        self._delegate_call('printErrors')
+        self._call_delegates('printErrors')
 
     def addError(self, test, err):
         super(CompositeTestResult, self).addError(test, err)
-        self._delegate_call('addError', test, err)
+        self._call_delegates('addError', test, err)
 
     def addFailure(self, test, err):
         super(CompositeTestResult, self).addFailure(test, err)
-        self._delegate_call('addFailure', test, err)
+        self._call_delegates('addFailure', test, err)
 
     def addSuccess(self, test):
         super(CompositeTestResult, self).addSuccess(test)
-        self._delegate_call('addSuccess', test)
+        self._call_delegates('addSuccess', test)
 
     def addSkip(self, test, reason):
         super(CompositeTestResult, self).addSkip(test, reason)
-        self._delegate_call('addSkip', test, reason)
+        self._call_delegates('addSkip', test, reason)
 
     def addExpectedFailure(self, test, err):
         super(CompositeTestResult, self).addExpectedFailure(test, err)
-        self._delegate_call('addExpectedFailure', test, err)
+        self._call_delegates('addExpectedFailure', test, err)
 
     def addUnexpectedSuccess(self, test):
         super(CompositeTestResult, self).addUnexpectedSuccess(test)
-        self._delegate_call('addUnexpectedSuccess', test)
+        self._call_delegates('addUnexpectedSuccess', test)
