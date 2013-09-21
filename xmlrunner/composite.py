@@ -1,5 +1,8 @@
 import unittest
 
+__all__ = ('CompositeTestResult',)
+
+
 class CompositeTestResult(unittest.TestResult):
     """This class defines an aggregation of `TestResult` instances.
 
