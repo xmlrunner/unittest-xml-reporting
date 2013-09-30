@@ -3,7 +3,6 @@
 import unittest
 
 import xml.etree.ElementTree as ET
-
 from xml.dom.minidom import Document
 
 from xmlrunner import builder
