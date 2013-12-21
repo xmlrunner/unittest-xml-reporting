@@ -12,7 +12,8 @@ exec(compile(open(xmlrunner_version).read(), xmlrunner_version, 'exec'))
 
 
 setup(
-    name = 'unittest-xml-reporting',
+    name = "xmlrunner',
+    py_modules=['xmlrunner'],
     version = __version__,
     author = 'Daniel Fernandes Martins',
     author_email = 'daniel.tritone@gmail.com',
