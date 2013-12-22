@@ -6,13 +6,13 @@ from setuptools import setup, find_packages
 # Load version information
 xmlrunner_version = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
-    'src', 'xmlrunner', 'version.py'
+    'xmlrunner', 'version.py'
 )
 exec(compile(open(xmlrunner_version).read(), xmlrunner_version, 'exec'))
 
 
 setup(
-    name = "xmlrunner',
+    name = 'xmlrunner',
     py_modules=['xmlrunner'],
     version = __version__,
     author = 'Daniel Fernandes Martins',
@@ -21,7 +21,7 @@ setup(
     license = 'LGPL',
     platforms = ['Any'],
     keywords = ['pyunit', 'unittest', 'junit xml', 'report', 'testrunner'],
-    url = 'http://github.com/danielfm/unittest-xml-reporting/tree/master/',
+    url = 'https://github.com/pycontribs/xmlrunner',
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
@@ -34,9 +34,9 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Testing'
     ],
-    packages = find_packages('src'),
-    package_dir = {'':'src'},
-    zip_safe = False,
+    packages = ['xmlrunner'],
+    provides = ['xmlrunner'],
+    zip_safe = True,
     include_package_data = True,
-    test_suite = 'xmlrunner.tests.testsuite'
+    test_suite = 'xmlrunner.tests.test_xmlrunner'
 )
