@@ -43,6 +43,8 @@ class _DelegateIO(object):
     def __getattr__(self, attr):
         return getattr(self._captured, attr)
 
+    def reset(self):
+        self._captured = StringIO()
 
 def testcase_name(test_method):
     testcase = type(test_method)
@@ -70,6 +72,10 @@ class _TestInfo(object):
         self.outcome = outcome
         self.elapsed_time = 0
         self.err = err
+        self.stdout = sys.stdout.getvalue()
+        sys.stdout.reset()
+        self.stderr = sys.stderr.getvalue()
+        sys.stderr.reset()
 
         self.test_description = self.test_result.getDescription(test_method)
         self.test_exception_info = (
@@ -256,6 +262,26 @@ class _XMLTestResult(_TextTestResult):
         errors = filter(lambda e: e.outcome == _TestInfo.ERROR, tests)
         testsuite.setAttribute('errors', str(len(list(errors))))
 
+        systemout = xml_document.createElement('system-out')
+        testsuite.appendChild(systemout)
+
+        stdout = StringIO()
+        for test in tests:
+            # Merge the stdout from the tests in a class
+            stdout.write(test.stdout)
+        systemout_text = xml_document.createCDATASection(stdout.getvalue())
+        systemout.appendChild(systemout_text)
+        
+        systemerr = xml_document.createElement('system-err')
+        testsuite.appendChild(systemerr)
+
+        stderr = StringIO()
+        for test in tests:
+            # Merge the stdout from the tests in a class
+            stderr.write(test.stderr)
+            
+        systemerr_text = xml_document.createCDATASection(stderr.getvalue())
+        systemerr.appendChild(systemerr_text)
         return testsuite
 
     _report_testsuite = staticmethod(_report_testsuite)
@@ -311,22 +337,6 @@ class _XMLTestResult(_TextTestResult):
 
     _report_testcase = staticmethod(_report_testcase)
 
-    def _report_output(test_runner, xml_testsuite, xml_document):
-        """
-        Appends the system-out and system-err sections to the XML document.
-        """
-        systemout = xml_document.createElement('system-out')
-        xml_testsuite.appendChild(systemout)
-
-        _XMLTestResult._createCDATAsections(xml_document, systemout, sys.stdout.getvalue())
-
-        systemerr = xml_document.createElement('system-err')
-        xml_testsuite.appendChild(systemerr)
-
-        _XMLTestResult._createCDATAsections(xml_document, systemerr, sys.stderr.getvalue())
-
-    _report_output = staticmethod(_report_output)
-
     def generate_reports(self, test_runner):
         """
         Generates the XML reports to a given XMLTestRunner object.
@@ -347,7 +357,6 @@ class _XMLTestResult(_TextTestResult):
             )
             for test in tests:
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
-            _XMLTestResult._report_output(test_runner, testsuite, doc)
             xml_content = doc.toprettyxml(indent='\t')
 
             if type(test_runner.output) is str:
