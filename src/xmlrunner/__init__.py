@@ -339,10 +339,10 @@ class _XMLTestResult(_TextTestResult):
             _XMLTestResult._report_output(test_runner, testsuite, doc)
             xml_content = doc.toprettyxml(indent='\t')
 
-            if type(test_runner.output) is str:
+            if isinstance(test_runner.output, basestring):
                 report_file = open(
-                    '%s%sTEST-%s-%s.xml' % (
-                        test_runner.output, os.sep, suite,
+                    u'%s%sTEST-%s-%s.xml' % (
+                        output, os.sep, suite,
                         test_runner.outsuffix
                     ), 'w'
                 )
