@@ -8,7 +8,7 @@ xmlrunner_version = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
     'src', 'xmlrunner', 'version.py'
 )
-exec(compile(open(xmlrunner_version).read(), xmlrunner_version, 'exec'))
+exec(compile(open(xmlrunner_version,"rb").read(), xmlrunner_version, 'exec'))
 
 
 setup(
