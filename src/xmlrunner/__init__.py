@@ -8,6 +8,8 @@ default TextTestRunner.
 import os
 import sys
 import time
+import six
+
 try:
     from unittest2.runner import TextTestRunner
     from unittest2.runner import TextTestResult as _TextTestResult
@@ -25,6 +27,12 @@ except ImportError:
 # Allow version to be detected at runtime.
 from .version import __version__, __version_info__
 
+def to_unicode(data):
+    if six.PY2:
+        return six.text_type(data).encode('utf-8')
+    else:
+        # default encoding is UTF-8
+        return six.text_type(data)
 
 class _DelegateIO(object):
     """
@@ -325,13 +333,12 @@ class _XMLTestResult(_TextTestResult):
             testcase.appendChild(failure)
             if test_result.outcome != _TestInfo.SKIP:
                 failure.setAttribute('type', test_result.err[0].__name__)
-                failure.setAttribute('message', str(test_result.err[1]))
-                error_info = str(test_result.get_error_info())
+                failure.setAttribute('message', to_unicode(test_result.err[1]))
+                error_info = to_unicode(test_result.get_error_info())
                 _XMLTestResult._createCDATAsections(xml_document, failure, error_info)
             else:
                 failure.setAttribute('type', 'skip')
-                failure.setAttribute('message', test_result.err)
-
+                failure.setAttribute('message', to_unicode(test_result.err))
 
     _report_testcase = staticmethod(_report_testcase)
 
