@@ -268,6 +268,20 @@ class _XMLTestResult(_TextTestResult):
 
     _test_method_name = staticmethod(_test_method_name)
 
+    def _createCDATAsections(xmldoc, node, text):
+        pos = text.find(']]>')
+        while pos >= 0:
+            tmp=text[0:pos+2]
+            cdata = xmldoc.createCDATASection(tmp)
+            node.appendChild(cdata)
+            text=text[pos+2:]
+            pos = text.find(']]>')
+        cdata = xmldoc.createCDATASection(text)
+        node.appendChild(cdata)
+
+    _createCDATAsections = staticmethod(_createCDATAsections)
+
+
     def _report_testcase(suite_name, test_result, xml_testsuite, xml_document):
         """
         Appends a testcase section to the XML document.
@@ -289,8 +303,7 @@ class _XMLTestResult(_TextTestResult):
                 failure.setAttribute('type', test_result.err[0].__name__)
                 failure.setAttribute('message', str(test_result.err[1]))
                 error_info = str(test_result.get_error_info())
-                failureText = xml_document.createCDATASection(error_info)
-                failure.appendChild(failureText)
+                _XMLTestResult._createCDATAsections(xml_document, failure, error_info)
             else:
                 failure.setAttribute('type', 'skip')
                 failure.setAttribute('message', test_result.err)
@@ -305,14 +318,12 @@ class _XMLTestResult(_TextTestResult):
         systemout = xml_document.createElement('system-out')
         xml_testsuite.appendChild(systemout)
 
-        systemout_text = xml_document.createCDATASection(sys.stdout.getvalue())
-        systemout.appendChild(systemout_text)
+        _XMLTestResult._createCDATAsections(xml_document, systemout, sys.stdout.getvalue())
 
         systemerr = xml_document.createElement('system-err')
         xml_testsuite.appendChild(systemerr)
 
-        systemerr_text = xml_document.createCDATASection(sys.stderr.getvalue())
-        systemerr.appendChild(systemerr_text)
+        _XMLTestResult._createCDATAsections(xml_document, systemerr, sys.stderr.getvalue())
 
     _report_output = staticmethod(_report_output)
 
