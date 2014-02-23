@@ -186,6 +186,15 @@ class XMLContextBuilderTest(unittest.TestCase):
         cdata = cdata_container.childNodes[0]
         self.assertEqual(cdata.data, self.invalid_chars_replace)
 
+    def test_append_cdata_closing_tags_into_cdata_section(self):
+        self.builder.append_cdata_section('tag',']]>')
+        self.builder.end_context()
+        root_child = self.doc.childNodes[0]
+        cdata_container = root_child.childNodes[0]
+        self.assertEqual(len(cdata_container.childNodes), 2)
+        self.assertEqual(cdata_container.childNodes[0].data, ']]')
+        self.assertEqual(cdata_container.childNodes[1].data, '>')
+
     def test_append_tag_with_valid_unicode_values(self):
         self.builder.append('tag', self.valid_chars, attr=self.valid_chars)
         self.builder.end_context()

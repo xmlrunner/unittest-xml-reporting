@@ -147,10 +147,19 @@ class XMLContextBuilder(object):
         by the current context. Returns the created tag.
         """
         element = self._xml_doc.createElement(tag)
+
+        pos = content.find(']]>')
+        while pos >= 0:
+            tmp=content[0:pos+2]
+            element.appendChild(self._create_cdata_section(tmp))
+            content=content[pos+2:]
+            pos = content.find(']]>')
+
         element.appendChild(self._create_cdata_section(content))
         
         self._append_child(element)
         return element
+
 
     def append(self, tag, content, **kwargs):
         """Apends a tag in the format <tag attr='val' attr2='val2'>CDATA</tag>
