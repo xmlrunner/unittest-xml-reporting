@@ -337,7 +337,7 @@ class _XMLTestResult(_TextTestResult):
             for test in tests:
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
             _XMLTestResult._report_output(test_runner, testsuite, doc)
-            xml_content = doc.toprettyxml(indent='\t')
+            xml_content = doc.toprettyxml(indent='\t', encoding=test_runner.encoding)
 
             if type(test_runner.output) is str:
                 report_file = open(
@@ -360,10 +360,11 @@ class XMLTestRunner(TextTestRunner):
     A test runner class that outputs the results in JUnit like XML files.
     """
     def __init__(self, output='.', outsuffix=None, stream=sys.stderr,
-                 descriptions=True, verbosity=1, elapsed_times=True):
+                 descriptions=True, verbosity=1, elapsed_times=True, encoding = ""):
         TextTestRunner.__init__(self, stream, descriptions, verbosity)
         self.verbosity = verbosity
         self.output = output
+        self.encoding = encoding
         if outsuffix:
             self.outsuffix = outsuffix
         else:
