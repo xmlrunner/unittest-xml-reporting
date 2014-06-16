@@ -453,7 +453,7 @@ class XMLTestRunner(TextTestRunner):
             if expectedFails:
                 infos.append("expected failures={0}".format(expectedFails))
             if unexpectedSuccesses:
-                infos.append("unexpected successes={0}".fornat(unexpectedSuccesses))
+                infos.append("unexpected successes={0}".format(unexpectedSuccesses))
 
             if infos:
                 self.stream.writeln(" ({0})".format(", ".join(infos)))
