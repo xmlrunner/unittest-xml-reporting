@@ -49,7 +49,10 @@ class _DelegateIO(object):
         self.delegate.write(text)
 
     def __getattr__(self, attr):
-        return getattr(self._captured, attr)
+        try:
+            return getattr(self._captured, attr)
+        except AttributeError:
+            return getattr(self.delegate, attr)
 
     def reset(self):
         self._captured = StringIO()
