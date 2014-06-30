@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dnozay/unittest-xml-reporting.svg?branch=travis)](https://travis-ci.org/dnozay/unittest-xml-reporting)
+
 # unittest-xml-reporting
 
 unittest-xml-reporting is a unittest test runner that can save test results
