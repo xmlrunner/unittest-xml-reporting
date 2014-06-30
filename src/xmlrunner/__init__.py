@@ -269,19 +269,17 @@ class _XMLTestResult(_TextTestResult):
         for test in tests:
             # Merge the stdout from the tests in a class
             stdout.write(test.stdout)
-        systemout_text = xml_document.createCDATASection(stdout.getvalue())
-        systemout.appendChild(systemout_text)
-        
+        _XMLTestResult._createCDATAsections(xml_document, systemout, stdout.getvalue())
+
         systemerr = xml_document.createElement('system-err')
         testsuite.appendChild(systemerr)
 
         stderr = StringIO()
         for test in tests:
-            # Merge the stdout from the tests in a class
+            # Merge the stderr from the tests in a class
             stderr.write(test.stderr)
-            
-        systemerr_text = xml_document.createCDATASection(stderr.getvalue())
-        systemerr.appendChild(systemerr_text)
+        _XMLTestResult._createCDATAsections(xml_document, systemerr, stderr.getvalue())
+
         return testsuite
 
     _report_testsuite = staticmethod(_report_testsuite)
