@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/xmlrunner/unittest-xml-reporting.svg?branch=master)](https://travis-ci.org/xmlrunner/unittest-xml-reporting)
+
 # unittest-xml-reporting
 
 unittest-xml-reporting is a unittest test runner that can save test results
