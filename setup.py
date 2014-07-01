@@ -37,5 +37,6 @@ setup(
     package_dir = {'':'src'},
     zip_safe = False,
     include_package_data = True,
+    install_requires = ['six'],
     test_suite = 'xmlrunner.tests.testsuite'
 )
