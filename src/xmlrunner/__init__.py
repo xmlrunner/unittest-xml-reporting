@@ -349,7 +349,7 @@ class _XMLTestResult(_TextTestResult):
         from xml.dom.minidom import Document
         all_results = self._get_info_by_testcase(test_runner.outsuffix)
 
-        if (isinstance(test_runner.output, str) and not
+        if (isinstance(test_runner.output, six.string_types) and not
                 os.path.exists(test_runner.output)):
             os.makedirs(test_runner.output)
 
@@ -364,7 +364,7 @@ class _XMLTestResult(_TextTestResult):
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
             xml_content = doc.toprettyxml(indent='\t', encoding=test_runner.encoding)
 
-            if type(test_runner.output) is str:
+            if isinstance(test_runner.output, six.string_types):
                 report_file = open(
                     '%s%sTEST-%s-%s.xml' % (
                         test_runner.output, os.sep, suite,
