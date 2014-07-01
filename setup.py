@@ -9,6 +9,14 @@ ver_path = convert_path('xmlrunner/version.py')
 with open(ver_path) as ver_file:
     exec(ver_file.read(), main_ns)
 
+install_requires, setup_requires, tests_require = [], [], ['mock']
+
+import sys
+if sys.version_info < (2, 7):
+    install_requires = ['unittest2']
+    setup_requires = ['unittest2']
+    tests_require += ['unittest2']
+
 setup(
     name = 'unittest-xml-reporting',
     version = main_ns['__version__'],
@@ -31,6 +39,9 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Testing'
     ],
+    packages = find_packages(),
+    install_requires = install_requires,
+    setup_requires = setup_requires,
     test_suite = 'tests.testsuite',
-    tests_require = ['mock']
+    tests_require = tests_require
 )
