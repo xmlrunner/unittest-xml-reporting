@@ -1,10 +1,9 @@
-import sys
-import unittest
-
-from . import composite, result
 
 __all__ = ('XMLTestRunner',)
 
+import sys
+import unittest
+from xmlrunner import composite, result
 
 class XMLTestRunner(unittest.TextTestRunner):
     """Subclass of `TextTestRunner` which was modified so it uses a

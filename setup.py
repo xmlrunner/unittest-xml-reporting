@@ -1,10 +1,17 @@
-from setuptools import setup
 
-from xmlrunner import get_version
+import os
+import sys
+from setuptools import setup, find_packages
+from distutils.util import convert_path
+
+main_ns = {}
+ver_path = convert_path('xmlrunner/version.py')
+with open(ver_path) as ver_file:
+    exec(ver_file.read(), main_ns)
 
 setup(
     name = 'unittest-xml-reporting',
-    version = get_version(),
+    version = main_ns['__version__'],
     author = 'Daniel Fernandes Martins',
     author_email = 'daniel.tritone@gmail.com',
     description = 'unittest-based test runner with Ant/JUnit like XML reporting.',
