@@ -25,7 +25,7 @@ except ImportError:
 
 
 # Allow version to be detected at runtime.
-from .version import __version__, __version_info__
+from .version import __version__
 
 def to_unicode(data):
     if six.PY2:
