@@ -4,6 +4,7 @@ import time
 from unittest import result, util
 
 from . import builder
+import six
 
 __all__ = ('XMLTestResult',)
 
@@ -127,7 +128,7 @@ class XMLTestResult(result.TestResult):
         if err:
             exctype, value = err[:2]
             params['type'] = exctype.__name__
-            params['message'] = str(value).splitlines()[0]
+            params['message'] = six.text_type(value).splitlines(True)[0]
             cdata = self._exc_info_to_string(err, test)
 
         self._builder.append(error_type, cdata, **params)
@@ -148,13 +149,13 @@ class XMLTestResult(result.TestResult):
         # Assume that self.out_dir is a stream by default
         stream = self.out_dir
 
-        if type(stream) is str:
+        if type(stream) in six.string_types:
             filename = '{0}{1}TESTS-TestSuites-{3}.xml'.format(stream, os.sep,
                 'suite', self.out_suffix)
 
             if not os.path.exists(stream):
                 os.makedirs(stream)
 
-            stream = open(filename, 'w')
+            stream = open(filename, 'wb')
 
         stream.write(self._builder.finish())

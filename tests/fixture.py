@@ -1,13 +1,17 @@
+from __future__ import print_function
+
 import random
 import unittest
 import sys
 
 import xmlrunner
 
+import six
+
 
 class TestSomething(unittest.TestCase):
     def test_invalid_xml_unicode(self):
-        print(u'invalid xml: \x01\x0B\xfffe')
+        six.print_(six.u('invalid xml: \x01\x0B\xfffe'))
 
 
 class TestSequenceFunctions(unittest.TestCase):
@@ -25,12 +29,12 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertRaises(TypeError, random.shuffle, (1,2,3))
 
     def test_choice(self):
-        print u"this is stdout\x01\x0B"
-        print >> sys.stderr, u"this is stderr\x01\x0B"
+        six.print_(six.u("this is stdout\x01\x0B"))
+        six.print_(six.u("this is stderr\x01\x0B"), file=sys.stderr)
         element = random.choice(self.seq)
         self.assertTrue(element in self.seq)
 
-    @unittest.skip(u"some reason\x01\x0B")
+    @unittest.skip(six.u("some reason\x01\x0B"))
     def test_skip(self):
         fail('Should not be called')
 
@@ -43,7 +47,7 @@ class TestSequenceFunctions(unittest.TestCase):
         pass
 
     def test_error(self):
-        raise RuntimeError(u"Error msg\x01\x0B")
+        raise RuntimeError(six.u("Error msg\x01\x0B"))
 
     def test_sample(self):
         with self.assertRaises(ValueError):

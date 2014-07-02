@@ -1,14 +1,17 @@
-from StringIO import StringIO
 
 import unittest
 
 import xml.etree.ElementTree as ET
 
 import xmlrunner
+
 import sys
 
+import six
+from six import BytesIO, StringIO
+
 # Test suite used to test XMLTestResult
-import fixture
+from . import fixture
 
 
 _TIME_REGEXP = '^\d+\.\d+$'
@@ -23,7 +26,7 @@ class XMLTestResultTest(unittest.TestCase):
     """
 
     def setUp(self):
-        self.stream = StringIO()
+        self.stream = BytesIO()
 
         loader = unittest.TestLoader()
         suite = loader.loadTestsFromModule(fixture)
@@ -74,7 +77,7 @@ class XMLTestResultTest(unittest.TestCase):
     @no_predicate_support
     def test_first_testsuite_skipped_invalid_utf8_reason(self):
         tag = self.root_node.findall('./testsuite[1]/testcase/skipped')[0]
-        self.assertEqual(tag.attrib['message'], u'some reason\ufffd\ufffd')
+        self.assertEqual(tag.attrib['message'], six.u('some reason\ufffd\ufffd'))
 
     @no_predicate_support
     def test_first_testsuite_unexpected_success(self):
@@ -95,13 +98,13 @@ class XMLTestResultTest(unittest.TestCase):
 
     def test_testcase_success_invalid_utf8_stderr(self):
         stderr = self.root_node.findall('./testsuite/testcase/system-err')[0]
-        self.assertEqual(stderr.text.strip(), u'this is stderr\ufffd\ufffd')
+        self.assertEqual(stderr.text.strip(), six.u('this is stderr\ufffd\ufffd'))
 
     @no_predicate_support
     def test_testcase_error_invalid_utf8_msg(self):
         error = self.root_node.findall('./testsuite/testcase[@name="test_error"]/error')[0]
         self.assertEqual(error.attrib['type'], 'RuntimeError')
-        self.assertEqual(error.attrib['message'], u'Error msg\ufffd\ufffd')
+        self.assertEqual(error.attrib['message'], six.u('Error msg\ufffd\ufffd'))
 
         self.assertRegexpMatches(error.text, 'Traceback \(most recent call last\):')
         self.assertRegexpMatches(error.text, 'File ".*/tests/fixture\.py",.*, in test_error')
@@ -144,4 +147,4 @@ class XMLTestResultTest(unittest.TestCase):
     @no_predicate_support
     def test_last_testsuite_first_testcase_invalid_utf8_stdout(self):
         stdout = self.root_node.findall('./testsuite[last()]/testcase[1]/system-out')[0]
-        self.assertEqual(stdout.text.strip(), u'invalid xml: \ufffd\ufffd\xfffe')
+        self.assertEqual(stdout.text.strip(), six.u('invalid xml: \ufffd\ufffd\xfffe'))

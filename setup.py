@@ -9,12 +9,12 @@ ver_path = convert_path('xmlrunner/version.py')
 with open(ver_path) as ver_file:
     exec(ver_file.read(), main_ns)
 
-install_requires, setup_requires, tests_require = [], [], ['mock']
+install_requires, setup_requires, tests_require = ['six'], ['six'], ['six','mock']
 
 import sys
 if sys.version_info < (2, 7):
-    install_requires = ['unittest2']
-    setup_requires = ['unittest2']
+    install_requires += ['unittest2']
+    setup_requires += ['unittest2']
     tests_require += ['unittest2']
 
 setup(

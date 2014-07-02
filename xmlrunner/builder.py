@@ -1,6 +1,8 @@
 import re
 import sys
 import time
+import six
+from six import unichr
 
 from xml.dom.minidom import Document
 
@@ -14,11 +16,11 @@ __all__ = ('TestXMLBuilder', 'TestXMLContext')
 _char_tail = ''
 
 if sys.maxunicode > 0x10000:
-    _char_tail = u'%s-%s' % (unichr(0x10000), unichr(min(sys.maxunicode, 0x10FFFF)))
+    _char_tail = six.u('%s-%s' % (unichr(0x10000), unichr(min(sys.maxunicode, 0x10FFFF))))
 
-_nontext_sub = re.compile(ur'[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD%s]' % _char_tail, re.U).sub
+_nontext_sub = re.compile(six.u(r'[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD%s]' % _char_tail), re.U).sub
 
-def replace_nontext(text, replacement=u'\uFFFD'):
+def replace_nontext(text, replacement=six.u('\uFFFD')):
     return _nontext_sub(replacement, text)
 
 
@@ -86,7 +88,7 @@ class TestXMLContext(object):
                 valid_counter_for_element = (tag in ('testsuites', 'testsuite'))
 
             if valid_counter_for_element:
-                value = str(self.counters.get(counter_name, 0))
+                value = six.text_type(self.counters.get(counter_name, 0))
                 self.element.setAttribute(counter_name, value)
 
     def increment_counter(self, counter_name):
@@ -158,7 +160,7 @@ class XMLContextBuilder(object):
         element = self._xml_doc.createElement(tag)
 
         for key, value in kwargs.items():
-            filtered_value = replace_nontext(str(value))
+            filtered_value = replace_nontext(six.text_type(value))
             element.setAttribute(key, filtered_value)
 
         if content:
