@@ -11,6 +11,14 @@ xmlrunner_version = os.path.join(
 exec(compile(open(xmlrunner_version,"rb").read(), xmlrunner_version, 'exec'))
 
 
+install_requires, setup_requires, tests_require = [], [], ['six']
+
+import sys
+if sys.version_info < (2, 7):
+    install_requires += ['unittest2']
+    setup_requires += ['unittest2']
+    tests_require += ['unittest2']
+
 setup(
     name = 'unittest-xml-reporting',
     version = __version__,
@@ -37,6 +45,8 @@ setup(
     package_dir = {'':'src'},
     zip_safe = False,
     include_package_data = True,
-    install_requires = ['six'],
+    install_requires = install_requires,
+    setup_requires = setup_requires,
+    tests_require = tests_require,
     test_suite = 'xmlrunner.tests.testsuite'
 )

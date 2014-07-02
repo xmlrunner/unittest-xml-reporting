@@ -3,8 +3,12 @@
 
 """Executable module to test unittest-xml-reporting.
 """
+import sys
+if sys.version_info < (2, 7):
+    import unittest2 as unittest
+else:
+    import unittest
 
-import unittest
 import xmlrunner
 
 class XMLTestRunnerTestCase(unittest.TestCase):
