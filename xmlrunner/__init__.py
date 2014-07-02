@@ -1,8 +1,7 @@
-from runner import *
 
-VERSION = (2, 0, 0)
+__all__ = ('XMLTestRunner',)
 
-def get_version():
-    """Returns VERSION as string in X.Y.Z format.
-    """
-    return '.'.join(str(part) for part in VERSION)
+import xmlrunner.version
+from xmlrunner.runner import XMLTestRunner
+
+__version__ = xmlrunner.version.__version__
