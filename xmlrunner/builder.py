@@ -16,9 +16,9 @@ __all__ = ('TestXMLBuilder', 'TestXMLContext')
 _char_tail = ''
 
 if sys.maxunicode > 0x10000:
-    _char_tail = six.u('%s-%s' % (unichr(0x10000), unichr(min(sys.maxunicode, 0x10FFFF))))
+    _char_tail = six.u('%s-%s') % (unichr(0x10000), unichr(min(sys.maxunicode, 0x10FFFF)))
 
-_nontext_sub = re.compile(six.u(r'[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD%s]' % _char_tail), re.U).sub
+_nontext_sub = re.compile(six.u(r'[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD%s]') % _char_tail, re.U).sub
 
 def replace_nontext(text, replacement=six.u('\uFFFD')):
     return _nontext_sub(replacement, text)
