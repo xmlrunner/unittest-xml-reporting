@@ -11,49 +11,20 @@ Django docs website.
 
 from django.conf import settings
 from django.test.simple import DjangoTestSuiteRunner
-from django.test.utils import setup_test_environment, teardown_test_environment
 import xmlrunner
 
-
+# if using django-discover-runner, pretty much the same thing
+# class XMLDiscoverTestRunner(discover_runner.DiscoverRunner):
 class XMLTestRunner(DjangoTestSuiteRunner):
-    def run_tests(self, test_labels, extra_tests=None, **kwargs):
-        """
-        Run the unit tests for all the test labels in the provided list.
-        Labels must be of the form:
-         - app.TestClass.test_method
-            Run a single specific test method
-         - app.TestClass
-            Run all the test methods in a given class
-         - app
-            Search for doctests and unittests in the named application.
 
-        When looking for tests, the test runner will look in the models and
-        tests modules for the application.
-
-        A list of 'extra' tests may also be provided; these tests
-        will be added to the test suite.
-
-        Returns the number of tests that failed.
-        """
-        setup_test_environment()
-
-        settings.DEBUG = False
-
+    def run_suite(self, suite, **kwargs):
         verbosity = getattr(settings, 'TEST_OUTPUT_VERBOSE', 1)
+        #XXX: verbosity = self.verbosity
         if isinstance(verbosity, bool):
             verbosity = (1, 2)[verbosity]
         descriptions = getattr(settings, 'TEST_OUTPUT_DESCRIPTIONS', False)
         output = getattr(settings, 'TEST_OUTPUT_DIR', '.')
-
-        suite = self.build_suite(test_labels, extra_tests)
-
-        old_config = self.setup_databases()
-
-        result = xmlrunner.XMLTestRunner(
+        return xmlrunner.XMLTestRunner(
             verbosity=verbosity, descriptions=descriptions,
-            output=output).run(suite)
+            output=output, failfast=self.failfast).run(suite)
 
-        self.teardown_databases(old_config)
-        teardown_test_environment()
-
-        return len(result.failures) + len(result.errors)
