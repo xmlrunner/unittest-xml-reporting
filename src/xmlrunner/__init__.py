@@ -127,11 +127,12 @@ class _XMLTestResult(_TextTestResult):
     Used by XMLTestRunner.
     """
     def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1,
-                 elapsed_times=True):
+                 elapsed_times=True, properties=None):
         _TextTestResult.__init__(self, stream, descriptions, verbosity)
         self.successes = []
         self.callback = None
         self.elapsed_times = elapsed_times
+        self.properties = None # junit testsuite properties
 
     def _prepare_callback(self, test_info, target_list, verbose_str,
                           short_str):
@@ -253,7 +254,20 @@ class _XMLTestResult(_TextTestResult):
 
         return tests_by_testcase
 
-    def _report_testsuite(suite_name, outsuffix, tests, xml_document):
+    def _report_testsuite_properties(xml_testsuite, xml_document, properties):
+        xml_properties = xml_document.createElement('properties')
+        xml_testsuite.appendChild(xml_properties)
+        if properties:
+            for key, value in properties.items():
+                prop = xml_document.createElement('property')
+                prop.setAttribute('name', str(key))
+                prop.setAttribute('value', str(value))
+                xml_properties.appendChild(prop)
+        return xml_properties
+
+    _report_testsuite_properties = staticmethod(_report_testsuite_properties)
+
+    def _report_testsuite(suite_name, outsuffix, tests, xml_document, properties):
         """
         Appends the testsuite section to the XML document.
         """
@@ -271,6 +285,8 @@ class _XMLTestResult(_TextTestResult):
 
         errors = filter(lambda e: e.outcome == _TestInfo.ERROR, tests)
         testsuite.setAttribute('errors', str(len(list(errors))))
+
+        _XMLTestResult._report_testsuite_properties(testsuite, xml_document, properties)
 
         systemout = xml_document.createElement('system-out')
         testsuite.appendChild(systemout)
@@ -360,7 +376,7 @@ class _XMLTestResult(_TextTestResult):
 
             # Build the XML file
             testsuite = _XMLTestResult._report_testsuite(
-                suite, test_runner.outsuffix, tests, doc
+                suite, test_runner.outsuffix, tests, doc, self.properties
             )
             for test in tests:
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
@@ -432,6 +448,9 @@ class XMLTestRunner(TextTestRunner):
             # Prepare the test execution
             self._patch_standard_output()
             result = self._make_result()
+            if hasattr(test, 'properties'):
+                # junit testsuite properties
+                result.properties = test.properties
 
             # Print a nice header
             self.stream.writeln()
