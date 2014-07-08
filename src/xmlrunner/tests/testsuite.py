@@ -10,6 +10,11 @@ else:
     import unittest
 
 import xmlrunner
+from six import StringIO
+from tempfile import mkdtemp
+from shutil import rmtree
+from glob import glob
+import os.path
 
 class XMLTestRunnerTestCase(unittest.TestCase):
     """
@@ -25,12 +30,18 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             self.assertTrue(False)
 
     def test_xmlrunner(self):
-        runner = xmlrunner.XMLTestRunner(verbosity=0)
+        stream = StringIO()
+        outdir = mkdtemp()
+        self.addCleanup(rmtree, outdir)
+        runner = xmlrunner.XMLTestRunner(
+            stream=stream, output=outdir, verbosity=0)
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_pass'))
         suite.addTest(self.DummyTest('test_skip'))
         suite.addTest(self.DummyTest('test_fail'))
+        self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
         runner.run(suite)
+        self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
 
 if __name__ == '__main__':
     unittest.main()
