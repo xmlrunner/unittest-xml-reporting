@@ -79,7 +79,6 @@ class _TestInfo(object):
 
     def __init__(self, test_result, test_method, outcome=SUCCESS, err=None):
         self.test_result = test_result
-        self.test_method = test_method
         self.outcome = outcome
         self.elapsed_time = 0
         self.err = err
@@ -99,7 +98,7 @@ class _TestInfo(object):
         self.test_id = test_method.id()
 
     def id(self):
-        return self.test_method.id()
+        return self.test_id
 
     def test_finished(self):
         """Save info that can only be calculated once a test has run.
