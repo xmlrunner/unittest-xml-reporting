@@ -10,13 +10,10 @@ ver_path = convert_path('src/xmlrunner/version.py')
 with open(ver_path, 'rb') as ver_file:
     exec(ver_file.read(), main_ns)
 
-install_requires, setup_requires, tests_require = [], [], ['six']
-
+install_requires = ['six']
 import sys
 if sys.version_info < (2, 7):
     install_requires += ['unittest2']
-    setup_requires += ['unittest2']
-    tests_require += ['unittest2']
 
 setup(
     name = 'unittest-xml-reporting',
@@ -45,7 +42,5 @@ setup(
     zip_safe = False,
     include_package_data = True,
     install_requires = install_requires,
-    setup_requires = setup_requires,
-    tests_require = tests_require,
     test_suite = 'xmlrunner.tests.testsuite'
 )
