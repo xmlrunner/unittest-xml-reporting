@@ -1,23 +1,27 @@
 #!/usr/bin/env python
 
+import codecs
 import os
+import re
+import sys
+
 from setuptools import setup, find_packages
 from distutils.util import convert_path
 
 # Load version information
-main_ns = {}
 ver_path = convert_path('src/xmlrunner/version.py')
-with open(ver_path, 'rb') as ver_file:
-    exec(ver_file.read(), main_ns)
+_version_file = codecs.open(ver_path, 'r', 'utf-8')
+
+VERSION = re.compile("^__version__ = '(.*?)'", re.S).match(_version_file.read().strip()).group(1)
 
 install_requires = ['six']
-import sys
+
 if sys.version_info < (2, 7):
     install_requires += ['unittest2']
 
 setup(
     name = 'unittest-xml-reporting',
-    version = main_ns['__version__'],
+    version = VERSION,
     author = 'Daniel Fernandes Martins',
     author_email = 'daniel.tritone@gmail.com',
     description = 'unittest-based test runner with Ant/JUnit like XML reporting.',
