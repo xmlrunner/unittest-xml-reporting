@@ -10,12 +10,12 @@ Django docs website.
 """
 
 from django.conf import settings
-from django.test.simple import DjangoTestSuiteRunner
+from django.test.runner import DiscoverRunner
 import xmlrunner
 
 # if using django-discover-runner, pretty much the same thing
 # class XMLDiscoverTestRunner(discover_runner.DiscoverRunner):
-class XMLTestRunner(DjangoTestSuiteRunner):
+class XMLTestRunner(DiscoverRunner):
 
     def run_suite(self, suite, **kwargs):
         verbosity = getattr(settings, 'TEST_OUTPUT_VERBOSE', 1)
