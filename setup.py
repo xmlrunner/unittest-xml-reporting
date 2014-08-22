@@ -10,7 +10,7 @@ ver_path = convert_path('src/xmlrunner/version.py')
 with open(ver_path, 'rb') as ver_file:
     exec(ver_file.read(), main_ns)
 
-install_requires = ['six']
+install_requires = ['six>=1.4.0']
 import sys
 if sys.version_info < (2, 7):
     install_requires += ['unittest2']
