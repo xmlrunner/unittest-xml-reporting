@@ -28,7 +28,7 @@ except ImportError:
 from .version import __version__
 
 def to_unicode(data):
-    if six.PY2:
+    if getattr(six, 'PY2', None):
         return six.text_type(data).encode('utf-8')
     else:
         # default encoding is UTF-8
