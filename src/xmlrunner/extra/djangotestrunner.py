@@ -9,13 +9,22 @@ how to configure a custom TestRunner in a Django project, please read the
 Django docs website.
 """
 
+import django
 from django.conf import settings
-from django.test.simple import DjangoTestSuiteRunner
+
+# future compatibilty with django
+# in django 1.6 DiscoverRunner bacame default and
+# DjangoTestSuiteRunner became depecated, will be removed in 1.8
+if django.VERSION < (1, 6):
+    from django.test.simple import DjangoTestSuiteRunner
+    _DjangoRunner = DjangoTestSuiteRunner
+else:
+    from django.test.runner import DiscoverRunner
+    _DjangoRunner = DiscoverRunner
+    
 import xmlrunner
 
-# if using django-discover-runner, pretty much the same thing
-# class XMLDiscoverTestRunner(discover_runner.DiscoverRunner):
-class XMLTestRunner(DjangoTestSuiteRunner):
+class XMLTestRunner(_DjangoRunner):
 
     def run_suite(self, suite, **kwargs):
         verbosity = getattr(settings, 'TEST_OUTPUT_VERBOSE', 1)
