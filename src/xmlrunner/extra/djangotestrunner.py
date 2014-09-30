@@ -21,7 +21,7 @@ if django.VERSION < (1, 6):
 else:
     from django.test.runner import DiscoverRunner
     _DjangoRunner = DiscoverRunner
-    
+
 import xmlrunner
 
 class XMLTestRunner(_DjangoRunner):
