@@ -36,6 +36,10 @@ $ cd danielfm-unittest-xml-reporting-XXXXXXXXXXXXXXXX
 $ sudo python setup.py install
 ````
 
+Or you can manually download the latest released version from
+[PyPI](https://pypi.python.org/pypi/unittest-xml-reporting/).
+
+
 ## Usage
 
 The script below, adapted from the
@@ -110,3 +114,17 @@ order to use this feature, you have to enable verbose output by setting
 Tells the test runner where to put the XML reports. If the directory
 couldn't be found, the test runner will try to create it before
 generate the XML files.
+
+
+## Contributing
+
+We are always looking for good contributions, so please just fork the
+repository and send pull requests. If you would like write access to the
+repository, or become a maintainer, feel free to get in touch.
+
+## Work in progress
+
+There is a [rewrite branch](https://github.com/xmlrunner/unittest-xml-reporting/tree/rewrite) which contains better unit tests and uses a different runner. It
+introduces a `CompositeTestResult` which allows the use of both `TextTestResult`
+and `XMLTestResult` as delegates. If you would like to help reconcile both
+branches, pull requests are welcome.
