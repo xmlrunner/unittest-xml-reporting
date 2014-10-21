@@ -46,7 +46,7 @@ class XMLTestRunner(TextTestRunner):
     """
     def __init__(self, output='.', outsuffix=None, stream=sys.stderr,
                  descriptions=True, verbosity=1, elapsed_times=True,
-                 failfast=False, encoding=None):
+                 failfast=False, encoding='utf8'):
         TextTestRunner.__init__(self, stream, descriptions, verbosity,
                                 failfast=failfast)
         self.verbosity = verbosity
