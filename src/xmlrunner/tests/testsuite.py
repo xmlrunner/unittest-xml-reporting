@@ -16,6 +16,7 @@ from shutil import rmtree
 from glob import glob
 import os.path
 
+
 class XMLTestRunnerTestCase(unittest.TestCase):
     """
     XMLTestRunner test case.
@@ -24,6 +25,9 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         @unittest.skip("demonstrating skipping")
         def test_skip(self):
             pass   # pragma: no cover
+        @unittest.skip(u"demonstrating non-ascii skipping: éçà")
+        def test_non_ascii_skip(self):
+            pass
         def test_pass(self):
             pass
         def test_fail(self):
@@ -38,6 +42,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             1 / 0
         def test_cdata_section(self):
             print('<![CDATA[content]]>')
+        def test_non_ascii_error(self):
+            self.assertEqual(u"éçà", 42)
 
     def setUp(self):
         self.stream = StringIO()
@@ -58,6 +64,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
         runner.run(suite)
         self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
+        return runner
 
     def test_basic_unittest_constructs(self):
         suite = unittest.TestSuite()
@@ -68,6 +75,21 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.addTest(self.DummyTest('test_unexpected_success'))
         suite.addTest(self.DummyTest('test_error'))
         self._test_xmlrunner(suite)
+
+    def test_xmlrunner_non_ascii(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_non_ascii_skip'))
+        suite.addTest(self.DummyTest('test_non_ascii_error'))
+        outdir = StringIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        self.assertIn(
+            u'<skipped message="demonstrating non-ascii skipping: éçà" type="skip"/>'.encode('utf8'),
+            output)
 
     def test_xmlrunner_pass(self):
         suite = unittest.TestSuite()

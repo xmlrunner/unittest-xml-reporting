@@ -18,11 +18,13 @@ except ImportError:
 
 
 def to_unicode(data):
-    if six.PY2:
-        return six.text_type(data).encode('utf-8')
-    else:
-        # default encoding is UTF-8
+    """Returns unicode in Python2 and str in Python3"""
+    try:
         return six.text_type(data)
+    except UnicodeDecodeError:
+        # Try utf8
+        return repr(data).decode('utf8', 'replace')
+
 
 def testcase_name(test_method):
     testcase = type(test_method)
