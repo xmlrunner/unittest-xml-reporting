@@ -23,7 +23,9 @@ setup(
     description = 'unittest-based test runner with Ant/JUnit like XML reporting.',
     license = 'BSD',
     platforms = ['Any'],
-    keywords = ['pyunit', 'unittest', 'junit xml', 'report', 'testrunner'],
+    keywords = [
+        'pyunit', 'unittest', 'junit xml', 'report', 'testrunner', 'xmlrunner'
+    ],
     url = 'http://github.com/xmlrunner/unittest-xml-reporting/tree/master/',
     classifiers = [
         'Development Status :: 5 - Production/Stable',
