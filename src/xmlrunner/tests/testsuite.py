@@ -10,7 +10,7 @@ else:
     import unittest
 
 import xmlrunner
-from six import StringIO
+from six import StringIO, BytesIO
 from tempfile import mkdtemp
 from shutil import rmtree
 from glob import glob
@@ -25,7 +25,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         @unittest.skip("demonstrating skipping")
         def test_skip(self):
             pass   # pragma: no cover
-        @unittest.skip("demonstrating non-ascii skipping: éçà")
+        @unittest.skip(u"demonstrating non-ascii skipping: éçà")
         def test_non_ascii_skip(self):
             pass   # pragma: no cover
         def test_pass(self):
@@ -43,7 +43,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         def test_cdata_section(self):
             print('<![CDATA[content]]>')
         def test_non_ascii_error(self):
-            self.assertEqual("éçà", 42)
+            self.assertEqual(u"éçà", 42)
 
     def setUp(self):
         self.stream = StringIO()
@@ -64,6 +64,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
         runner.run(suite)
         self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
+        return runner
 
     def test_basic_unittest_constructs(self):
         suite = unittest.TestSuite()
@@ -79,7 +80,16 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_non_ascii_skip'))
         suite.addTest(self.DummyTest('test_non_ascii_error'))
-        self._test_xmlrunner(suite)
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        self.assertIn(
+            u'<skipped message="demonstrating non-ascii skipping: éçà" type="skip"/>'.encode('utf8'),
+            output)
 
     def test_xmlrunner_pass(self):
         suite = unittest.TestSuite()
@@ -125,7 +135,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
 
     def test_xmlrunner_stream(self):
         stream = self.stream
-        output = StringIO()
+        output = BytesIO()
         runner = xmlrunner.XMLTestRunner(
             stream=stream, output=output, verbosity=self.verbosity,
             **self.runner_kwargs)

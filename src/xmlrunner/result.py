@@ -23,7 +23,7 @@ def to_unicode(data):
          return six.text_type(data)
     try:
         # Try utf8
-        return six.text_type(data).encode('utf-8')
+        return six.text_type(data)
     except UnicodeDecodeError as err:
         return repr(data).decode('utf8', 'replace')
 
@@ -358,7 +358,7 @@ class _XMLTestResult(_TextTestResult):
                     '%s%sTEST-%s-%s.xml' % (
                         test_runner.output, os.sep, suite,
                         test_runner.outsuffix
-                    ), 'w'
+                    ), 'wb'
                 )
                 try:
                     report_file.write(xml_content)
