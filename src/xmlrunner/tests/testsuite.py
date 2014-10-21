@@ -16,6 +16,7 @@ from shutil import rmtree
 from glob import glob
 import os.path
 
+
 class XMLTestRunnerTestCase(unittest.TestCase):
     """
     XMLTestRunner test case.
@@ -24,6 +25,9 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         @unittest.skip("demonstrating skipping")
         def test_skip(self):
             pass   # pragma: no cover
+        @unittest.skip("demonstrating non-ascii skipping: éçà")
+        def test_non_ascii_skip(self):
+            pass
         def test_pass(self):
             pass
         def test_fail(self):
@@ -38,6 +42,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             1 / 0
         def test_cdata_section(self):
             print('<![CDATA[content]]>')
+        def test_non_ascii_error(self):
+            self.assertEqual(u"éçà", 42)
 
     def setUp(self):
         self.stream = StringIO()
@@ -67,6 +73,12 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.addTest(self.DummyTest('test_expected_failure'))
         suite.addTest(self.DummyTest('test_unexpected_success'))
         suite.addTest(self.DummyTest('test_error'))
+        self._test_xmlrunner(suite)
+
+    def test_xmlrunner_non_ascii(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_non_ascii_skip'))
+        suite.addTest(self.DummyTest('test_non_ascii_error'))
         self._test_xmlrunner(suite)
 
     def test_xmlrunner_pass(self):
