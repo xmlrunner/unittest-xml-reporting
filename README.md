@@ -22,7 +22,7 @@ $ pip install unittest-xml-reporting
 If you use Git and want to get the latest *development* version:
 
 ````bash
-$ git clone git://github.com/danielfm/unittest-xml-reporting.git
+$ git clone https://github.com/xmlrunner/unittest-xml-reporting.git
 $ cd unittest-xml-reporting
 $ sudo python setup.py install
 ````
@@ -30,9 +30,9 @@ $ sudo python setup.py install
 Or get the latest *development* version as a tarball:
 
 ````bash
-$ wget http://github.com/danielfm/unittest-xml-reporting/tarball/master
-$ tar zxf danielfm-unittest-xml-reporting-XXXXXXXXXXXXXXXX.tar.gz
-$ cd danielfm-unittest-xml-reporting-XXXXXXXXXXXXXXXX
+$ wget https://github.com/xmlrunner/unittest-xml-reporting/archive/master.zip
+$ unzip master.zip
+$ cd unittest-xml-reporting
 $ sudo python setup.py install
 ````
 
