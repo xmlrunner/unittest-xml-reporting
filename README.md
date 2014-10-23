@@ -122,6 +122,13 @@ We are always looking for good contributions, so please just fork the
 repository and send pull requests. If you would like write access to the
 repository, or become a maintainer, feel free to get in touch.
 
+
+### Testing changes with `tox`
+
+Please use `tox` to test your changes before sending a pull request.
+You can find more information about `tox` at <https://testrun.org/tox/latest/>.
+
+
 ## Work in progress
 
 There is a [rewrite branch](https://github.com/xmlrunner/unittest-xml-reporting/tree/rewrite) which contains better unit tests and uses a different runner. It

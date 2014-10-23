@@ -7,3 +7,8 @@ dist/*
 
 # Egg info directory
 *.egg-info
+
+# tox + coverage
+.tox
+.coverage
+htmlcov/
