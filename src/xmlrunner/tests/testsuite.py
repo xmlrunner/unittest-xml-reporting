@@ -36,6 +36,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             pass
         def test_error(self):
             1 / 0
+        def test_cdata_section(self):
+            print('<![CDATA[content]]>')
 
     def setUp(self):
         self.stream = StringIO()
@@ -65,6 +67,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.addTest(self.DummyTest('test_expected_failure'))
         suite.addTest(self.DummyTest('test_unexpected_success'))
         suite.addTest(self.DummyTest('test_error'))
+        suite.addTest(self.DummyTest('test_cdata_section'))
         self._test_xmlrunner(suite)
 
     def test_xmlrunner_pass(self):
