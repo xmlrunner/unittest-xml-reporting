@@ -37,12 +37,24 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         def test_error(self):
             1 / 0
 
+    def setUp(self):
+        self.stream = StringIO()
+        self.outdir = mkdtemp()
+        self.verbosity = 0
+        self.addCleanup(rmtree, self.outdir)
+
+    def _test_xmlrunner(self, suite, runner=None):
+        outdir = self.outdir
+        stream = self.stream
+        verbosity = self.verbosity
+        if runner is None:
+            runner = xmlrunner.XMLTestRunner(
+                stream=stream, output=outdir, verbosity=verbosity)
+        self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
+        runner.run(suite)
+        self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
+
     def test_xmlrunner(self):
-        stream = StringIO()
-        outdir = mkdtemp()
-        self.addCleanup(rmtree, outdir)
-        runner = xmlrunner.XMLTestRunner(
-            stream=stream, output=outdir, verbosity=0)
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_pass'))
         suite.addTest(self.DummyTest('test_skip'))
@@ -50,18 +62,22 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.addTest(self.DummyTest('test_expected_failure'))
         suite.addTest(self.DummyTest('test_unexpected_success'))
         suite.addTest(self.DummyTest('test_error'))
-        self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
-        runner.run(suite)
-        self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
+        self._test_xmlrunner(suite)
 
     def test_xmlrunner_pass(self):
-        stream = StringIO()
-        outdir = mkdtemp()
-        self.addCleanup(rmtree, outdir)
-        runner = xmlrunner.XMLTestRunner(
-            stream=stream, output=outdir, verbosity=0)
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_pass'))
-        self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
-        runner.run(suite)
-        self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
+        self._test_xmlrunner(suite)
+
+    def test_xmlrunner_verbose(self):
+        self.verbosity = 1
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        self._test_xmlrunner(suite)
+
+    def test_xmlrunner_showall(self):
+        self.verbosity = 2
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        self._test_xmlrunner(suite)
+
