@@ -41,15 +41,18 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.stream = StringIO()
         self.outdir = mkdtemp()
         self.verbosity = 0
+        self.runner_kwargs = {}
         self.addCleanup(rmtree, self.outdir)
 
     def _test_xmlrunner(self, suite, runner=None):
         outdir = self.outdir
         stream = self.stream
         verbosity = self.verbosity
+        runner_kwargs = self.runner_kwargs
         if runner is None:
             runner = xmlrunner.XMLTestRunner(
-                stream=stream, output=outdir, verbosity=verbosity)
+                stream=stream, output=outdir, verbosity=verbosity,
+                **self.runner_kwargs)
         self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
         runner.run(suite)
         self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
@@ -80,4 +83,12 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_pass'))
         self._test_xmlrunner(suite)
+
+    def test_xmlrunner_outsuffix(self):
+        self.runner_kwargs['outsuffix'] = '.somesuffix'
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        self._test_xmlrunner(suite)
+        xmlfile = glob(os.path.join(self.outdir, '*xml'))[0]
+        assert xmlfile.endswith('.somesuffix.xml')
 
