@@ -59,7 +59,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
 
-    def test_xmlrunner(self):
+    def test_basic_unittest_constructs(self):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_pass'))
         suite.addTest(self.DummyTest('test_skip'))
@@ -67,7 +67,6 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.addTest(self.DummyTest('test_expected_failure'))
         suite.addTest(self.DummyTest('test_unexpected_success'))
         suite.addTest(self.DummyTest('test_error'))
-        suite.addTest(self.DummyTest('test_cdata_section'))
         self._test_xmlrunner(suite)
 
     def test_xmlrunner_pass(self):
@@ -85,6 +84,11 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.verbosity = 2
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_pass'))
+        self._test_xmlrunner(suite)
+
+    def test_xmlrunner_cdata_section(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_cdata_section'))
         self._test_xmlrunner(suite)
 
     def test_xmlrunner_outsuffix(self):
