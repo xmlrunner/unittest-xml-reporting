@@ -99,3 +99,9 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         xmlfile = glob(os.path.join(self.outdir, '*xml'))[0]
         assert xmlfile.endswith('.somesuffix.xml')
 
+    def test_junitxml_properties(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        suite.properties = dict(key='value')
+        self._test_xmlrunner(suite)
+
