@@ -23,7 +23,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
     class DummyTest(unittest.TestCase):
         @unittest.skip("demonstrating skipping")
         def test_skip(self):
-            pass
+            pass   # pragma: no cover
         def test_pass(self):
             pass
         def test_fail(self):
@@ -42,6 +42,3 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
         runner.run(suite)
         self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
-
-if __name__ == '__main__':
-    unittest.main()
