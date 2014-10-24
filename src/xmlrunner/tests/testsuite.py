@@ -105,3 +105,13 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.properties = dict(key='value')
         self._test_xmlrunner(suite)
 
+    def test_xmlrunner_stream(self):
+        stream = self.stream
+        output = StringIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=stream, output=output, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        runner.run(suite)
+
