@@ -105,6 +105,12 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.properties = dict(key='value')
         self._test_xmlrunner(suite)
 
+    def test_xmlrunner_elapsed_times(self):
+        self.runner_kwargs['elapsed_times'] = False
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        self._test_xmlrunner(suite)
+
     def test_xmlrunner_stream(self):
         stream = self.stream
         output = StringIO()
