@@ -124,3 +124,15 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_pass'))
         runner.run(suite)
+
+    def test_xmlrunner_patched_stdout(self):
+        old_stdout, old_stderr = sys.stdout, sys.stderr
+        try:
+            sys.stdout, sys.stderr = StringIO(), StringIO()
+            suite = unittest.TestSuite()
+            suite.addTest(self.DummyTest('test_pass'))
+            suite.properties = dict(key='value')
+            self._test_xmlrunner(suite)
+        finally:
+            sys.stdout, sys.stderr = old_stdout, old_stderr
+
