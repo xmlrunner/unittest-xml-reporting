@@ -1,5 +1,10 @@
-[![License:BSD](http://img.shields.io/badge/license-BSD-blue.svg)](http://img.shields.io/badge/license-BSD-blue.svg) [![Build Status](https://travis-ci.org/xmlrunner/unittest-xml-reporting.svg?branch=master)](https://travis-ci.org/xmlrunner/unittest-xml-reporting) [![Code Health](https://landscape.io/github/xmlrunner/unittest-xml-reporting/master/landscape.png)](https://landscape.io/github/xmlrunner/unittest-xml-reporting/master) [![Requirements Status](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements.svg?branch=master)](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements/?branch=master)
-
+[![License](https://pypip.in/license/unittest-xml-reporting/badge.svg)](https://pypi.python.org/pypi/unittest-xml-reporting/)
+[![Build Status](https://travis-ci.org/xmlrunner/unittest-xml-reporting.svg?branch=master)](https://travis-ci.org/xmlrunner/unittest-xml-reporting)
+[![Code Health](https://landscape.io/github/xmlrunner/unittest-xml-reporting/master/landscape.png)](https://landscape.io/github/xmlrunner/unittest-xml-reporting/master)
+[![Requirements Status](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements.svg?branch=master)](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements/?branch=master) 
+[![Latest Version](https://pypip.in/version/unittest-xml-reporting/badge.svg)](https://pypi.python.org/pypi/unittest-xml-reporting/)
+[![Downloads](https://pypip.in/download/unittest-xml-reporting/badge.svg)](https://pypi.python.org/pypi/unittest-xml-reporting/)
+[![Development Status](https://pypip.in/status/unittest-xml-reporting/badge.svg)](https://pypi.python.org/pypi/unittest-xml-reporting/)
 
 # unittest-xml-reporting
 
