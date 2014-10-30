@@ -19,10 +19,12 @@ except ImportError:
 
 def to_unicode(data):
     """Returns unicode in Python2 and str in Python3"""
+    if six.PY3:
+         return six.text_type(data)
     try:
-        return six.text_type(data)
-    except UnicodeDecodeError:
         # Try utf8
+        return six.text_type(data).encode('utf-8')
+    except UnicodeDecodeError as err:
         return repr(data).decode('utf8', 'replace')
 
 

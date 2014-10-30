@@ -27,7 +27,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             pass   # pragma: no cover
         @unittest.skip("demonstrating non-ascii skipping: éçà")
         def test_non_ascii_skip(self):
-            pass
+            pass   # pragma: no cover
         def test_pass(self):
             pass
         def test_fail(self):
@@ -43,7 +43,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         def test_cdata_section(self):
             print('<![CDATA[content]]>')
         def test_non_ascii_error(self):
-            self.assertEqual(u"éçà", 42)
+            self.assertEqual("éçà", 42)
 
     def setUp(self):
         self.stream = StringIO()
