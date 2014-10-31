@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import os
 from setuptools import setup, find_packages
 from distutils.util import convert_path
 
@@ -9,11 +8,6 @@ main_ns = {}
 ver_path = convert_path('src/xmlrunner/version.py')
 with open(ver_path, 'rb') as ver_file:
     exec(ver_file.read(), main_ns)
-
-install_requires = ['six>=1.4.0']
-import sys
-if sys.version_info < (2, 7):
-    install_requires += ['unittest2']
 
 setup(
     name = 'unittest-xml-reporting',
@@ -43,6 +37,9 @@ setup(
     package_dir = {'':'src'},
     zip_safe = False,
     include_package_data = True,
-    install_requires = install_requires,
+    install_requires = ['six>=1.4.0'],
+    extras_require={
+        ':python_version=="2.6"': ['unittest2'],
+    },
     test_suite = 'xmlrunner.tests.testsuite'
 )
