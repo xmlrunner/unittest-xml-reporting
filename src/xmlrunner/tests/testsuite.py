@@ -44,6 +44,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             print('<![CDATA[content]]>')
         def test_non_ascii_error(self):
             self.assertEqual(u"éçà", 42)
+        def test_unsafe_unicode(self):
+            print(u"A\x00B\x08C\x0BD\x0C")
 
     def setUp(self):
         self.stream = StringIO()
@@ -90,6 +92,18 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.assertIn(
             u'<skipped message="demonstrating non-ascii skipping: éçà" type="skip"/>'.encode('utf8'),
             output)
+
+    def test_xmlrunner_unsafe_unicode(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_unsafe_unicode'))
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        self.assertIn(u"<![CDATA[ABCD\n]]>".encode('utf8'), output)
 
     def test_xmlrunner_pass(self):
         suite = unittest.TestSuite()

@@ -3,6 +3,7 @@ import os
 import sys
 import time
 import six
+import re
 
 try:
     from unittest2.runner import TextTestResult as _TextTestResult
@@ -17,6 +18,24 @@ except ImportError:
     from io import StringIO
 
 
+
+# Matches invalid XML1.0 unicode characters, like control characters:
+# http://www.w3.org/TR/2006/REC-xml-20060816/#charsets
+INVALID_XML_1_0_UNICODE_RE = re.compile(
+    u'[\x00-\x08\x0B\x0C\x0E-\x1F\uD800-\uDFFF\uFFFE\uFFFF]', re.UNICODE)
+
+
+def xml_safe_unicode(base, encoding='utf-8'):
+    """Return a unicode string containing only valid XML characters.
+
+    encoding - if base is a byte string it is first decoded to unicode
+        using this encoding.
+    """
+    if isinstance(base, six.binary_type):
+        base = base.decode(encoding)
+    return INVALID_XML_1_0_UNICODE_RE.sub('', base)
+
+
 def to_unicode(data):
     """Returns unicode in Python2 and str in Python3"""
     if six.PY3:
@@ -26,6 +45,10 @@ def to_unicode(data):
         return six.text_type(data)
     except UnicodeDecodeError as err:
         return repr(data).decode('utf8', 'replace')
+
+
+def safe_unicode(data, encoding=None):
+    return xml_safe_unicode(to_unicode(data), encoding)
 
 
 def testcase_name(test_method):
@@ -290,6 +313,7 @@ class _XMLTestResult(_TextTestResult):
     _test_method_name = staticmethod(_test_method_name)
 
     def _createCDATAsections(xmldoc, node, text):
+        text = safe_unicode(text)
         pos = text.find(']]>')
         while pos >= 0:
             tmp=text[0:pos+2]
@@ -321,13 +345,13 @@ class _XMLTestResult(_TextTestResult):
             failure = xml_document.createElement(elem_name)
             testcase.appendChild(failure)
             if test_result.outcome != _TestInfo.SKIP:
-                failure.setAttribute('type', test_result.err[0].__name__)
-                failure.setAttribute('message', to_unicode(test_result.err[1]))
-                error_info = to_unicode(test_result.get_error_info())
+                failure.setAttribute('type', safe_unicode(test_result.err[0].__name__))
+                failure.setAttribute('message', safe_unicode(test_result.err[1]))
+                error_info = safe_unicode(test_result.get_error_info())
                 _XMLTestResult._createCDATAsections(xml_document, failure, error_info)
             else:
                 failure.setAttribute('type', 'skip')
-                failure.setAttribute('message', to_unicode(test_result.err))
+                failure.setAttribute('message', safe_unicode(test_result.err))
 
     _report_testcase = staticmethod(_report_testcase)
 
