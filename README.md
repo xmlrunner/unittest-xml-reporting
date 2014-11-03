@@ -14,7 +14,7 @@ systems, IDEs and continuous integration servers.
 
 ## Requirements
 
-* Python 2.7+
+* Python 2.6+
 
 ## Installation
 
