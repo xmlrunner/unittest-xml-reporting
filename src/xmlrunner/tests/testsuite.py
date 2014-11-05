@@ -203,3 +203,24 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         finally:
             sys.stdout, sys.stderr = old_stdout, old_stderr
 
+    def test_xmlrunner_runas_module(self):
+        # safe some mangled stuff
+        org_main = unittest.main
+
+        self.ranAsModule = False
+        def ownrunner(testRunner=None):
+            self.ranAsModule = True
+            self.assertIsNotNone(testRunner)
+
+        # change main function of unittest
+        unittest.main = ownrunner
+
+        import runpy
+        # run testsiute
+        try:
+            runpy.run_module("xmlrunner")
+            self.assertTrue(self.ranAsModule)
+        finally:
+            # restore manipulated
+            unittest.main = org_main
+
