@@ -218,7 +218,10 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         import runpy
         # run testsiute
         try:
-            runpy.run_module("xmlrunner")
+            if sys.version_info < (2, 7):
+                runpy.run_module("xmlrunner.__main__")
+            else:
+                runpy.run_module("xmlrunner")
             self.assertTrue(self.ranAsModule)
         finally:
             # restore manipulated
