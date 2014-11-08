@@ -44,7 +44,7 @@ def to_unicode(data):
         # Try utf8
         return six.text_type(data)
     except UnicodeDecodeError as err:
-        return repr(data).decode('utf8', 'replace')
+        return repr(data).decode('UTF-8', 'replace')
 
 
 def safe_unicode(data, encoding=None):
@@ -375,6 +375,10 @@ class _XMLTestResult(_TextTestResult):
             )
             for test in tests:
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
+            
+            print 
+            print "#"* 100
+            print 'xml content in encoding ', test_runner.encoding
             xml_content = doc.toprettyxml(indent='\t', encoding=test_runner.encoding)
 
             if isinstance(test_runner.output, six.string_types):
