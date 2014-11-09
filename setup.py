@@ -2,11 +2,12 @@
 
 from setuptools import setup, find_packages
 from distutils.util import convert_path
+import codecs
 
 # Load version information
 main_ns = {}
 ver_path = convert_path('src/xmlrunner/version.py')
-with open(ver_path, 'rb') as ver_file:
+with codecs.open(ver_path, 'rb', 'utf8') as ver_file:
     exec(ver_file.read(), main_ns)
 
 install_requires = ['six>=1.4.0']
