@@ -14,6 +14,9 @@ from glob import glob
 import os.path
 
 
+from .builder_test import *
+
+
 class XMLTestRunnerTestCase(unittest.TestCase):
     """
     XMLTestRunner test case.
