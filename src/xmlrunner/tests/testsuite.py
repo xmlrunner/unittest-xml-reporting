@@ -110,7 +110,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         output = outdir.read()
         firstline = output.splitlines()[0]
         # test for issue #74
-        self.assertIn('encoding="UTF-8"', firstline)
+        self.assertIn('encoding="UTF-8"'.encode('utf8'), firstline)
 
     def test_xmlrunner_unsafe_unicode(self):
         suite = unittest.TestSuite()
