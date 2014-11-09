@@ -95,6 +95,11 @@ if __name__ == '__main__':
         failfast=False, buffer=False, catchbreak=False)
 ````
 
+Or run xmlrunner directly:
+````bash
+$ python -m xmlrunner discover
+````
+
 ### Django
 
 In order to plug `XMLTestRunner` to a Django project, add the following
