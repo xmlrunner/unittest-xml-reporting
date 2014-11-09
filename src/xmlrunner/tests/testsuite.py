@@ -46,6 +46,11 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             self.assertEqual(u"éçà", 42)
         def test_unsafe_unicode(self):
             print(u"A\x00B\x08C\x0BD\x0C")
+        def test_runner_buffer_output_pass(self):
+            print('should not be printed')
+        def test_runner_buffer_output_fail(self):
+            print('should be printed')
+            self.fail('expected to fail')
 
     def setUp(self):
         self.stream = StringIO()
@@ -104,6 +109,15 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir.seek(0)
         output = outdir.read()
         self.assertIn(u"<![CDATA[ABCD\n]]>".encode('utf8'), output)
+
+    def test_xmlrunner_buffer_output(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_runner_buffer_output_pass'))
+        suite.addTest(self.DummyTest('test_runner_buffer_output_fail'))
+        self._test_xmlrunner(suite)
+        testsuite_output = self.stream.getvalue()
+        self.assertIn('should be printed', testsuite_output)
+        self.assertNotIn('should not be printed', testsuite_output)
 
     def test_xmlrunner_pass(self):
         suite = unittest.TestSuite()

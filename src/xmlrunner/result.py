@@ -76,10 +76,8 @@ class _TestInfo(object):
         self.outcome = outcome
         self.elapsed_time = 0
         self.err = err
-        self.stdout = sys.stdout.getvalue()
-        sys.stdout.reset()
-        self.stderr = sys.stderr.getvalue()
-        sys.stderr.reset()
+        self.stdout = test_result._stdout_data
+        self.stderr = test_result._stderr_data
 
         self.test_description = self.test_result.getDescription(test_method)
         self.test_exception_info = (
@@ -123,6 +121,9 @@ class _XMLTestResult(_TextTestResult):
     def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1,
                  elapsed_times=True, properties=None):
         _TextTestResult.__init__(self, stream, descriptions, verbosity)
+        self.buffer = True  # we are capturing test output
+        self._stdout_data = None
+        self._stderr_data = None
         self.successes = []
         self.callback = None
         self.elapsed_times = elapsed_times
@@ -166,10 +167,18 @@ class _XMLTestResult(_TextTestResult):
             self.stream.write('  ' + self.getDescription(test))
             self.stream.write(" ... ")
 
+    def _save_output_data(self):
+        self._stdout_data = sys.stdout.getvalue()
+        self._stderr_data = sys.stderr.getvalue()
+
     def stopTest(self, test):
         """
         Called after execute each test method.
         """
+        self._save_output_data()
+        # self._stdout_data = sys.stdout.getvalue()
+        # self._stderr_data = sys.stderr.getvalue()
+
         _TextTestResult.stopTest(self, test)
         self.stop_time = time.time()
 
@@ -181,6 +190,7 @@ class _XMLTestResult(_TextTestResult):
         """
         Called when a test executes successfully.
         """
+        self._save_output_data()
         self._prepare_callback(
             _TestInfo(self, test), self.successes, 'OK', '.'
         )
@@ -189,6 +199,7 @@ class _XMLTestResult(_TextTestResult):
         """
         Called when a test method fails.
         """
+        self._save_output_data()
         testinfo = _TestInfo(self, test, _TestInfo.FAILURE, err)
         self.failures.append((
             testinfo,
@@ -200,6 +211,7 @@ class _XMLTestResult(_TextTestResult):
         """
         Called when a test method raises an error.
         """
+        self._save_output_data()
         testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
         self.errors.append((
             testinfo,
@@ -211,6 +223,7 @@ class _XMLTestResult(_TextTestResult):
         """
         Called when a test method was skipped.
         """
+        self._save_output_data()
         testinfo = _TestInfo(self, test, _TestInfo.SKIP, reason)
         self.skipped.append((testinfo, reason))
         self._prepare_callback(testinfo, [], 'SKIP', 'S')
