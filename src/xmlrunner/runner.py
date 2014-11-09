@@ -16,13 +16,18 @@ except ImportError:
     from io import StringIO
 
 
+# see issue #74, the encoding name needs to be one of
+# http://www.iana.org/assignments/character-sets/character-sets.xhtml
+UTF8 = 'UTF-8'
+
+
 class XMLTestRunner(TextTestRunner):
     """
     A test runner class that outputs the results in JUnit like XML files.
     """
     def __init__(self, output='.', outsuffix=None, stream=sys.stderr,
                  descriptions=True, verbosity=1, elapsed_times=True,
-                 failfast=False, buffer=False, encoding='utf8'):
+                 failfast=False, buffer=False, encoding=UTF8):
         TextTestRunner.__init__(self, stream, descriptions, verbosity,
                                 failfast=failfast, buffer=buffer)
         self.verbosity = verbosity

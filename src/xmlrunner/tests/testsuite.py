@@ -98,6 +98,20 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             u'<skipped message="demonstrating non-ascii skipping: éçà" type="skip"/>'.encode('utf8'),
             output)
 
+    def test_xmlrunner_safe_xml_encoding_name(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        firstline = output.splitlines()[0]
+        # test for issue #74
+        self.assertIn('encoding="UTF-8"', firstline)
+
     def test_xmlrunner_unsafe_unicode(self):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_unsafe_unicode'))
