@@ -2,11 +2,7 @@
 import sys
 import time
 
-try:
-    from unittest2.runner import TextTestRunner
-except ImportError:
-    from unittest import TextTestRunner
-
+from .unittest import TextTestRunner
 from .result import _XMLTestResult
 
 try:

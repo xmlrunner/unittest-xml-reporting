@@ -4,11 +4,8 @@
 """Executable module to test unittest-xml-reporting.
 """
 import sys
-if sys.version_info < (2, 7):
-    import unittest2 as unittest
-else:
-    import unittest
 
+from xmlrunner.unittest import unittest
 import xmlrunner
 from six import StringIO, BytesIO
 from tempfile import mkdtemp

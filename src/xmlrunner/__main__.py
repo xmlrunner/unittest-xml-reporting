@@ -13,12 +13,7 @@ if sys.argv[0].endswith("__main__.py"):
 
 __unittest = True
 
-try:
-    from unittest2.main import TestProgram
-except ImportError:
-    from unittest.main import TestProgram, USAGE_AS_MAIN
-    TestProgram.USAGE = USAGE_AS_MAIN
-
+from .unittest import TestProgram
 from .runner import XMLTestRunner
 
 main = TestProgram

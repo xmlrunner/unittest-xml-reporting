@@ -5,11 +5,7 @@ import time
 import six
 import re
 
-try:
-    from unittest2.runner import TextTestResult as _TextTestResult
-    from unittest2.result import TestResult
-except ImportError:
-    from unittest import TestResult, _TextTestResult
+from .unittest import TestResult, _TextTestResult
 
 try:
     # Removed in Python 3
