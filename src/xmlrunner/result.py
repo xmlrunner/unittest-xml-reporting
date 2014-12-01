@@ -9,7 +9,7 @@ from .unittest import TestResult, _TextTestResult
 
 try:
     # Removed in Python 3
-    from cStringIO import StringIO
+    from StringIO import StringIO
 except ImportError:
     from io import StringIO
 
