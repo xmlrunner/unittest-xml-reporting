@@ -5,13 +5,6 @@ import time
 from .unittest import TextTestRunner
 from .result import _XMLTestResult
 
-try:
-    # Removed in Python 3
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
-
-
 # see issue #74, the encoding name needs to be one of
 # http://www.iana.org/assignments/character-sets/character-sets.xhtml
 UTF8 = 'UTF-8'

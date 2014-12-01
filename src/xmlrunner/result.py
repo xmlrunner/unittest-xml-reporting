@@ -4,15 +4,9 @@ import sys
 import time
 import six
 import re
+from six.moves import StringIO
 
 from .unittest import TestResult, _TextTestResult
-
-try:
-    # Removed in Python 3
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
-
 
 
 # Matches invalid XML1.0 unicode characters, like control characters:
