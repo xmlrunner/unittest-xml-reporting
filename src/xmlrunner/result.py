@@ -4,6 +4,7 @@ import sys
 import time
 import six
 import re
+from os import path
 from six.moves import StringIO
 
 from .unittest import TestResult, _TextTestResult
@@ -231,7 +232,7 @@ class _XMLTestResult(_TextTestResult):
             self.stream.writeln(self.separator2)
             self.stream.writeln('%s' % test_info.get_error_info())
 
-    def _get_info_by_testcase(self, outsuffix):
+    def _get_info_by_testcase(self):
         """
         Organizes test results by TestCase module. This information is
         used during the report generation, where a XML report will be created
@@ -264,14 +265,14 @@ class _XMLTestResult(_TextTestResult):
 
     _report_testsuite_properties = staticmethod(_report_testsuite_properties)
 
-    def _report_testsuite(suite_name, outsuffix, tests, xml_document, properties):
+    def _report_testsuite(suite_name, tests, xml_document, properties):
         """
         Appends the testsuite section to the XML document.
         """
         testsuite = xml_document.createElement('testsuite')
         xml_document.appendChild(testsuite)
 
-        testsuite.setAttribute('name', "%s-%s" % (suite_name, outsuffix))
+        testsuite.setAttribute('name', suite_name)
         testsuite.setAttribute('tests', str(len(tests)))
 
         testsuite.setAttribute(
@@ -363,7 +364,7 @@ class _XMLTestResult(_TextTestResult):
         Generates the XML reports to a given XMLTestRunner object.
         """
         from xml.dom.minidom import Document
-        all_results = self._get_info_by_testcase(test_runner.outsuffix)
+        all_results = self._get_info_by_testcase()
 
         if (isinstance(test_runner.output, six.string_types) and not
                 os.path.exists(test_runner.output)):
@@ -372,25 +373,25 @@ class _XMLTestResult(_TextTestResult):
         for suite, tests in all_results.items():
             doc = Document()
 
+            suite_name = suite
+            if test_runner.outsuffix:
+                # not checking with 'is not None', empty means no suffix.
+                suite_name = '%s-%s' % (suite, test_runner.outsuffix)
+
             # Build the XML file
             testsuite = _XMLTestResult._report_testsuite(
-                suite, test_runner.outsuffix, tests, doc, self.properties
+                suite_name, tests, doc, self.properties
             )
             for test in tests:
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
             xml_content = doc.toprettyxml(indent='\t', encoding=test_runner.encoding)
 
             if isinstance(test_runner.output, six.string_types):
-                report_file = open(
-                    '%s%sTEST-%s-%s.xml' % (
-                        test_runner.output, os.sep, suite,
-                        test_runner.outsuffix
-                    ), 'wb'
-                )
-                try:
+                filename = path.join(
+                    test_runner.output,
+                    'TEST-%s.xml' % suite_name)
+                with open(filename, 'wb') as report_file:
                     report_file.write(xml_content)
-                finally:
-                    report_file.close()
             else:
                 # Assume that test_runner.output is a stream
                 test_runner.output.write(xml_content)

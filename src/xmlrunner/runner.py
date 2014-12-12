@@ -22,10 +22,11 @@ class XMLTestRunner(TextTestRunner):
         self.verbosity = verbosity
         self.output = output
         self.encoding = encoding
-        if outsuffix:
-            self.outsuffix = outsuffix
-        else:
-            self.outsuffix = time.strftime("%Y%m%d%H%M%S")
+        # None means default timestamped suffix
+        # '' (empty) means no suffix
+        if outsuffix is None:
+            outsuffix = time.strftime("%Y%m%d%H%M%S")
+        self.outsuffix = outsuffix
         self.elapsed_times = elapsed_times
 
     def _make_result(self):

@@ -174,6 +174,15 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         xmlfile = glob(os.path.join(self.outdir, '*xml'))[0]
         assert xmlfile.endswith('.somesuffix.xml')
 
+    def test_xmlrunner_nosuffix(self):
+        self.runner_kwargs['outsuffix'] = ''
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        self._test_xmlrunner(suite)
+        xmlfile = glob(os.path.join(self.outdir, '*xml'))[0]
+        xmlfile = os.path.basename(xmlfile)
+        assert xmlfile == 'TEST-xmlrunner.tests.testsuite.DummyTest.xml'
+
     def test_junitxml_properties(self):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_pass'))
