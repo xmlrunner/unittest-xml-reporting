@@ -14,9 +14,6 @@ from glob import glob
 import os.path
 
 
-from .builder_test import *
-
-
 class XMLTestRunnerTestCase(unittest.TestCase):
     """
     XMLTestRunner test case.
@@ -181,7 +178,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self._test_xmlrunner(suite)
         xmlfile = glob(os.path.join(self.outdir, '*xml'))[0]
         xmlfile = os.path.basename(xmlfile)
-        assert xmlfile == 'TEST-xmlrunner.tests.testsuite.DummyTest.xml'
+        assert xmlfile.endswith('DummyTest.xml')
 
     def test_junitxml_properties(self):
         suite = unittest.TestSuite()

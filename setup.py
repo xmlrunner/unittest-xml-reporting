@@ -6,7 +6,7 @@ import codecs
 
 # Load version information
 main_ns = {}
-ver_path = convert_path('src/xmlrunner/version.py')
+ver_path = convert_path('xmlrunner/version.py')
 with codecs.open(ver_path, 'rb', 'utf8') as ver_file:
     exec(ver_file.read(), main_ns)
 
@@ -41,8 +41,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Testing'
     ],
-    packages = find_packages('src'),
-    package_dir = {'':'src'},
+    packages = ['xmlrunner'],
     zip_safe = False,
     include_package_data = True,
     install_requires = install_requires,
@@ -50,5 +49,5 @@ setup(
         # this is for wheels to work
         ':python_version=="2.6"': ['unittest2'],
     },
-    test_suite = 'xmlrunner.tests.testsuite'
+    test_suite = 'tests'
 )
