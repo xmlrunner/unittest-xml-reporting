@@ -33,7 +33,7 @@ class DjangoTest(unittest.TestCase):
             'app2.tests.DummyTestCase.test_pass',
             'app.tests.DummyTestCase.test_pass',
         ])
-        suite = runner.build_suite()
+        suite = runner.build_suite(test_labels=[])
         test_ids = [ test.id() for test in suite ]
         self.assertEqual(test_ids, [
             'app.tests.DummyTestCase.test_pass',
@@ -43,7 +43,7 @@ class DjangoTest(unittest.TestCase):
     @unittest.skipIf(django is None, 'django not found')
     def test_django_runner(self):
         from django.conf import settings
-        settings.configure()
+        settings.configure(INSTALLED_APPS=['app','app2'])
         from django.test.utils import get_runner
         runner_class = get_runner(settings)
         runner = runner_class()
