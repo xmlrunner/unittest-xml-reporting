@@ -30,11 +30,11 @@ def xml_safe_unicode(base, encoding='utf-8'):
 def to_unicode(data):
     """Returns unicode in Python2 and str in Python3"""
     if six.PY3:
-         return six.text_type(data)
+        return six.text_type(data)
     try:
         # Try utf8
         return six.text_type(data)
-    except UnicodeDecodeError as err:
+    except UnicodeDecodeError:
         return repr(data).decode('utf8', 'replace')
 
 
