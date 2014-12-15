@@ -53,6 +53,7 @@ class DjangoTest(unittest.TestCase):
     def test_django_xmlrunner(self):
         from django.conf import settings
         settings.configure(
+            INSTALLED_APPS=['app','app2'],
             TEST_RUNNER='xmlrunner.extra.djangotestrunner.XMLTestRunner')
         from django.test.utils import get_runner
         runner_class = get_runner(settings)
