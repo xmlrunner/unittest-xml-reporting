@@ -9,6 +9,7 @@ how to configure a custom TestRunner in a Django project, please read the
 Django docs website.
 """
 
+import xmlrunner
 import django
 from django.conf import settings
 
@@ -22,13 +23,12 @@ else:
     from django.test.runner import DiscoverRunner
     _DjangoRunner = DiscoverRunner
 
-import xmlrunner
 
 class XMLTestRunner(_DjangoRunner):
 
     def run_suite(self, suite, **kwargs):
         verbosity = getattr(settings, 'TEST_OUTPUT_VERBOSE', 1)
-        #XXX: verbosity = self.verbosity
+        # XXX: verbosity = self.verbosity
         if isinstance(verbosity, bool):
             verbosity = (1, 2)[verbosity]
         descriptions = getattr(settings, 'TEST_OUTPUT_DESCRIPTIONS', False)
@@ -36,4 +36,3 @@ class XMLTestRunner(_DjangoRunner):
         return xmlrunner.XMLTestRunner(
             verbosity=verbosity, descriptions=descriptions,
             output=output, failfast=self.failfast).run(suite)
-

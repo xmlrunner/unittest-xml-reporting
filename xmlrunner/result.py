@@ -13,7 +13,9 @@ from .unittest import TestResult, _TextTestResult
 # Matches invalid XML1.0 unicode characters, like control characters:
 # http://www.w3.org/TR/2006/REC-xml-20060816/#charsets
 INVALID_XML_1_0_UNICODE_RE = re.compile(
-    u'[\x00-\x08\x0B\x0C\x0E-\x1F\uD800-\uDFFF\uFFFE\uFFFF]', re.UNICODE)
+    u'[\x00-\x08\x0B\x0C\x0E-\x1F\uD800-\uDFFF\uFFFE\uFFFF]',
+    re.UNICODE
+)
 
 
 def xml_safe_unicode(base, encoding='utf-8'):
@@ -118,7 +120,7 @@ class _XMLTestResult(_TextTestResult):
         self.successes = []
         self.callback = None
         self.elapsed_times = elapsed_times
-        self.properties = None # junit testsuite properties
+        self.properties = None  # junit testsuite properties
 
     def _prepare_callback(self, test_info, target_list, verbose_str,
                           short_str):
@@ -240,13 +242,14 @@ class _XMLTestResult(_TextTestResult):
         """
         tests_by_testcase = {}
 
-        for tests in (self.successes, self.failures, self.errors, self.skipped):
+        for tests in (self.successes, self.failures, self.errors,
+                      self.skipped):
             for test_info in tests:
                 if isinstance(test_info, tuple):
                     # This is a skipped, error or a failure test case
                     test_info = test_info[0]
                 testcase_name = test_info.test_name
-                if not testcase_name in tests_by_testcase:
+                if testcase_name not in tests_by_testcase:
                     tests_by_testcase[testcase_name] = []
                 tests_by_testcase[testcase_name].append(test_info)
 
@@ -265,7 +268,8 @@ class _XMLTestResult(_TextTestResult):
 
     _report_testsuite_properties = staticmethod(_report_testsuite_properties)
 
-    def _report_testsuite(suite_name, tests, xml_document, parentElement, properties):
+    def _report_testsuite(suite_name, tests, xml_document, parentElement,
+                          properties):
         """
         Appends the testsuite section to the XML document.
         """
@@ -284,7 +288,8 @@ class _XMLTestResult(_TextTestResult):
         errors = filter(lambda e: e.outcome == _TestInfo.ERROR, tests)
         testsuite.setAttribute('errors', str(len(list(errors))))
 
-        _XMLTestResult._report_testsuite_properties(testsuite, xml_document, properties)
+        _XMLTestResult._report_testsuite_properties(
+            testsuite, xml_document, properties)
 
         systemout = xml_document.createElement('system-out')
         testsuite.appendChild(systemout)
@@ -293,7 +298,8 @@ class _XMLTestResult(_TextTestResult):
         for test in tests:
             # Merge the stdout from the tests in a class
             stdout.write(test.stdout)
-        _XMLTestResult._createCDATAsections(xml_document, systemout, stdout.getvalue())
+        _XMLTestResult._createCDATAsections(
+            xml_document, systemout, stdout.getvalue())
 
         systemerr = xml_document.createElement('system-err')
         testsuite.appendChild(systemerr)
@@ -302,7 +308,8 @@ class _XMLTestResult(_TextTestResult):
         for test in tests:
             # Merge the stderr from the tests in a class
             stderr.write(test.stderr)
-        _XMLTestResult._createCDATAsections(xml_document, systemerr, stderr.getvalue())
+        _XMLTestResult._createCDATAsections(
+            xml_document, systemerr, stderr.getvalue())
 
         return testsuite
 
@@ -320,16 +327,15 @@ class _XMLTestResult(_TextTestResult):
         text = safe_unicode(text)
         pos = text.find(']]>')
         while pos >= 0:
-            tmp=text[0:pos+2]
+            tmp = text[0:pos+2]
             cdata = xmldoc.createCDATASection(tmp)
             node.appendChild(cdata)
-            text=text[pos+2:]
+            text = text[pos+2:]
             pos = text.find(']]>')
         cdata = xmldoc.createCDATASection(text)
         node.appendChild(cdata)
 
     _createCDATAsections = staticmethod(_createCDATAsections)
-
 
     def _report_testcase(suite_name, test_result, xml_testsuite, xml_document):
         """
@@ -345,14 +351,21 @@ class _XMLTestResult(_TextTestResult):
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
 
         if (test_result.outcome != _TestInfo.SUCCESS):
-            elem_name = ('failure', 'error', 'skipped')[test_result.outcome - 1]
+            elem_name = ('failure', 'error', 'skipped')[test_result.outcome-1]
             failure = xml_document.createElement(elem_name)
             testcase.appendChild(failure)
             if test_result.outcome != _TestInfo.SKIP:
-                failure.setAttribute('type', safe_unicode(test_result.err[0].__name__))
-                failure.setAttribute('message', safe_unicode(test_result.err[1]))
+                failure.setAttribute(
+                    'type',
+                    safe_unicode(test_result.err[0].__name__)
+                )
+                failure.setAttribute(
+                    'message',
+                    safe_unicode(test_result.err[1])
+                )
                 error_info = safe_unicode(test_result.get_error_info())
-                _XMLTestResult._createCDATAsections(xml_document, failure, error_info)
+                _XMLTestResult._createCDATAsections(
+                    xml_document, failure, error_info)
             else:
                 failure.setAttribute('type', 'skip')
                 failure.setAttribute('message', safe_unicode(test_result.err))
@@ -366,21 +379,22 @@ class _XMLTestResult(_TextTestResult):
         from xml.dom.minidom import Document
         all_results = self._get_info_by_testcase()
 
-        outputHandledAsString = isinstance(test_runner.output, six.string_types)
+        outputHandledAsString = \
+            isinstance(test_runner.output, six.string_types)
 
-        if ( outputHandledAsString and not os.path.exists(test_runner.output)):
+        if (outputHandledAsString and not os.path.exists(test_runner.output)):
             os.makedirs(test_runner.output)
 
         if not outputHandledAsString:
             doc = Document()
             testsuite = doc.createElement('testsuites')
             doc.appendChild(testsuite)
-            parentElement = testsuite;
+            parentElement = testsuite
 
         for suite, tests in all_results.items():
             if outputHandledAsString:
                 doc = Document()
-                parentElement = doc;
+                parentElement = doc
 
             suite_name = suite
             if test_runner.outsuffix:
@@ -393,7 +407,10 @@ class _XMLTestResult(_TextTestResult):
             )
             for test in tests:
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
-            xml_content = doc.toprettyxml(indent='\t', encoding=test_runner.encoding)
+            xml_content = doc.toprettyxml(
+                indent='\t',
+                encoding=test_runner.encoding
+            )
 
             if outputHandledAsString:
                 filename = path.join(

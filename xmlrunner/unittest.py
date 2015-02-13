@@ -20,3 +20,7 @@ else:
         TestProgram.USAGE = USAGE_AS_MAIN
     except ImportError:
         pass
+
+__all__ = (
+    'unittest', 'TextTestRunner', 'TestResult', '_TextTestResult',
+    'TestProgram')

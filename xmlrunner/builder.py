@@ -20,9 +20,16 @@ UTF8 = 'UTF-8'
 _char_tail = ''
 
 if sys.maxunicode > 0x10000:
-    _char_tail = six.u('%s-%s') % (unichr(0x10000), unichr(min(sys.maxunicode, 0x10FFFF)))
+    _char_tail = six.u('%s-%s') % (
+        unichr(0x10000),
+        unichr(min(sys.maxunicode, 0x10FFFF))
+    )
 
-_nontext_sub = re.compile(six.u(r'[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD%s]') % _char_tail, re.U).sub
+_nontext_sub = re.compile(
+    six.u(r'[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD%s]') % _char_tail,
+    re.U
+).sub
+
 
 def replace_nontext(text, replacement=six.u('\uFFFD')):
     return _nontext_sub(replacement, text)
@@ -38,9 +45,9 @@ class TestXMLContext(object):
     and so on), they all have a 'time' attribute indicating how long it took
     for their testcases to run, etc.
 
-    The purpose of this class is to abstract the job of composing this hierarchy
-    while keeping track of counters and how long it took for a context to be
-    processed.
+    The purpose of this class is to abstract the job of composing this
+    hierarchy while keeping track of counters and how long it took for a
+    context to be processed.
     """
 
     # Allowed keys for self.counters
@@ -87,12 +94,18 @@ class TestXMLContext(object):
             valid_counter_for_element = False
 
             if counter_name == 'skipped':
-                valid_counter_for_element = (tag == 'testsuite')
+                valid_counter_for_element = (
+                    tag == 'testsuite'
+                )
             else:
-                valid_counter_for_element = (tag in ('testsuites', 'testsuite'))
+                valid_counter_for_element = (
+                    tag in ('testsuites', 'testsuite')
+                )
 
             if valid_counter_for_element:
-                value = six.text_type(self.counters.get(counter_name, 0))
+                value = six.text_type(
+                    self.counters.get(counter_name, 0)
+                )
                 self.element.setAttribute(counter_name, value)
 
     def increment_counter(self, counter_name):
@@ -100,7 +113,8 @@ class TestXMLContext(object):
         defined in `_allowed_counters`.
         """
         if counter_name in TestXMLContext._allowed_counters:
-            self.counters[counter_name] = self.counters.get(counter_name, 0) + 1
+            self.counters[counter_name] = \
+                self.counters.get(counter_name, 0) + 1
 
     def elapsed_time(self):
         """Returns the time the context took to run between the calls to
@@ -154,16 +168,15 @@ class XMLContextBuilder(object):
 
         pos = content.find(']]>')
         while pos >= 0:
-            tmp=content[0:pos+2]
+            tmp = content[0:pos+2]
             element.appendChild(self._create_cdata_section(tmp))
-            content=content[pos+2:]
+            content = content[pos+2:]
             pos = content.find(']]>')
 
         element.appendChild(self._create_cdata_section(content))
 
         self._append_child(element)
         return element
-
 
     def append(self, tag, content, **kwargs):
         """Apends a tag in the format <tag attr='val' attr2='val2'>CDATA</tag>
@@ -219,5 +232,6 @@ class XMLContextBuilder(object):
         """Ends all open contexts and returns a pretty printed version of the
         generated XML document.
         """
-        while self.end_context(): pass
+        while self.end_context():
+            pass
         return self._xml_doc.toprettyxml(indent='\t', encoding=UTF8)

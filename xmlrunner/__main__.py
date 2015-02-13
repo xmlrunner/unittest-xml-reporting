@@ -1,6 +1,9 @@
 """Main entry point"""
 
 import sys
+from .unittest import TestProgram
+from .runner import XMLTestRunner
+
 if sys.argv[0].endswith("__main__.py"):
     import os.path
     # We change sys.argv[0] to make help message more useful
@@ -13,8 +16,6 @@ if sys.argv[0].endswith("__main__.py"):
 
 __unittest = True
 
-from .unittest import TestProgram
-from .runner import XMLTestRunner
 
 main = TestProgram
 

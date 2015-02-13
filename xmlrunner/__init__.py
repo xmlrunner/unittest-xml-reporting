@@ -9,3 +9,5 @@ default TextTestRunner.
 from .version import __version__
 
 from .runner import XMLTestRunner
+
+__all__ = ('__version__', 'XMLTestRunner')
