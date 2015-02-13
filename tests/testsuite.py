@@ -11,6 +11,7 @@ from six import StringIO, BytesIO
 from tempfile import mkdtemp
 from shutil import rmtree
 from glob import glob
+from xml.dom import minidom
 import os.path
 
 
@@ -108,6 +109,33 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         firstline = output.splitlines()[0]
         # test for issue #74
         self.assertIn('encoding="UTF-8"'.encode('utf8'), firstline)
+        
+    def test_xmlrunner_check_for_valid_xml_streamout(self):
+        """
+        This test checks if the xml document is valid if there are more than
+        one testsuite and the output of the report is a single stream.
+        """
+        class DummyTestA(unittest.TestCase):
+            def test_pass(self):
+                pass
+        class DummyTestB(unittest.TestCase):
+            def test_pass(self):
+                pass
+        suite = unittest.TestSuite()
+        suite.addTest( unittest.TestLoader().loadTestsFromTestCase(DummyTestA) );
+        suite.addTest( unittest.TestLoader().loadTestsFromTestCase(DummyTestB) );
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        # Finally check if we have a valid XML document or not.        
+        try:
+            minidom.parseString(output)
+        except Exception as e:
+            self.fail(e)
 
     def test_xmlrunner_unsafe_unicode(self):
         suite = unittest.TestSuite()

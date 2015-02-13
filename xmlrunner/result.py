@@ -265,12 +265,12 @@ class _XMLTestResult(_TextTestResult):
 
     _report_testsuite_properties = staticmethod(_report_testsuite_properties)
 
-    def _report_testsuite(suite_name, tests, xml_document, properties):
+    def _report_testsuite(suite_name, tests, xml_document, parentElement, properties):
         """
         Appends the testsuite section to the XML document.
         """
         testsuite = xml_document.createElement('testsuite')
-        xml_document.appendChild(testsuite)
+        parentElement.appendChild(testsuite)
 
         testsuite.setAttribute('name', suite_name)
         testsuite.setAttribute('tests', str(len(tests)))
@@ -366,12 +366,21 @@ class _XMLTestResult(_TextTestResult):
         from xml.dom.minidom import Document
         all_results = self._get_info_by_testcase()
 
-        if (isinstance(test_runner.output, six.string_types) and not
-                os.path.exists(test_runner.output)):
+        outputHandledAsString = isinstance(test_runner.output, six.string_types)
+
+        if ( outputHandledAsString and not os.path.exists(test_runner.output)):
             os.makedirs(test_runner.output)
 
-        for suite, tests in all_results.items():
+        if not outputHandledAsString:
             doc = Document()
+            testsuite = doc.createElement('testsuites')
+            doc.appendChild(testsuite)
+            parentElement = testsuite;
+
+        for suite, tests in all_results.items():
+            if outputHandledAsString:
+                doc = Document()
+                parentElement = doc;
 
             suite_name = suite
             if test_runner.outsuffix:
@@ -380,18 +389,19 @@ class _XMLTestResult(_TextTestResult):
 
             # Build the XML file
             testsuite = _XMLTestResult._report_testsuite(
-                suite_name, tests, doc, self.properties
+                suite_name, tests, doc, parentElement, self.properties
             )
             for test in tests:
                 _XMLTestResult._report_testcase(suite, test, testsuite, doc)
             xml_content = doc.toprettyxml(indent='\t', encoding=test_runner.encoding)
 
-            if isinstance(test_runner.output, six.string_types):
+            if outputHandledAsString:
                 filename = path.join(
                     test_runner.output,
                     'TEST-%s.xml' % suite_name)
                 with open(filename, 'wb') as report_file:
                     report_file.write(xml_content)
-            else:
-                # Assume that test_runner.output is a stream
-                test_runner.output.write(xml_content)
+
+        if not outputHandledAsString:
+            # Assume that test_runner.output is a stream
+            test_runner.output.write(xml_content)
