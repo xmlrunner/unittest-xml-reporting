@@ -84,12 +84,12 @@ class TestXMLContextTest(unittest.TestCase):
         element.attributes['time'].value
 
 
-class XMLContextBuilderTest(unittest.TestCase):
-    """XMLContextBuilder test cases.
+class TestXMLBuilderTest(unittest.TestCase):
+    """TestXMLBuilder test cases.
     """
 
     def setUp(self):
-        self.builder = builder.XMLContextBuilder()
+        self.builder = builder.TestXMLBuilder()
         self.doc = self.builder._xml_doc
         self.builder.begin_context('testsuites', 'name')
 
@@ -113,7 +113,7 @@ class XMLContextBuilderTest(unittest.TestCase):
         self.assertIs(self.builder.current_context().parent, root)
 
     def test_end_inexistent_context(self):
-        self.builder = builder.XMLContextBuilder()
+        self.builder = builder.TestXMLBuilder()
 
         self.assertFalse(self.builder.end_context())
         self.assertEqual(len(self.doc.childNodes), 0)

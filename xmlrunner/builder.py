@@ -123,7 +123,7 @@ class TestXMLContext(object):
         return format(self._stop_time - self._start_time, '.3f')
 
 
-class XMLContextBuilder(object):
+class TestXMLBuilder(object):
     """This class encapsulates most rules needed to create a XML test report
     behind a simple interface.
     """
