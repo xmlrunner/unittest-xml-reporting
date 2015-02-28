@@ -169,6 +169,18 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         testsuite_output = self.stream.getvalue()
         self.assertIn('should be printed', testsuite_output)
 
+    @unittest.skipIf(not hasattr(unittest.TestCase,'subTest'),
+        'unittest.TestCase.subTest not present.')
+    def test_unittest_subTest(self):
+        class DummyTest(unittest.TestCase):
+            def test_subTest(self):
+                for i in range(2):
+                    with self.subTest(i=i):
+                        self.fail('this is a subtest.')
+        suite = unittest.TestSuite()
+        suite.addTest(DummyTest('test_subTest'))
+        self._test_xmlrunner(suite)
+
     def test_xmlrunner_pass(self):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_pass'))
