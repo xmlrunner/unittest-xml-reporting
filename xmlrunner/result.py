@@ -64,7 +64,7 @@ class _TestInfo(object):
     # Possible test outcomes
     (SUCCESS, FAILURE, ERROR, SKIP) = range(4)
 
-    def __init__(self, test_result, test_method, outcome=SUCCESS, err=None):
+    def __init__(self, test_result, test_method, outcome=SUCCESS, err=None, subTest=None):
         self.test_result = test_result
         self.outcome = outcome
         self.elapsed_time = 0
@@ -81,6 +81,8 @@ class _TestInfo(object):
 
         self.test_name = testcase_name(test_method)
         self.test_id = test_method.id()
+        if subTest:
+            self.test_id = subTest.id()
 
     def id(self):
         return self.test_id
@@ -209,6 +211,18 @@ class _XMLTestResult(_TextTestResult):
         self.errors.append((
             testinfo,
             self._exc_info_to_string(err, test)
+        ))
+        self._prepare_callback(testinfo, [], 'ERROR', 'E')
+
+    def addSubTest(self, testcase, test, err):
+        """
+        Called when a subTest method raises an error.
+        """
+        self._save_output_data()
+        testinfo = _TestInfo(self, testcase, _TestInfo.ERROR, err, subTest=test)
+        self.errors.append((
+            testinfo,
+            self._exc_info_to_string(err, testcase)
         ))
         self._prepare_callback(testinfo, [], 'ERROR', 'E')
 
