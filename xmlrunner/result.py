@@ -13,7 +13,7 @@ from .unittest import TestResult, _TextTestResult
 # Matches invalid XML1.0 unicode characters, like control characters:
 # http://www.w3.org/TR/2006/REC-xml-20060816/#charsets
 INVALID_XML_1_0_UNICODE_RE = re.compile(
-    ur'[\x00-\x08\x0B\x0C\x0E-\x1F\uD800-\uDFFF\uFFFE\uFFFF]',
+    ur'[\u0000-\u0008\u000B\u000C\u000E-\u001F\uD800-\uDFFF\uFFFE\uFFFF]',
     re.UNICODE
 )
 
