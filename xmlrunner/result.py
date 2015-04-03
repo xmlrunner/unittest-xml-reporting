@@ -186,8 +186,14 @@ class _XMLTestResult(_TextTestResult):
             self.stream.write(" ... ")
 
     def _save_output_data(self):
-        self._stdout_data = sys.stdout.getvalue()
-        self._stderr_data = sys.stderr.getvalue()
+        try:
+            self._stdout_data = sys.stdout.getvalue()
+        except AttributeError:
+            pass
+        try:
+            self._stderr_data = sys.stderr.getvalue()
+        except AttributeError:
+            pass
 
     def stopTest(self, test):
         """
