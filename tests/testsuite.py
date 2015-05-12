@@ -50,6 +50,17 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             print('should be printed')
             self.fail('expected to fail')
 
+    class DummySubTest(unittest.TestCase):
+        def test_subTest_pass(self):
+            for i in range(2):
+                with self.subTest(i=i):
+                    pass
+
+        def test_subTest_fail(self):
+            for i in range(2):
+                with self.subTest(i=i):
+                    self.fail('this is a subtest.')
+
     def setUp(self):
         self.stream = StringIO()
         self.outdir = mkdtemp()
@@ -171,30 +182,32 @@ class XMLTestRunnerTestCase(unittest.TestCase):
 
     @unittest.skipIf(not hasattr(unittest.TestCase,'subTest'),
         'unittest.TestCase.subTest not present.')
-    def test_unittest_subTest(self):
+    def test_unittest_subTest_fail(self):
         # test for issue #77
-        class DummySubTest(unittest.TestCase):
-            def test_subTest(self):
-                for i in range(2):
-                    with self.subTest(i=i):
-                        self.fail('this is a subtest.')
         outdir = BytesIO()
         runner = xmlrunner.XMLTestRunner(
             stream=self.stream, output=outdir, verbosity=self.verbosity,
             **self.runner_kwargs)
         suite = unittest.TestSuite()
-        suite.addTest(DummySubTest('test_subTest'))
+        suite.addTest(self.DummySubTest('test_subTest_fail'))
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
         self.assertIn(
             b'<testcase classname="tests.testsuite.DummySubTest" '
-            b'name="test_subTest (i=0)"',
+            b'name="test_subTest_fail (i=0)"',
             output)
         self.assertIn(
             b'<testcase classname="tests.testsuite.DummySubTest" '
-            b'name="test_subTest (i=1)"',
+            b'name="test_subTest_fail (i=1)"',
             output)
+
+    @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'), 'unittest.TestCase.subTest not present.')
+    def test_unittest_subTest_pass(self):
+        # Test for issue #85
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummySubTest('test_subTest_pass'))
+        self._test_xmlrunner(suite)
 
     def test_xmlrunner_pass(self):
         suite = unittest.TestSuite()
