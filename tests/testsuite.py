@@ -49,6 +49,9 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         def test_runner_buffer_output_fail(self):
             print('should be printed')
             self.fail('expected to fail')
+        def test_non_ascii_runner_buffer_output_fail(self):
+            print(u'Where is the café ?')
+            self.fail(u'The café could not be found')
 
     class DummySubTest(unittest.TestCase):
         def test_subTest_pass(self):
@@ -159,6 +162,23 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir.seek(0)
         output = outdir.read()
         self.assertIn(u"<![CDATA[ABCD\n]]>".encode('utf8'), output)
+
+    def test_xmlrunner_non_ascii_failures(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_non_ascii_runner_buffer_output_fail'))
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        self.assertIn(
+            u'Where is the café ?'.encode('utf8'),
+            output)
+        self.assertIn(
+            u'The café could not be found'.encode('utf8'),
+            output)
 
     @unittest.expectedFailure
     def test_xmlrunner_buffer_output_pass(self):

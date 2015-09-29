@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import traceback
 import six
 import re
 from os import path
@@ -39,6 +40,9 @@ _illegal_ranges = [
 
 INVALID_XML_1_0_UNICODE_RE = re.compile(u'[%s]' % u''.join(_illegal_ranges)) 
 
+
+STDOUT_LINE = '\nStdout:\n%s'
+STDERR_LINE = '\nStderr:\n%s'
 
 
 def xml_safe_unicode(base, encoding='utf-8'):
@@ -460,3 +464,44 @@ class _XMLTestResult(_TextTestResult):
         if not outputHandledAsString:
             # Assume that test_runner.output is a stream
             test_runner.output.write(xml_content)
+
+    def _exc_info_to_string(self, err, test):
+        """Converts a sys.exc_info()-style tuple of values into a string."""
+        if six.PY3:
+            # It works fine in python 3
+            return super(_XMLTestResult, self)._exc_info_to_string(err, test)
+
+        # This comes directly from python2 unittest
+        exctype, value, tb = err
+        # Skip test runner traceback levels
+        while tb and self._is_relevant_tb_level(tb):
+            tb = tb.tb_next
+
+        if exctype is test.failureException:
+            # Skip assert*() traceback levels
+            length = self._count_relevant_tb_levels(tb)
+            msgLines = traceback.format_exception(exctype, value, tb, length)
+        else:
+            msgLines = traceback.format_exception(exctype, value, tb)
+
+        if self.buffer:
+            output = sys.stdout.getvalue()
+            error = sys.stderr.getvalue()
+            if output:
+                if not output.endswith('\n'):
+                    output += '\n'
+                msgLines.append(STDOUT_LINE % output)
+            if error:
+                if not error.endswith('\n'):
+                    error += '\n'
+                msgLines.append(STDERR_LINE % error)
+        # This is the extra magic to make sure all lines are str
+        encoding = getattr(sys.stdout, 'encoding', 'utf-8')
+        lines = []
+        for line in msgLines:
+            if not isinstance(line, str):
+                # utf8 shouldnt be hard-coded, but not sure f
+                line = line.encode(encoding)
+            lines.append(line)
+
+        return ''.join(lines)
