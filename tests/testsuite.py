@@ -64,6 +64,17 @@ class XMLTestRunnerTestCase(unittest.TestCase):
                 with self.subTest(i=i):
                     self.fail('this is a subtest.')
 
+    class DummyErrorInCallTest(unittest.TestCase):
+        def __call__(self, result):
+            try:
+                raise Exception('Massive fail')
+            except Exception:
+                result.addError(self, sys.exc_info())
+                return
+            super(DummyErrorInCallTest, self).__call__(result)
+        def test_pass(self):
+            pass
+
     def setUp(self):
         self.stream = StringIO()
         self.outdir = mkdtemp()
@@ -311,3 +322,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         finally:
             sys.stdout, sys.stderr = old_stdout, old_stderr
 
+    def test_xmlrunner_error_in_call(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyErrorInCallTest('test_pass'))
+        self._test_xmlrunner(suite)
