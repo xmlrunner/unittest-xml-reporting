@@ -326,3 +326,5 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyErrorInCallTest('test_pass'))
         self._test_xmlrunner(suite)
+        testsuite_output = self.stream.getvalue()
+        self.assertIn('Exception: Massive fail', testsuite_output)
