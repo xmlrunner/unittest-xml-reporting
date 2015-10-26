@@ -134,6 +134,16 @@ class _TestInfo(object):
         """
         return self.test_exception_info
 
+    def get_failure_attributes(self):
+        res_attrs = {}
+        if self.outcome != self.SKIP:
+            res_attrs["type"] = safe_unicode(self.err[0].__name__)
+            res_attrs["message"] = safe_unicode(self.err[1])
+        else:
+            res_attrs["type"] = "skip"
+            res_attrs["message"] = safe_unicode(self.err)
+        return res_attrs
+
 
 class _XMLTestResult(_TextTestResult):
     """
@@ -412,21 +422,12 @@ class _XMLTestResult(_TextTestResult):
             elem_name = ('failure', 'error', 'skipped')[test_result.outcome-1]
             failure = xml_document.createElement(elem_name)
             testcase.appendChild(failure)
+            for attr, value in test_result.get_failure_attributes().items():
+                failure.setAttribute(attr, value)
             if test_result.outcome != _TestInfo.SKIP:
-                failure.setAttribute(
-                    'type',
-                    safe_unicode(test_result.err[0].__name__)
-                )
-                failure.setAttribute(
-                    'message',
-                    safe_unicode(test_result.err[1])
-                )
                 error_info = safe_unicode(test_result.get_error_info())
                 _XMLTestResult._createCDATAsections(
                     xml_document, failure, error_info)
-            else:
-                failure.setAttribute('type', 'skip')
-                failure.setAttribute('message', safe_unicode(test_result.err))
 
     _report_testcase = staticmethod(_report_testcase)
 
