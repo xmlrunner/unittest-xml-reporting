@@ -1,4 +1,5 @@
 
+import logging
 import os
 import sys
 import time
@@ -11,6 +12,7 @@ from six.moves import StringIO
 
 from .unittest import TestResult, _TextTestResult
 
+LOG = logging.getLogger(__name__)
 
 # Matches invalid XML1.0 unicode characters, like control characters:
 # http://www.w3.org/TR/2006/REC-xml-20060816/#charsets
@@ -221,6 +223,7 @@ class _XMLTestResult(_TextTestResult):
         """
         Called when a test method fails.
         """
+        LOG.exception(err)
         self._save_output_data()
         testinfo = _TestInfo(self, test, _TestInfo.FAILURE, err)
         self.failures.append((
@@ -233,6 +236,7 @@ class _XMLTestResult(_TextTestResult):
         """
         Called when a test method raises an error.
         """
+        LOG.exception(err)
         self._save_output_data()
         testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
         self.errors.append((

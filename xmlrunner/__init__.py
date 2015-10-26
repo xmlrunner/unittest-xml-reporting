@@ -5,6 +5,16 @@ This module provides the XMLTestRunner class, which is heavily based on the
 default TextTestRunner.
 """
 
+import logging
+try:
+    from logging import NullHandler
+except ImportError:
+    class NullHandler(logging.Handler):
+        def emit(self, record):
+            pass
+
+logging.getLogger(__name__).addHandler(NullHandler())
+
 # Allow version to be detected at runtime.
 from .version import __version__
 

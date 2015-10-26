@@ -3,6 +3,8 @@
 
 """Executable module to test unittest-xml-reporting.
 """
+import collections
+import logging
 import sys
 
 from xmlrunner.unittest import unittest
@@ -13,6 +15,15 @@ from shutil import rmtree
 from glob import glob
 from xml.dom import minidom
 import os.path
+
+
+class MockedLogger(logging.Logger, object):
+    def __init__(self, *args, **kwargs):
+        self._mock_calls = collections.defaultdict(lambda: 0)
+        super(MockedLogger, self).__init__(*args, **kwargs)
+
+    def exception(self, *args, **kwargs):
+        self._mock_calls["exception"] += 1
 
 
 class XMLTestRunnerTestCase(unittest.TestCase):
@@ -199,6 +210,19 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self._test_xmlrunner(suite)
         testsuite_output = self.stream.getvalue()
         self.assertIn('should be printed', testsuite_output)
+
+    def test_unittest_logger(self):
+        log_bck = xmlrunner.result.LOG
+        try:
+            logger = MockedLogger("xmlrunner.result")
+            xmlrunner.result.LOG = logger
+            suite = unittest.TestSuite()
+            suite.addTest(self.DummyTest('test_fail'))
+            self._test_xmlrunner(suite)
+            self.assertEquals(logger._mock_calls["exception"], 1,
+                              "logger.exception not called")
+        finally:
+            xmlrunner.result.LOG = log_bck
 
     @unittest.skipIf(not hasattr(unittest.TestCase,'subTest'),
         'unittest.TestCase.subTest not present.')
