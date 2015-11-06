@@ -65,7 +65,7 @@ def to_unicode(data):
         # Try utf8
         return six.text_type(data)
     except UnicodeDecodeError:
-        return repr(data).decode('utf8', 'replace')
+        return str(data).decode('utf8', 'replace')
 
 
 def safe_unicode(data, encoding=None):
