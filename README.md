@@ -95,6 +95,32 @@ if __name__ == '__main__':
         failfast=False, buffer=False, catchbreak=False)
 ````
 
+The XMLTestRunner can also be used to report on docstrings style tests.
+
+````
+import doctest
+import xmlrunner
+
+def twice(n):
+    """
+    >>> twice(5)
+    10
+    """
+    return 2*n
+
+class DocTest:
+    def threetimes(self, n):
+        """
+        >>> d=DocTest(); d.threetimes(5)
+        15
+        """
+        return 3*n
+
+if __name__ == "__main__":
+    t = doctest.DocTestSuite()
+    xmlrunner.XMLTestRunner().run(t)
+````
+
 ### Django
 
 In order to plug `XMLTestRunner` to a Django project, add the following
