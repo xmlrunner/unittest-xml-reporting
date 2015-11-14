@@ -106,19 +106,19 @@ def twice(n):
     >>> twice(5)
     10
     """
-    return 2*n
+    return 2 * n
 
-class DocTest:
+class Multiplicator(object):
     def threetimes(self, n):
         """
-        >>> d=DocTest(); d.threetimes(5)
+        >>> Multiplicator().threetimes(5)
         15
         """
-        return 3*n
+        return 3 * n
 
 if __name__ == "__main__":
-    t = doctest.DocTestSuite()
-    xmlrunner.XMLTestRunner().run(t)
+    suite = doctest.DocTestSuite()
+    xmlrunner.XMLTestRunner().run(suite)
 ````
 
 ### Django
