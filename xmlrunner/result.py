@@ -9,7 +9,7 @@ from os import path
 from six import unichr
 from six.moves import StringIO
 
-from .unittest import TestResult, _TextTestResult
+from .unittest import TestResult, _TextTestResult, failfast
 
 
 # Matches invalid XML1.0 unicode characters, like control characters:
@@ -217,6 +217,7 @@ class _XMLTestResult(_TextTestResult):
             _TestInfo(self, test), self.successes, 'OK', '.'
         )
 
+    @failfast
     def addFailure(self, test, err):
         """
         Called when a test method fails.
@@ -229,6 +230,7 @@ class _XMLTestResult(_TextTestResult):
         ))
         self._prepare_callback(testinfo, [], 'FAIL', 'F')
 
+    @failfast
     def addError(self, test, err):
         """
         Called when a test method raises an error.
