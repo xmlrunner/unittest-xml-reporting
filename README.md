@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
 The XMLTestRunner can also be used to report on docstrings style tests.
 
-````
+````python
 import doctest
 import xmlrunner
 
