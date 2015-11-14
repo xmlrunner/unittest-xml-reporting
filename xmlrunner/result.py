@@ -300,15 +300,14 @@ class _XMLTestResult(_TextTestResult):
         return tests_by_testcase
 
     def _report_testsuite_properties(xml_testsuite, xml_document, properties):
-        xml_properties = xml_document.createElement('properties')
-        xml_testsuite.appendChild(xml_properties)
         if properties:
+            xml_properties = xml_document.createElement('properties')
+            xml_testsuite.appendChild(xml_properties)
             for key, value in properties.items():
                 prop = xml_document.createElement('property')
                 prop.setAttribute('name', str(key))
                 prop.setAttribute('value', str(value))
                 xml_properties.appendChild(prop)
-        return xml_properties
 
     _report_testsuite_properties = staticmethod(_report_testsuite_properties)
 
