@@ -312,7 +312,7 @@ class _XMLTestResult(_TextTestResult):
 
     _report_testsuite_properties = staticmethod(_report_testsuite_properties)
 
-    def _report_testsuite(suite_name, tests, xml_document, parentElement,
+    def _report_testsuite(suite_name, suite, tests, xml_document, parentElement,
                           properties):
         """
         Appends the testsuite section to the XML document.
@@ -334,6 +334,9 @@ class _XMLTestResult(_TextTestResult):
 
         _XMLTestResult._report_testsuite_properties(
             testsuite, xml_document, properties)
+
+        for test in tests:
+            _XMLTestResult._report_testcase(suite, test, testsuite, xml_document)
 
         systemout = xml_document.createElement('system-out')
         testsuite.appendChild(systemout)
@@ -447,10 +450,8 @@ class _XMLTestResult(_TextTestResult):
 
             # Build the XML file
             testsuite = _XMLTestResult._report_testsuite(
-                suite_name, tests, doc, parentElement, self.properties
+                suite_name, suite, tests, doc, parentElement, self.properties
             )
-            for test in tests:
-                _XMLTestResult._report_testcase(suite, test, testsuite, doc)
             xml_content = doc.toprettyxml(
                 indent='\t',
                 encoding=test_runner.encoding

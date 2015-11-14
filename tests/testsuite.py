@@ -305,6 +305,25 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.properties = dict(key='value')
         self._test_xmlrunner(suite)
 
+    def test_junitxml_xsd_validation(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_fail'))
+        suite.addTest(self.DummyTest('test_pass'))
+        suite.properties = dict(key='value')
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        # poor man's schema validation; see issue #90
+        i_properties = output.index('<properties>'.encode('utf8'))
+        i_system_out = output.index('<system-out>'.encode('utf8'))
+        i_system_err = output.index('<system-err>'.encode('utf8'))
+        i_testcase = output.index('<testcase'.encode('utf8'))
+        self.assertTrue(i_properties < i_testcase < i_system_out < i_system_err)
+
     def test_xmlrunner_elapsed_times(self):
         self.runner_kwargs['elapsed_times'] = False
         suite = unittest.TestSuite()
