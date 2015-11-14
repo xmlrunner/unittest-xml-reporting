@@ -251,6 +251,20 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.addTest(self.DummyTest('test_pass'))
         self._test_xmlrunner(suite)
 
+    def test_xmlrunner_failfast(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_fail'))
+        suite.addTest(self.DummyTest('test_pass'))
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity, failfast=True,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        self.assertIn('test_fail'.encode('utf8'), output)
+        self.assertNotIn('test_pass'.encode('utf8'), output)
+
     def test_xmlrunner_verbose(self):
         self.verbosity = 1
         suite = unittest.TestSuite()
