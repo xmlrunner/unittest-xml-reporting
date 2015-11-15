@@ -27,6 +27,7 @@ else:
 class XMLTestRunner(_DjangoRunner):
 
     def run_suite(self, suite, **kwargs):
+        dummy = kwargs  # unused
         verbosity = getattr(settings, 'TEST_OUTPUT_VERBOSE', 1)
         # XXX: verbosity = self.verbosity
         if isinstance(verbosity, bool):

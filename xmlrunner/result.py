@@ -148,7 +148,7 @@ class _XMLTestResult(_TextTestResult):
         self.successes = []
         self.callback = None
         self.elapsed_times = elapsed_times
-        self.properties = None  # junit testsuite properties
+        self.properties = properties  # junit testsuite properties
 
     def _prepare_callback(self, test_info, target_list, verbose_str,
                           short_str):
@@ -273,7 +273,7 @@ class _XMLTestResult(_TextTestResult):
         """
         Writes information about the FAIL or ERROR to the stream.
         """
-        for test_info, error in errors:
+        for test_info, dummy in errors:
             self.stream.writeln(self.separator1)
             self.stream.writeln(
                 '%s [%.3fs]: %s' % (flavour, test_info.elapsed_time,
