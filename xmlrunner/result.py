@@ -190,8 +190,13 @@ class _XMLTestResult(_TextTestResult):
             self.stream.write(" ... ")
 
     def _save_output_data(self):
-        self._stdout_data = sys.stdout.getvalue()
-        self._stderr_data = sys.stderr.getvalue()
+        # Only try to get sys.stdout and sys.sterr as they not be
+        # StringIO yet, e.g. when test fails during __call__
+        try:
+            self._stdout_data = sys.stdout.getvalue()
+            self._stderr_data = sys.stderr.getvalue()
+        except AttributeError:
+            pass
 
     def stopTest(self, test):
         """
@@ -343,7 +348,8 @@ class _XMLTestResult(_TextTestResult):
         stdout = StringIO()
         for test in tests:
             # Merge the stdout from the tests in a class
-            stdout.write(test.stdout)
+            if test.stdout is not None:
+                stdout.write(test.stdout)
         _XMLTestResult._createCDATAsections(
             xml_document, systemout, stdout.getvalue())
 
@@ -353,7 +359,8 @@ class _XMLTestResult(_TextTestResult):
         stderr = StringIO()
         for test in tests:
             # Merge the stderr from the tests in a class
-            stderr.write(test.stderr)
+            if test.stderr is not None:
+                stderr.write(test.stderr)
         _XMLTestResult._createCDATAsections(
             xml_document, systemerr, stderr.getvalue())
 
@@ -471,7 +478,12 @@ class _XMLTestResult(_TextTestResult):
         """Converts a sys.exc_info()-style tuple of values into a string."""
         if six.PY3:
             # It works fine in python 3
-            return super(_XMLTestResult, self)._exc_info_to_string(err, test)
+            try:
+                return super(_XMLTestResult, self)._exc_info_to_string(
+                    err, test)
+            except AttributeError:
+                # We keep going using the legacy python <= 2 way
+                pass
 
         # This comes directly from python2 unittest
         exctype, value, tb = err
@@ -487,8 +499,16 @@ class _XMLTestResult(_TextTestResult):
             msgLines = traceback.format_exception(exctype, value, tb)
 
         if self.buffer:
-            output = sys.stdout.getvalue()
-            error = sys.stderr.getvalue()
+            # Only try to get sys.stdout and sys.sterr as they not be
+            # StringIO yet, e.g. when test fails during __call__
+            try:
+                output = sys.stdout.getvalue()
+            except AttributeError:
+                output = None
+            try:
+                error = sys.stderr.getvalue()
+            except AttributeError:
+                error = None
             if output:
                 if not output.endswith('\n'):
                     output += '\n'
