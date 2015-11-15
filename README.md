@@ -157,8 +157,10 @@ generate the XML files.
 ## Contributing
 
 We are always looking for good contributions, so please just fork the
-repository and send pull requests. If you would like write access to the
-repository, or become a maintainer, feel free to get in touch.
+repository and send pull requests (with tests!).
+
+If you would like write access to the repository, or become a maintainer,
+feel free to get in touch.
 
 
 ### Testing changes with `tox`
