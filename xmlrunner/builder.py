@@ -2,7 +2,6 @@ import re
 import sys
 import time
 import six
-from six import unichr
 
 from xml.dom.minidom import Document
 
@@ -21,8 +20,8 @@ _char_tail = ''
 
 if sys.maxunicode > 0x10000:
     _char_tail = six.u('%s-%s') % (
-        unichr(0x10000),
-        unichr(min(sys.maxunicode, 0x10FFFF))
+        six.unichr(0x10000),
+        six.unichr(min(sys.maxunicode, 0x10FFFF))
     )
 
 _nontext_sub = re.compile(

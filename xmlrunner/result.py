@@ -6,7 +6,6 @@ import traceback
 import six
 import re
 from os import path
-from six import unichr
 from six.moves import StringIO
 
 from .unittest import TestResult, _TextTestResult, failfast
@@ -34,7 +33,7 @@ if sys.maxunicode >= 0x10000:  # not narrow build
     ]) 
 
 _illegal_ranges = [
-    "%s-%s" % (unichr(low), unichr(high))
+    "%s-%s" % (six.unichr(low), six.unichr(high))
     for (low, high) in _illegal_unichrs
 ]
 
