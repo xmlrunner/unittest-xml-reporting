@@ -1,4 +1,22 @@
-"""Integartion with diagnostics module."""
+"""Integration with diagnostics module.
+
+Custom test runner that uses diagnostics module to generate
+pretty tracebacks in html format and adds links to generated html
+files into resulted xml report (every "error" tag now has "details"
+attribute).
+
+Usage:
+
+import unittest
+from xmlrunner.extra.diagnosticstestrunner import XMLTestRunner
+
+class MyTestCase(unittest.TestCase):
+    def test_mytest(self):
+        self.assertTrue(True)
+
+if __name__ == '__main__':
+    unittest.main(testRunner=XMLTestRunner())
+"""
 
 from diagnostics import exception_hook, FileStorage, ExceptionInfo
 
