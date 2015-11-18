@@ -315,7 +315,7 @@ class _XMLTestResult(_TextTestResult):
 
     _report_testsuite_properties = staticmethod(_report_testsuite_properties)
 
-    def _report_testsuite(suite_name, suite, tests, xml_document, parentElement,
+    def _report_testsuite(suite_name, tests, xml_document, parentElement,
                           properties):
         """
         Appends the testsuite section to the XML document.
@@ -339,7 +339,7 @@ class _XMLTestResult(_TextTestResult):
             testsuite, xml_document, properties)
 
         for test in tests:
-            _XMLTestResult._report_testcase(suite, test, testsuite, xml_document)
+            _XMLTestResult._report_testcase(test, testsuite, xml_document)
 
         systemout = xml_document.createElement('system-out')
         testsuite.appendChild(systemout)
@@ -389,14 +389,16 @@ class _XMLTestResult(_TextTestResult):
 
     _createCDATAsections = staticmethod(_createCDATAsections)
 
-    def _report_testcase(suite_name, test_result, xml_testsuite, xml_document):
+    def _report_testcase(test_result, xml_testsuite, xml_document):
         """
         Appends a testcase section to the XML document.
         """
         testcase = xml_document.createElement('testcase')
         xml_testsuite.appendChild(testcase)
 
-        testcase.setAttribute('classname', suite_name)
+        class_name = re.sub(r'^__main__.', '', test_result.id())
+        class_name = class_name.rpartition('.')[0]
+        testcase.setAttribute('classname', class_name)
         testcase.setAttribute(
             'name', _XMLTestResult._test_method_name(test_result.test_id)
         )
@@ -455,7 +457,7 @@ class _XMLTestResult(_TextTestResult):
 
             # Build the XML file
             testsuite = _XMLTestResult._report_testsuite(
-                suite_name, suite, tests, doc, parentElement, self.properties
+                suite_name, tests, doc, parentElement, self.properties
             )
             xml_content = doc.toprettyxml(
                 indent='\t',
