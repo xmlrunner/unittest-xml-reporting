@@ -5,7 +5,7 @@
 
 [![Build Status](https://travis-ci.org/xmlrunner/unittest-xml-reporting.svg?branch=master)](https://travis-ci.org/xmlrunner/unittest-xml-reporting)
 [![Code Health](https://landscape.io/github/xmlrunner/unittest-xml-reporting/master/landscape.png)](https://landscape.io/github/xmlrunner/unittest-xml-reporting/master)
-[![Requirements Status](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements.svg?branch=master)](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements/?branch=master) 
+[![Requirements Status](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements.svg?branch=master)](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements/?branch=master)
 
 # unittest-xml-reporting
 
@@ -15,7 +15,7 @@ systems, IDEs and continuous integration servers.
 
 ## Requirements
 
-* Python 2.7+
+* Python 2.7+ or 3.3+
 * Please note Python 2.6 end-of-life was in Oct 2013, and support will be dropped in next major version.
 
 ## Installation
