@@ -94,8 +94,15 @@ class _TestInfo(object):
         self.test_result = test_result
         self.outcome = outcome
         self.elapsed_time = 0
-        self.test_exception_name = safe_unicode(err[0].__name__)
-        self.test_exception_message = safe_unicode(err[1])
+        self.test_exception_name = None
+        self.test_exception_message = None
+        if self.outcome != _TestInfo.SUCCESS:
+            if self.outcome != _TestInfo.SKIP:
+                self.test_exception_name = safe_unicode(err[0].__name__)
+                self.test_exception_message = safe_unicode(err[1])
+            else:
+                self.test_exception_message = safe_unicode(err)
+            
         self.stdout = test_result._stdout_data
         self.stderr = test_result._stderr_data
 
