@@ -10,21 +10,11 @@ Django docs website.
 """
 
 import xmlrunner
-import django
 from django.conf import settings
-
-# future compatibilty with django
-# in django 1.6 DiscoverRunner bacame default and
-# DjangoTestSuiteRunner became depecated, will be removed in 1.8
-if django.VERSION < (1, 6):
-    from django.test.simple import DjangoTestSuiteRunner
-    _DjangoRunner = DjangoTestSuiteRunner
-else:
-    from django.test.runner import DiscoverRunner
-    _DjangoRunner = DiscoverRunner
+from django.test.runner import DiscoverRunner
 
 
-class XMLTestRunner(_DjangoRunner):
+class XMLTestRunner(DiscoverRunner):
 
     def run_suite(self, suite, **kwargs):
         dummy = kwargs  # unused
