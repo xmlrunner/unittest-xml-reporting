@@ -36,7 +36,7 @@ class XMLTestRunner(TextTestRunner):
         """
         return _XMLTestResult(
             self.stream, self.descriptions, self.verbosity, self.elapsed_times,
-            self.buffer
+            buffer=self.buffer
         )
 
     def run(self, test):
