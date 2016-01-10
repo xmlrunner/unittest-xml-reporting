@@ -5,6 +5,8 @@
 
 [![Build Status](https://travis-ci.org/xmlrunner/unittest-xml-reporting.svg?branch=master)](https://travis-ci.org/xmlrunner/unittest-xml-reporting)
 [![Code Health](https://landscape.io/github/xmlrunner/unittest-xml-reporting/master/landscape.png)](https://landscape.io/github/xmlrunner/unittest-xml-reporting/master)
+[![codecov.io Coverage Status](https://codecov.io/github/xmlrunner/unittest-xml-reporting/coverage.svg?branch=master)](https://codecov.io/github/xmlrunner/unittest-xml-reporting?branch=master)
+[![Coveralls Coverage Status](https://coveralls.io/repos/xmlrunner/unittest-xml-reporting/badge.svg?branch=coveralls&service=github)](https://coveralls.io/github/xmlrunner/unittest-xml-reporting?branch=coveralls)
 [![Requirements Status](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements.svg?branch=master)](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements/?branch=master)
 
 # unittest-xml-reporting
