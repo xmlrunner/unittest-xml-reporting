@@ -3,7 +3,7 @@ import sys
 import time
 
 from .unittest import TextTestRunner
-from .result import _XMLTestResult
+from .result import _XMLTestResult, _TestInfo
 
 # see issue #74, the encoding name needs to be one of
 # http://www.iana.org/assignments/character-sets/character-sets.xhtml
@@ -16,7 +16,7 @@ class XMLTestRunner(TextTestRunner):
     """
     def __init__(self, output='.', outsuffix=None, stream=sys.stderr,
                  descriptions=True, verbosity=1, elapsed_times=True,
-                 failfast=False, buffer=False, encoding=UTF8):
+                 failfast=False, buffer=False, encoding=UTF8, info_cls=_TestInfo):
         TextTestRunner.__init__(self, stream, descriptions, verbosity,
                                 failfast=failfast, buffer=buffer)
         self.verbosity = verbosity
@@ -28,6 +28,10 @@ class XMLTestRunner(TextTestRunner):
             outsuffix = time.strftime("%Y%m%d%H%M%S")
         self.outsuffix = outsuffix
         self.elapsed_times = elapsed_times
+        if issubclass(info_cls, _TestInfo):
+            self.info_cls = info_cls
+        else:
+            self.info_cls = _TestInfo
 
     def _make_result(self):
         """
@@ -35,7 +39,8 @@ class XMLTestRunner(TextTestRunner):
         information about the executed tests.
         """
         return _XMLTestResult(
-            self.stream, self.descriptions, self.verbosity, self.elapsed_times
+            self.stream, self.descriptions, self.verbosity, self.elapsed_times,
+            info_cls=self.info_cls
         )
 
     def run(self, test):

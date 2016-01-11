@@ -1,4 +1,5 @@
 
+import logging
 import os
 import sys
 import time
@@ -10,6 +11,7 @@ from six.moves import StringIO
 
 from .unittest import TestResult, _TextTestResult, failfast
 
+LOG = logging.getLogger(__name__)
 
 # Matches invalid XML1.0 unicode characters, like control characters:
 # http://www.w3.org/TR/2006/REC-xml-20060816/#charsets
@@ -63,7 +65,7 @@ def to_unicode(data):
         # Try utf8
         return six.text_type(data)
     except UnicodeDecodeError:
-        return repr(data).decode('utf8', 'replace')
+        return str(data).decode('utf8', 'replace')
 
 
 def safe_unicode(data, encoding=None):
@@ -132,6 +134,16 @@ class _TestInfo(object):
         """
         return self.test_exception_info
 
+    def get_failure_attributes(self):
+        res_attrs = {}
+        if self.outcome != self.SKIP:
+            res_attrs["type"] = safe_unicode(self.err[0].__name__)
+            res_attrs["message"] = safe_unicode(self.err[1])
+        else:
+            res_attrs["type"] = "skip"
+            res_attrs["message"] = safe_unicode(self.err)
+        return res_attrs
+
 
 class _XMLTestResult(_TextTestResult):
     """
@@ -140,7 +152,7 @@ class _XMLTestResult(_TextTestResult):
     Used by XMLTestRunner.
     """
     def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1,
-                 elapsed_times=True, properties=None):
+                 elapsed_times=True, properties=None, info_cls=_TestInfo):
         _TextTestResult.__init__(self, stream, descriptions, verbosity)
         self.buffer = True  # we are capturing test output
         self._stdout_data = None
@@ -149,6 +161,7 @@ class _XMLTestResult(_TextTestResult):
         self.callback = None
         self.elapsed_times = elapsed_times
         self.properties = properties  # junit testsuite properties
+        self._info_cls = info_cls
 
     def _prepare_callback(self, test_info, target_list, verbose_str,
                           short_str):
@@ -218,7 +231,7 @@ class _XMLTestResult(_TextTestResult):
         """
         self._save_output_data()
         self._prepare_callback(
-            _TestInfo(self, test), self.successes, 'OK', '.'
+            self._info_cls(self, test), self.successes, 'OK', '.'
         )
 
     @failfast
@@ -226,8 +239,9 @@ class _XMLTestResult(_TextTestResult):
         """
         Called when a test method fails.
         """
+        LOG.error(self._exc_info_to_string(err, test))
         self._save_output_data()
-        testinfo = _TestInfo(self, test, _TestInfo.FAILURE, err)
+        testinfo = self._info_cls(self, test, _TestInfo.FAILURE, err)
         self.failures.append((
             testinfo,
             self._exc_info_to_string(err, test)
@@ -239,8 +253,9 @@ class _XMLTestResult(_TextTestResult):
         """
         Called when a test method raises an error.
         """
+        LOG.error(self._exc_info_to_string(err, test))
         self._save_output_data()
-        testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
+        testinfo = self._info_cls(self, test, _TestInfo.ERROR, err)
         self.errors.append((
             testinfo,
             self._exc_info_to_string(err, test)
@@ -253,7 +268,7 @@ class _XMLTestResult(_TextTestResult):
         """
         if err is not None:
             self._save_output_data()
-            testinfo = _TestInfo(self, testcase, _TestInfo.ERROR, err, subTest=test)
+            testinfo = self._info_cls(self, testcase, _TestInfo.ERROR, err, subTest=test)
             self.errors.append((
                 testinfo,
                 self._exc_info_to_string(err, testcase)
@@ -265,7 +280,7 @@ class _XMLTestResult(_TextTestResult):
         Called when a test method was skipped.
         """
         self._save_output_data()
-        testinfo = _TestInfo(self, test, _TestInfo.SKIP, reason)
+        testinfo = self._info_cls(self, test, _TestInfo.SKIP, reason)
         self.skipped.append((testinfo, reason))
         self._prepare_callback(testinfo, [], 'SKIP', 'S')
 
@@ -408,21 +423,12 @@ class _XMLTestResult(_TextTestResult):
             elem_name = ('failure', 'error', 'skipped')[test_result.outcome-1]
             failure = xml_document.createElement(elem_name)
             testcase.appendChild(failure)
+            for attr, value in test_result.get_failure_attributes().items():
+                failure.setAttribute(attr, value)
             if test_result.outcome != _TestInfo.SKIP:
-                failure.setAttribute(
-                    'type',
-                    safe_unicode(test_result.err[0].__name__)
-                )
-                failure.setAttribute(
-                    'message',
-                    safe_unicode(test_result.err[1])
-                )
                 error_info = safe_unicode(test_result.get_error_info())
                 _XMLTestResult._createCDATAsections(
                     xml_document, failure, error_info)
-            else:
-                failure.setAttribute('type', 'skip')
-                failure.setAttribute('message', safe_unicode(test_result.err))
 
     _report_testcase = staticmethod(_report_testcase)
 

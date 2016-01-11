@@ -155,6 +155,24 @@ Tells the test runner where to put the XML reports. If the directory
 couldn't be found, the test runner will try to create it before
 generate the XML files.
 
+## Pretty tracebacks
+
+XMLTestRunner provides optional integration with diagnostics module (https://pypi.python.org/pypi/diagnostics).
+
+Usage example:
+
+````
+import unittest
+from xmlrunner.extra.diagnosticstestrunner import XMLTestRunner
+
+class MyTestCase(unittest.TestCase):
+    def test_mytest(self):
+        self.assertTrue(True)
+
+if __name__ == '__main__':
+unittest.main(testRunner=XMLTestRunner())
+````
+
 
 ## Contributing
 

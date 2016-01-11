@@ -3,8 +3,11 @@
 
 """Executable module to test unittest-xml-reporting.
 """
+import collections
+import logging
 import sys
 
+from mock import patch
 from xmlrunner.unittest import unittest
 import xmlrunner
 import doctest
@@ -242,6 +245,13 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self._test_xmlrunner(suite)
         testsuite_output = self.stream.getvalue()
         self.assertIn('should be printed', testsuite_output)
+
+    @patch("xmlrunner.result.LOG")
+    def test_unittest_logger(self, logger):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_fail'))
+        self._test_xmlrunner(suite)
+        self.assertTrue(logger.error.called)
 
     @unittest.skipIf(not hasattr(unittest.TestCase,'subTest'),
         'unittest.TestCase.subTest not present.')
