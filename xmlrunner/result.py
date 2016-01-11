@@ -140,9 +140,9 @@ class _XMLTestResult(_TextTestResult):
     Used by XMLTestRunner.
     """
     def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1,
-                 elapsed_times=True, properties=None):
+                 elapsed_times=True, properties=None, buffer=True):
         _TextTestResult.__init__(self, stream, descriptions, verbosity)
-        self.buffer = True  # we are capturing test output
+        self.buffer = buffer
         self._stdout_data = None
         self._stderr_data = None
         self.successes = []
