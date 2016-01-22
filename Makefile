@@ -1,4 +1,8 @@
 
+build/tox/bin:
+	virtualenv build/tox
+	build/tox/bin/pip install tox
+
 build/publish/bin:
 	virtualenv build/publish
 	build/publish/bin/pip install wheel twine
@@ -14,7 +18,10 @@ dist: checkversion build/publish/bin
 publish: dist/ build/publish/bin
 	build/publish/bin/twine upload dist/*
 
+test: build/tox/bin
+	build/tox/bin/tox
+
 clean:
 	rm -rf build/ dist/
 
-.PHONY: checkversion dist publish clean
+.PHONY: checkversion dist publish clean test
