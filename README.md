@@ -18,7 +18,7 @@ systems, IDEs and continuous integration servers.
 ## Requirements
 
 * Python 2.7+ or 3.3+
-* Please note Python 2.6 end-of-life was in Oct 2013, and support will be dropped in next major version.
+* Please note Python 2.6 end-of-life was in Oct 2013, last version supporting 2.6 was 1.14.0
 
 ## Installation
 
