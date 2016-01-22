@@ -15,7 +15,7 @@ install_requires = ['six>=1.4.0']
 # this is for sdist to work.
 import sys
 if sys.version_info < (2, 7):
-    install_requires += ['unittest2']
+    raise RuntimeError('This version requires Python 2.7+')
 
 setup(
     name = 'unittest-xml-reporting',
@@ -45,9 +45,5 @@ setup(
     zip_safe = False,
     include_package_data = True,
     install_requires = install_requires,
-    extras_require={
-        # this is for wheels to work
-        ':python_version=="2.6"': ['unittest2'],
-    },
     test_suite = 'tests'
 )
