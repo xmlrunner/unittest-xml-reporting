@@ -140,7 +140,7 @@ class _XMLTestResult(_TextTestResult):
     Used by XMLTestRunner.
     """
     def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1,
-                 elapsed_times=True, properties=None):
+                 elapsed_times=True, properties=None, infoclass=None):
         _TextTestResult.__init__(self, stream, descriptions, verbosity)
         self.buffer = True  # we are capturing test output
         self._stdout_data = None
@@ -149,11 +149,15 @@ class _XMLTestResult(_TextTestResult):
         self.callback = None
         self.elapsed_times = elapsed_times
         self.properties = properties  # junit testsuite properties
+        if infoclass is None:
+            self.infoclass = _TestInfo
+        else:
+            self.infoclass = infoclass
 
     def _prepare_callback(self, test_info, target_list, verbose_str,
                           short_str):
         """
-        Appends a _TestInfo to the given target list and sets a callback
+        Appends a `infoclass` to the given target list and sets a callback
         method to be called by stopTest method.
         """
         target_list.append(test_info)
@@ -218,7 +222,7 @@ class _XMLTestResult(_TextTestResult):
         """
         self._save_output_data()
         self._prepare_callback(
-            _TestInfo(self, test), self.successes, 'OK', '.'
+            self.infoclass(self, test), self.successes, 'OK', '.'
         )
 
     @failfast
@@ -227,7 +231,8 @@ class _XMLTestResult(_TextTestResult):
         Called when a test method fails.
         """
         self._save_output_data()
-        testinfo = _TestInfo(self, test, _TestInfo.FAILURE, err)
+        testinfo = self.infoclass(
+            self, test, self.infoclass.FAILURE, err)
         self.failures.append((
             testinfo,
             self._exc_info_to_string(err, test)
@@ -240,7 +245,8 @@ class _XMLTestResult(_TextTestResult):
         Called when a test method raises an error.
         """
         self._save_output_data()
-        testinfo = _TestInfo(self, test, _TestInfo.ERROR, err)
+        testinfo = self.infoclass(
+            self, test, self.infoclass.ERROR, err)
         self.errors.append((
             testinfo,
             self._exc_info_to_string(err, test)
@@ -253,7 +259,8 @@ class _XMLTestResult(_TextTestResult):
         """
         if err is not None:
             self._save_output_data()
-            testinfo = _TestInfo(self, testcase, _TestInfo.ERROR, err, subTest=test)
+            testinfo = self.infoclass(
+                self, testcase, self.infoclass.ERROR, err, subTest=test)
             self.errors.append((
                 testinfo,
                 self._exc_info_to_string(err, testcase)
@@ -265,7 +272,8 @@ class _XMLTestResult(_TextTestResult):
         Called when a test method was skipped.
         """
         self._save_output_data()
-        testinfo = _TestInfo(self, test, _TestInfo.SKIP, reason)
+        testinfo = self.infoclass(
+            self, test, self.infoclass.SKIP, reason)
         self.skipped.append((testinfo, reason))
         self._prepare_callback(testinfo, [], 'SKIP', 'S')
 
@@ -329,10 +337,10 @@ class _XMLTestResult(_TextTestResult):
         testsuite.setAttribute(
             'time', '%.3f' % sum(map(lambda e: e.elapsed_time, tests))
         )
-        failures = filter(lambda e: e.outcome == _TestInfo.FAILURE, tests)
+        failures = filter(lambda e: e.outcome == e.FAILURE, tests)
         testsuite.setAttribute('failures', str(len(list(failures))))
 
-        errors = filter(lambda e: e.outcome == _TestInfo.ERROR, tests)
+        errors = filter(lambda e: e.outcome == e.ERROR, tests)
         testsuite.setAttribute('errors', str(len(list(errors))))
 
         _XMLTestResult._report_testsuite_properties(
@@ -404,11 +412,11 @@ class _XMLTestResult(_TextTestResult):
         )
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
 
-        if (test_result.outcome != _TestInfo.SUCCESS):
+        if (test_result.outcome != test_result.SUCCESS):
             elem_name = ('failure', 'error', 'skipped')[test_result.outcome-1]
             failure = xml_document.createElement(elem_name)
             testcase.appendChild(failure)
-            if test_result.outcome != _TestInfo.SKIP:
+            if test_result.outcome != test_result.SKIP:
                 failure.setAttribute(
                     'type',
                     safe_unicode(test_result.err[0].__name__)
