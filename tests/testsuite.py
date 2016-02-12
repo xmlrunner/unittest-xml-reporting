@@ -18,18 +18,20 @@ import os.path
 
 
 class DoctestTest(unittest.TestCase):
+
     def test_doctest_example(self):
         suite = doctest.DocTestSuite(tests.doctest_example)
         outdir = BytesIO()
         stream = StringIO()
-        runner = xmlrunner.XMLTestRunner(stream=stream, output=outdir, verbosity=0)
+        runner = xmlrunner.XMLTestRunner(
+            stream=stream, output=outdir, verbosity=0)
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        self.assertIn('classname="tests.doctest_example.Multiplicator" name="threetimes"'
-                      .encode('utf8'), output)
-        self.assertIn('classname="tests.doctest_example" name="twice"'
-                      .encode('utf8'), output)
+        self.assertIn('classname="tests.doctest_example.Multiplicator" '
+                      'name="threetimes"'.encode('utf8'), output)
+        self.assertIn('classname="tests.doctest_example" '
+                      'name="twice"'.encode('utf8'), output)
 
 
 class XMLTestRunnerTestCase(unittest.TestCase):
@@ -37,40 +39,54 @@ class XMLTestRunnerTestCase(unittest.TestCase):
     XMLTestRunner test case.
     """
     class DummyTest(unittest.TestCase):
+
         @unittest.skip("demonstrating skipping")
         def test_skip(self):
             pass   # pragma: no cover
+
         @unittest.skip(u"demonstrating non-ascii skipping: éçà")
         def test_non_ascii_skip(self):
             pass   # pragma: no cover
+
         def test_pass(self):
             pass
+
         def test_fail(self):
             self.assertTrue(False)
+
         @unittest.expectedFailure
         def test_expected_failure(self):
             self.assertTrue(False)
+
         @unittest.expectedFailure
         def test_unexpected_success(self):
             pass
+
         def test_error(self):
             1 / 0
+
         def test_cdata_section(self):
             print('<![CDATA[content]]>')
+
         def test_non_ascii_error(self):
             self.assertEqual(u"éçà", 42)
+
         def test_unsafe_unicode(self):
             print(u"A\x00B\x08C\x0BD\x0C")
+
         def test_runner_buffer_output_pass(self):
             print('should not be printed')
+
         def test_runner_buffer_output_fail(self):
             print('should be printed')
             self.fail('expected to fail')
+
         def test_non_ascii_runner_buffer_output_fail(self):
             print(u'Where is the café ?')
             self.fail(u'The café could not be found')
 
     class DummySubTest(unittest.TestCase):
+
         def test_subTest_pass(self):
             for i in range(2):
                 with self.subTest(i=i):
@@ -82,13 +98,16 @@ class XMLTestRunnerTestCase(unittest.TestCase):
                     self.fail('this is a subtest.')
 
     class DummyErrorInCallTest(unittest.TestCase):
+
         def __call__(self, result):
             try:
                 raise Exception('Massive fail')
             except Exception:
                 result.addError(self, sys.exc_info())
                 return
-            super(DummyErrorInCallTest, self).__call__(result)
+            super(XMLTestRunnerTestCase.DummyErrorInCallTest, self)\
+                .__call__(result)
+
         def test_pass(self):
             pass
 
@@ -107,7 +126,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         if runner is None:
             runner = xmlrunner.XMLTestRunner(
                 stream=stream, output=outdir, verbosity=verbosity,
-                **self.runner_kwargs)
+                **runner_kwargs)
         self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
         runner.run(suite)
         self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
@@ -129,14 +148,17 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.addTest(self.DummySubTest('test_subTest_pass'))
         outdir = BytesIO()
         stream = StringIO()
-        runner = xmlrunner.XMLTestRunner(stream=stream, output=outdir, verbosity=0)
+        runner = xmlrunner.XMLTestRunner(
+            stream=stream, output=outdir, verbosity=0)
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        self.assertIn('classname="tests.testsuite.DummyTest" name="test_pass"'
-                      .encode('utf8'), output)
-        self.assertIn('classname="tests.testsuite.DummySubTest" name="test_subTest_pass"'
-                      .encode('utf8'), output)
+        self.assertIn('classname="tests.testsuite.DummyTest" '
+                      'name="test_pass"'.encode('utf8'),
+                      output)
+        self.assertIn('classname="tests.testsuite.DummySubTest" '
+                      'name="test_subTest_pass"'.encode('utf8'),
+                      output)
 
     def test_xmlrunner_non_ascii(self):
         suite = unittest.TestSuite()
@@ -150,7 +172,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir.seek(0)
         output = outdir.read()
         self.assertIn(
-            u'<skipped message="demonstrating non-ascii skipping: éçà" type="skip"/>'.encode('utf8'),
+            u'<skipped message="demonstrating non-ascii skipping: éçà" '
+            u'type="skip"/>'.encode('utf8'),
             output)
 
     def test_xmlrunner_safe_xml_encoding_name(self):
@@ -166,21 +189,25 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         firstline = output.splitlines()[0]
         # test for issue #74
         self.assertIn('encoding="UTF-8"'.encode('utf8'), firstline)
-        
+
     def test_xmlrunner_check_for_valid_xml_streamout(self):
         """
         This test checks if the xml document is valid if there are more than
         one testsuite and the output of the report is a single stream.
         """
         class DummyTestA(unittest.TestCase):
+
             def test_pass(self):
                 pass
+
         class DummyTestB(unittest.TestCase):
+
             def test_pass(self):
                 pass
+
         suite = unittest.TestSuite()
-        suite.addTest( unittest.TestLoader().loadTestsFromTestCase(DummyTestA) );
-        suite.addTest( unittest.TestLoader().loadTestsFromTestCase(DummyTestB) );
+        suite.addTest(unittest.TestLoader().loadTestsFromTestCase(DummyTestA))
+        suite.addTest(unittest.TestLoader().loadTestsFromTestCase(DummyTestB))
         outdir = BytesIO()
         runner = xmlrunner.XMLTestRunner(
             stream=self.stream, output=outdir, verbosity=self.verbosity,
@@ -188,7 +215,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        # Finally check if we have a valid XML document or not.        
+        # Finally check if we have a valid XML document or not.
         try:
             minidom.parseString(output)
         except Exception as e:
@@ -204,11 +231,13 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        self.assertIn(u"<![CDATA[ABCD\n]]>".encode('utf8'), output)
+        self.assertIn(u"<![CDATA[ABCD\n]]>".encode('utf8'),
+                      output)
 
     def test_xmlrunner_non_ascii_failures(self):
         suite = unittest.TestSuite()
-        suite.addTest(self.DummyTest('test_non_ascii_runner_buffer_output_fail'))
+        suite.addTest(self.DummyTest(
+            'test_non_ascii_runner_buffer_output_fail'))
         outdir = BytesIO()
         runner = xmlrunner.XMLTestRunner(
             stream=self.stream, output=outdir, verbosity=self.verbosity,
@@ -243,8 +272,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         testsuite_output = self.stream.getvalue()
         self.assertIn('should be printed', testsuite_output)
 
-    @unittest.skipIf(not hasattr(unittest.TestCase,'subTest'),
-        'unittest.TestCase.subTest not present.')
+    @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
+                     'unittest.TestCase.subTest not present.')
     def test_unittest_subTest_fail(self):
         # test for issue #77
         outdir = BytesIO()
@@ -265,7 +294,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             b'name="test_subTest_fail (i=1)"',
             output)
 
-    @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'), 'unittest.TestCase.subTest not present.')
+    @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
+                     'unittest.TestCase.subTest not present.')
     def test_unittest_subTest_pass(self):
         # Test for issue #85
         suite = unittest.TestSuite()
@@ -283,7 +313,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.addTest(self.DummyTest('test_pass'))
         outdir = BytesIO()
         runner = xmlrunner.XMLTestRunner(
-            stream=self.stream, output=outdir, verbosity=self.verbosity, failfast=True,
+            stream=self.stream, output=outdir,
+            verbosity=self.verbosity, failfast=True,
             **self.runner_kwargs)
         runner.run(suite)
         outdir.seek(0)
@@ -348,7 +379,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         i_system_out = output.index('<system-out>'.encode('utf8'))
         i_system_err = output.index('<system-err>'.encode('utf8'))
         i_testcase = output.index('<testcase'.encode('utf8'))
-        self.assertTrue(i_properties < i_testcase < i_system_out < i_system_err)
+        self.assertTrue(i_properties < i_testcase <
+                        i_system_out < i_system_err)
 
     def test_junitxml_xsd_validation_empty_properties(self):
         suite = unittest.TestSuite()

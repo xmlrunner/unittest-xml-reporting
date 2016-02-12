@@ -135,7 +135,7 @@ class TestXMLBuilderTest(unittest.TestCase):
 
     def test_end_nested_context(self):
         self.builder.begin_context('testsuite', 'name')
-        nested = self.builder.current_context()
+        self.builder.current_context()
 
         self.assertTrue(self.builder.end_context())
 
@@ -187,7 +187,7 @@ class TestXMLBuilderTest(unittest.TestCase):
         self.assertEqual(cdata.data, self.invalid_chars_replace)
 
     def test_append_cdata_closing_tags_into_cdata_section(self):
-        self.builder.append_cdata_section('tag',']]>')
+        self.builder.append_cdata_section('tag', ']]>')
         self.builder.end_context()
         root_child = self.doc.childNodes[0]
         cdata_container = root_child.childNodes[0]
