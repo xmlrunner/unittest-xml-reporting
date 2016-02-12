@@ -16,7 +16,8 @@ class XMLTestRunner(TextTestRunner):
     """
     def __init__(self, output='.', outsuffix=None, stream=sys.stderr,
                  descriptions=True, verbosity=1, elapsed_times=True,
-                 failfast=False, buffer=False, encoding=UTF8):
+                 failfast=False, buffer=False, encoding=UTF8,
+                 resultclass=None):
         TextTestRunner.__init__(self, stream, descriptions, verbosity,
                                 failfast=failfast, buffer=buffer)
         self.verbosity = verbosity
@@ -28,13 +29,18 @@ class XMLTestRunner(TextTestRunner):
             outsuffix = time.strftime("%Y%m%d%H%M%S")
         self.outsuffix = outsuffix
         self.elapsed_times = elapsed_times
+        if resultclass is None:
+            self.resultclass = _XMLTestResult
+        else:
+            self.resultclass = resultclass
 
     def _make_result(self):
         """
         Creates a TestResult object which will be used to store
         information about the executed tests.
         """
-        return _XMLTestResult(
+        # override in subclasses if necessary.
+        return self.resultclass(
             self.stream, self.descriptions, self.verbosity, self.elapsed_times
         )
 
