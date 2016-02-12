@@ -89,6 +89,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
                 result.addError(self, sys.exc_info())
                 return
             super(DummyErrorInCallTest, self).__call__(result)
+
         def test_pass(self):
             pass
 
@@ -103,7 +104,6 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir = self.outdir
         stream = self.stream
         verbosity = self.verbosity
-        runner_kwargs = self.runner_kwargs
         if runner is None:
             runner = xmlrunner.XMLTestRunner(
                 stream=stream, output=outdir, verbosity=verbosity,
@@ -129,14 +129,15 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.addTest(self.DummySubTest('test_subTest_pass'))
         outdir = BytesIO()
         stream = StringIO()
-        runner = xmlrunner.XMLTestRunner(stream=stream, output=outdir, verbosity=0)
+        runner = xmlrunner.XMLTestRunner(stream=stream, output=outdir,
+                                         verbosity=0)
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
         self.assertIn('classname="tests.testsuite.DummyTest" name="test_pass"'
                       .encode('utf8'), output)
-        self.assertIn('classname="tests.testsuite.DummySubTest" name="test_subTest_pass"'
-                      .encode('utf8'), output)
+        self.assertIn('classname="tests.testsuite.DummySubTest" '
+                      'name="test_subTest_pass"'.encode('utf8'), output)
 
     def test_xmlrunner_non_ascii(self):
         suite = unittest.TestSuite()
@@ -150,8 +151,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir.seek(0)
         output = outdir.read()
         self.assertIn(
-            u'<skipped message="demonstrating non-ascii skipping: éçà" type="skip"/>'.encode('utf8'),
-            output)
+            u'<skipped message="demonstrating non-ascii skipping: éçà" '
+            'type="skip"/>'.encode('utf8'), output)
 
     def test_xmlrunner_safe_xml_encoding_name(self):
         suite = unittest.TestSuite()
@@ -166,7 +167,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         firstline = output.splitlines()[0]
         # test for issue #74
         self.assertIn('encoding="UTF-8"'.encode('utf8'), firstline)
-        
+
     def test_xmlrunner_check_for_valid_xml_streamout(self):
         """
         This test checks if the xml document is valid if there are more than
@@ -175,12 +176,13 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         class DummyTestA(unittest.TestCase):
             def test_pass(self):
                 pass
+
         class DummyTestB(unittest.TestCase):
             def test_pass(self):
                 pass
         suite = unittest.TestSuite()
-        suite.addTest( unittest.TestLoader().loadTestsFromTestCase(DummyTestA) );
-        suite.addTest( unittest.TestLoader().loadTestsFromTestCase(DummyTestB) );
+        suite.addTest(unittest.TestLoader().loadTestsFromTestCase(DummyTestA))
+        suite.addTest(unittest.TestLoader().loadTestsFromTestCase(DummyTestB))
         outdir = BytesIO()
         runner = xmlrunner.XMLTestRunner(
             stream=self.stream, output=outdir, verbosity=self.verbosity,
@@ -188,7 +190,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        # Finally check if we have a valid XML document or not.        
+        # Finally check if we have a valid XML document or not.
         try:
             minidom.parseString(output)
         except Exception as e:
@@ -208,7 +210,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
 
     def test_xmlrunner_non_ascii_failures(self):
         suite = unittest.TestSuite()
-        suite.addTest(self.DummyTest('test_non_ascii_runner_buffer_output_fail'))
+        suite.addTest(
+            self.DummyTest('test_non_ascii_runner_buffer_output_fail'))
         outdir = BytesIO()
         runner = xmlrunner.XMLTestRunner(
             stream=self.stream, output=outdir, verbosity=self.verbosity,
@@ -243,8 +246,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         testsuite_output = self.stream.getvalue()
         self.assertIn('should be printed', testsuite_output)
 
-    @unittest.skipIf(not hasattr(unittest.TestCase,'subTest'),
-        'unittest.TestCase.subTest not present.')
+    @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
+                     'unittest.TestCase.subTest not present.')
     def test_unittest_subTest_fail(self):
         # test for issue #77
         outdir = BytesIO()
@@ -265,7 +268,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             b'name="test_subTest_fail (i=1)"',
             output)
 
-    @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'), 'unittest.TestCase.subTest not present.')
+    @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
+                     'unittest.TestCase.subTest not present.')
     def test_unittest_subTest_pass(self):
         # Test for issue #85
         suite = unittest.TestSuite()
@@ -283,8 +287,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.addTest(self.DummyTest('test_pass'))
         outdir = BytesIO()
         runner = xmlrunner.XMLTestRunner(
-            stream=self.stream, output=outdir, verbosity=self.verbosity, failfast=True,
-            **self.runner_kwargs)
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            failfast=True, **self.runner_kwargs)
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
@@ -348,7 +352,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         i_system_out = output.index('<system-out>'.encode('utf8'))
         i_system_err = output.index('<system-err>'.encode('utf8'))
         i_testcase = output.index('<testcase'.encode('utf8'))
-        self.assertTrue(i_properties < i_testcase < i_system_out < i_system_err)
+        self.assertTrue(i_properties < i_testcase
+                        < i_system_out < i_system_err)
 
     def test_junitxml_xsd_validation_empty_properties(self):
         suite = unittest.TestSuite()
