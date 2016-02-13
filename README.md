@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
 ### Reporting to a single file
 
-````
+````python
 if __name__ == '__main__':
     with open('/path/to/results.xml', 'wb') as output:
         unittest.main(
