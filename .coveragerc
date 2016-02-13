@@ -1,0 +1,7 @@
+[report]
+omit =
+    */site-packages/*
+    */pypy-*/*
+    .tox/*
+    tests/*
+    */*virtualenv*/*
