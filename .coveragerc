@@ -1,0 +1,5 @@
+[report]
+include =
+  setup.py
+  tests/*
+  xmlrunner/*
