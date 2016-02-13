@@ -103,3 +103,4 @@ class DjangoTest(unittest.TestCase):
         test_files = glob.glob(path.join(self.tmpdir, 'TEST*.xml'))
         self.assertTrue(test_files,
                         'did not generate xml reports where expected.')
+        self.assertEqual(2, len(test_files))
