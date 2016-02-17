@@ -447,6 +447,11 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         testsuite_output = self.stream.getvalue()
         self.assertIn('Exception: Massive fail', testsuite_output)
 
+    @unittest.skipIf(not hasattr(sys, 'getrefcount'),
+                     'skip - PyPy does not have sys.getrefcount.')
+    @unittest.skipIf((3, 0) <= sys.version_info < (3, 4),
+                     'skip - test not garbage collected. '
+                     'https://bugs.python.org/issue11798.')
     def test_xmlrunner_hold_traceback(self):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyRefCountTest('test_fail'))
