@@ -605,12 +605,12 @@ class _XMLTestResult(_TextTestResult):
             testsuite = _XMLTestResult._report_testsuite(
                 suite_name, tests, doc, parentElement, self.properties
             )
-            xml_content = doc.toprettyxml(
-                indent='\t',
-                encoding=test_runner.encoding
-            )
 
             if outputHandledAsString:
+                xml_content = doc.toprettyxml(
+                    indent='\t',
+                    encoding=test_runner.encoding
+                )
                 filename = path.join(
                     test_runner.output,
                     'TEST-%s.xml' % suite_name)
@@ -621,6 +621,10 @@ class _XMLTestResult(_TextTestResult):
 
         if not outputHandledAsString:
             # Assume that test_runner.output is a stream
+            xml_content = doc.toprettyxml(
+                indent='\t',
+                encoding=test_runner.encoding
+            )
             test_runner.output.write(xml_content)
 
     def _exc_info_to_string(self, err, test):

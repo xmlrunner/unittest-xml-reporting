@@ -575,6 +575,15 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.addTest(self.DummyTest('test_pass'))
         runner.run(suite)
 
+    def test_xmlrunner_stream_empty_testsuite(self):
+        stream = self.stream
+        output = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=stream, output=output, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        suite = unittest.TestSuite()
+        runner.run(suite)
+
     def test_xmlrunner_output_subdir(self):
         stream = self.stream
         output = os.path.join(self.outdir, 'subdir')
