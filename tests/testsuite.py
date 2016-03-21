@@ -7,6 +7,7 @@ import sys
 
 from xmlrunner.unittest import unittest
 import xmlrunner
+from xmlrunner.result import _XMLTestResult
 import doctest
 import tests.doctest_example
 from six import StringIO, BytesIO
@@ -402,6 +403,15 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.runner_kwargs['elapsed_times'] = False
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_pass'))
+        self._test_xmlrunner(suite)
+
+    def test_xmlrunner_resultclass(self):
+        class Result(_XMLTestResult):
+            pass
+
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        self.runner_kwargs['resultclass'] = Result
         self._test_xmlrunner(suite)
 
     def test_xmlrunner_stream(self):
