@@ -15,7 +15,8 @@ install_requires = ['six>=1.4.0']
 # this is for sdist to work.
 import sys
 if sys.version_info < (2, 7):
-    raise RuntimeError('This version requires Python 2.7+')
+    # python 2.6 no longer supported, use last 1.x release instead.
+    raise RuntimeError('This version requires Python 2.7+')  # pragma: no cover
 
 setup(
     name = 'unittest-xml-reporting',
