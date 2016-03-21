@@ -109,7 +109,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
                 .__call__(result)
 
         def test_pass(self):
-            pass
+            # it is expected not to be called.
+            pass  # pragma: no cover
 
     def setUp(self):
         self.stream = StringIO()
@@ -218,7 +219,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         # Finally check if we have a valid XML document or not.
         try:
             minidom.parseString(output)
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
+            # note: we could remove the try/except, but it's more crude.
             self.fail(e)
 
     def test_xmlrunner_unsafe_unicode(self):
