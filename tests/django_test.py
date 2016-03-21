@@ -75,6 +75,14 @@ class DjangoTest(unittest.TestCase):
         runner = runner_class()
         self._check_runner(runner)
 
+    def test_django_verbose(self):
+        self._override_settings(
+            TEST_OUTPUT_VERBOSE=True,
+            TEST_RUNNER='xmlrunner.extra.djangotestrunner.XMLTestRunner')
+        runner_class = get_runner(settings)
+        runner = runner_class()
+        self._check_runner(runner)
+
     def test_django_single_report(self):
         self._override_settings(
             TEST_OUTPUT_DIR=self.tmpdir,
