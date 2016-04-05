@@ -76,15 +76,10 @@ class XMLTestRunner(TextTestRunner):
             )
             self.stream.writeln()
 
-            expectedFails = unexpectedSuccesses = skipped = 0
-            try:
-                results = map(len, (result.expectedFailures,
-                                    result.unexpectedSuccesses,
-                                    result.skipped))
-            except AttributeError:
-                pass
-            else:
-                expectedFails, unexpectedSuccesses, skipped = results
+            # other metrics
+            expectedFails = len(result.expectedFailures)
+            unexpectedSuccesses = len(result.unexpectedSuccesses)
+            skipped = len(result.skipped)
 
             # Error traces
             infos = []

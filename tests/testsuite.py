@@ -15,7 +15,27 @@ from tempfile import mkdtemp
 from shutil import rmtree
 from glob import glob
 from xml.dom import minidom
+from lxml import etree
 import os.path
+
+
+def _load_schema():
+    path = os.path.join(os.path.dirname(__file__),
+                        'vendor/jenkins/xunit-plugin',
+                        'junit-10.xsd')
+    with open(path, 'r') as schema_file:
+        schema_doc = etree.parse(schema_file)
+        schema = etree.XMLSchema(schema_doc)
+        return schema
+    raise RuntimeError('Could not load JUnit schema')  # pragma: no cover
+
+
+JUnitSchema = _load_schema()
+
+
+def validate_junit_report(text):
+    document = etree.parse(BytesIO(text))
+    JUnitSchema.assertValid(document)
 
 
 class DoctestTest(unittest.TestCase):
@@ -106,8 +126,6 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             except Exception:
                 result.addError(self, sys.exc_info())
                 return
-            super(XMLTestRunnerTestCase.DummyErrorInCallTest, self)\
-                .__call__(result)
 
         def test_pass(self):
             # it is expected not to be called.
@@ -384,6 +402,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         i_testcase = output.index('<testcase'.encode('utf8'))
         self.assertTrue(i_properties < i_testcase <
                         i_system_out < i_system_err)
+        # XSD validation - for good measure.
+        validate_junit_report(output)
 
     def test_junitxml_xsd_validation_empty_properties(self):
         suite = unittest.TestSuite()
@@ -398,6 +418,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir.seek(0)
         output = outdir.read()
         self.assertNotIn('<properties>'.encode('utf8'), output)
+        validate_junit_report(output)
 
     def test_xmlrunner_elapsed_times(self):
         self.runner_kwargs['elapsed_times'] = False
