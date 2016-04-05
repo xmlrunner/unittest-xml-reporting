@@ -343,6 +343,9 @@ class _XMLTestResult(_TextTestResult):
         errors = filter(lambda e: e.outcome == e.ERROR, tests)
         testsuite.setAttribute('errors', str(len(list(errors))))
 
+        skips = filter(lambda e: e.outcome == _TestInfo.SKIP, tests)
+        testsuite.setAttribute('skipped', str(len(list(skips))))
+ 
         _XMLTestResult._report_testsuite_properties(
             testsuite, xml_document, properties)
 
