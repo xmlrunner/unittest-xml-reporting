@@ -27,7 +27,7 @@ def _load_schema():
         schema_doc = etree.parse(schema_file)
         schema = etree.XMLSchema(schema_doc)
         return schema
-    raise RuntimeError('Could not load JUnit schema')
+    raise RuntimeError('Could not load JUnit schema')  # pragma: no cover
 
 
 JUnitSchema = _load_schema()
@@ -126,8 +126,6 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             except Exception:
                 result.addError(self, sys.exc_info())
                 return
-            super(XMLTestRunnerTestCase.DummyErrorInCallTest, self)\
-                .__call__(result)
 
         def test_pass(self):
             # it is expected not to be called.
