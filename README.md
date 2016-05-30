@@ -2,6 +2,7 @@
 [![Latest Version](https://img.shields.io/pypi/v/unittest-xml-reporting.svg)](https://pypi.python.org/pypi/unittest-xml-reporting/)
 [![Downloads](https://img.shields.io/pypi/dm/unittest-xml-reporting.svg)](https://pypi.python.org/pypi/unittest-xml-reporting/)
 [![Development Status](https://img.shields.io/pypi/status/unittest-xml-reporting.svg)](https://pypi.python.org/pypi/unittest-xml-reporting/)
+[![Documentation Status](https://readthedocs.org/projects/unittest-xml-reporting/badge/?version=latest)](http://unittest-xml-reporting.readthedocs.io/en/latest/?badge=latest)
 
 [![Build Status](https://travis-ci.org/xmlrunner/unittest-xml-reporting.svg?branch=master)](https://travis-ci.org/xmlrunner/unittest-xml-reporting)
 [![Code Health](https://landscape.io/github/xmlrunner/unittest-xml-reporting/master/landscape.png)](https://landscape.io/github/xmlrunner/unittest-xml-reporting/master)
