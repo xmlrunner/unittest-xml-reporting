@@ -17,7 +17,7 @@ class XMLTestRunner(TextTestRunner):
     def __init__(self, output='.', outsuffix=None, stream=sys.stderr,
                  descriptions=True, verbosity=1, elapsed_times=True,
                  failfast=False, buffer=False, encoding=UTF8,
-                 resultclass=None):
+                 resultclass=None, warnings=None):
         TextTestRunner.__init__(self, stream, descriptions, verbosity,
                                 failfast=failfast, buffer=buffer)
         self.verbosity = verbosity
@@ -52,6 +52,7 @@ class XMLTestRunner(TextTestRunner):
             # Prepare the test execution
             result = self._make_result()
             result.failfast = self.failfast
+            result.buffer = self.buffer
             if hasattr(test, 'properties'):
                 # junit testsuite properties
                 result.properties = test.properties
