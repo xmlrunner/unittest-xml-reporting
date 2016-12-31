@@ -94,7 +94,15 @@ class _TestInfo(object):
         self.test_result = test_result
         self.outcome = outcome
         self.elapsed_time = 0
-        self.err = err
+        self.test_exception_name = None
+        self.test_exception_message = None
+        if self.outcome != _TestInfo.SUCCESS:
+            if self.outcome != _TestInfo.SKIP:
+                self.test_exception_name = safe_unicode(err[0].__name__)
+                self.test_exception_message = safe_unicode(err[1])
+            else:
+                self.test_exception_message = safe_unicode(err)
+            
         self.stdout = test_result._stdout_data
         self.stderr = test_result._stderr_data
 
@@ -102,7 +110,7 @@ class _TestInfo(object):
         self.test_exception_info = (
             '' if outcome in (self.SUCCESS, self.SKIP)
             else self.test_result._exc_info_to_string(
-                    self.err, test_method)
+                    err, test_method)
         )
 
         self.test_name = testcase_name(test_method)
@@ -422,18 +430,18 @@ class _XMLTestResult(_TextTestResult):
             if test_result.outcome != test_result.SKIP:
                 failure.setAttribute(
                     'type',
-                    safe_unicode(test_result.err[0].__name__)
+                    test_result.test_exception_name
                 )
                 failure.setAttribute(
                     'message',
-                    safe_unicode(test_result.err[1])
+                    test_result.test_exception_message
                 )
                 error_info = safe_unicode(test_result.get_error_info())
                 _XMLTestResult._createCDATAsections(
                     xml_document, failure, error_info)
             else:
                 failure.setAttribute('type', 'skip')
-                failure.setAttribute('message', safe_unicode(test_result.err))
+                failure.setAttribute('message', test_result.test_exception_message)
 
     _report_testcase = staticmethod(_report_testcase)
 
