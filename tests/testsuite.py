@@ -131,6 +131,13 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             # it is expected not to be called.
             pass  # pragma: no cover
 
+    class DummyRefCountTest(unittest.TestCase):
+        class dummy(object):
+            pass
+        def test_fail(self):
+            inst = self.dummy()
+            self.assertTrue(False)
+
     def setUp(self):
         self.stream = StringIO()
         self.outdir = mkdtemp()
@@ -472,3 +479,11 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self._test_xmlrunner(suite)
         testsuite_output = self.stream.getvalue()
         self.assertIn('Exception: Massive fail', testsuite_output)
+
+    def test_xmlrunner_hold_traceback(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyRefCountTest('test_fail'))
+        countBeforeTest = sys.getrefcount(self.DummyRefCountTest.dummy)
+        runner = self._test_xmlrunner(suite)
+        countAfterTest = sys.getrefcount(self.DummyRefCountTest.dummy)
+        self.assertEqual(countBeforeTest, countAfterTest)
