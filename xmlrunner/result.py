@@ -149,7 +149,7 @@ class XMLTestResult(result.TestResult):
         # Assume that self.out_dir is a stream by default
         stream = self.out_dir
 
-        if type(stream) in six.string_types:
+        if isinstance(stream, six.string_types):
             filename = '{0}{1}TESTS-TestSuites-{3}.xml'.format(stream, os.sep,
                 'suite', self.out_suffix)
 
