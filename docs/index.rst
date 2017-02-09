@@ -19,9 +19,13 @@ as well as::
 
     python -m xmlrunner discover [options]
 
+and it's possible to set the output directory ``test-reports`` ::
+
+    python -m xmlrunner --xmloutput test-reports [options]
+
 You can also add a top level file to allow running the tests with
-the command ``python tests.py``, and configure the test runner
-to output the XML reports in the ``test-reports`` directory. ::
+the command ``python tests.py`` with finer XMLTestRunner
+configuration. ::
 
     # tests.py
 

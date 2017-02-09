@@ -16,10 +16,22 @@ if sys.argv[0].endswith("__main__.py"):
 
 __unittest = True
 
+# Default output to '.' may be changed by the --xmloutput param
+output='.'
+if '--xmloutput' in sys.argv:
+    i = sys.argv.index('--xmloutput')
+    del sys.argv[i]
+    try:
+        output=sys.argv[i]
+        if output.startswith('-'):
+            raise IndexError
+        del sys.argv[i]
+    except IndexError:
+        sys.exit('Missing output for the --xmloutput param.')
 
 main = TestProgram
 
 main(
-    module=None, testRunner=XMLTestRunner,
+    module=None, testRunner=XMLTestRunner(output=output),
     # see issue #59
     failfast=False, catchbreak=False, buffer=False)
