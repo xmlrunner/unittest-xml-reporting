@@ -9,6 +9,7 @@ how to configure a custom TestRunner in a Django project, please read the
 Django docs website.
 """
 
+import os
 import xmlrunner
 import os.path
 from django.conf import settings
@@ -31,6 +32,8 @@ class XMLTestRunner(DiscoverRunner):
             verbosity=verbosity, descriptions=descriptions,
             failfast=self.failfast)
         if single_file is not None:
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
             file_path = os.path.join(output_dir, single_file)
             with open(file_path, 'wb') as xml:
                 return xmlrunner.XMLTestRunner(
