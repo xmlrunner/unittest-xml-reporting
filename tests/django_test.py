@@ -98,6 +98,23 @@ class DjangoTest(unittest.TestCase):
         self.assertTrue(path.exists(expected_file),
                         'did not generate xml report where expected.')
 
+    def test_django_single_report_create_folder(self):
+        intermediate_directory = 'report'
+        directory = path.join(self.tmpdir, intermediate_directory)
+        self._override_settings(
+            TEST_OUTPUT_DIR=directory,
+            TEST_OUTPUT_FILE_NAME='results.xml',
+            TEST_OUTPUT_VERBOSE=0,
+            TEST_RUNNER='xmlrunner.extra.djangotestrunner.XMLTestRunner')
+        apps.populate(settings.INSTALLED_APPS)
+        runner_class = get_runner(settings)
+        runner = runner_class()
+        suite = runner.build_suite()
+        runner.run_suite(suite)
+        expected_file = path.join(directory, 'results.xml')
+        self.assertTrue(path.exists(expected_file),
+                        'did not generate xml report where expected.')
+
     def test_django_multiple_reports(self):
         self._override_settings(
             TEST_OUTPUT_DIR=self.tmpdir,
