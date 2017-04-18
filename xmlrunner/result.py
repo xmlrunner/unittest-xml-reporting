@@ -185,6 +185,7 @@ class _XMLTestResult(_TextTestResult):
                 )
             elif self.dots:
                 self.stream.write(short_str)
+            self.stream.flush()
         self.callback = callback
 
     def startTest(self, test):
