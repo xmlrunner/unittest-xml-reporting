@@ -4,6 +4,7 @@ import sys
 import os
 from os import path
 import glob
+import mock
 import tempfile
 import shutil
 
@@ -129,3 +130,20 @@ class DjangoTest(unittest.TestCase):
         self.assertTrue(test_files,
                         'did not generate xml reports where expected.')
         self.assertEqual(2, len(test_files))
+
+    def test_django_runner_extension(self):
+        from xmlrunner.extra.djangotestrunner import XMLTestRunner
+
+        class MyDjangoRunner(XMLTestRunner):
+            test_runner = mock.Mock()
+        
+        self._override_settings(
+            TEST_OUTPUT_DIR=self.tmpdir,
+            TEST_OUTPUT_VERBOSE=0)
+        apps.populate(settings.INSTALLED_APPS)
+
+        runner = MyDjangoRunner()
+        suite = runner.build_suite(test_labels=None)
+        runner.run_suite(suite)
+        
+        self.assertTrue(MyDjangoRunner.test_runner.called)
