@@ -36,13 +36,11 @@ class XMLTestRunner(DiscoverRunner):
 
         # For single file case we are able to create file here
         # But for multiple files case files will be created inside runner/results
-        if single_file is not None:
+        if single_file is None:  # output will be a path (folder)
+            output = output_dir
+        else:  # output will be a stream
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
-
-        if single_file is None:  # output is a stream
-            output = output_dir
-        else:  # output is a folder
             file_path = os.path.join(output_dir, single_file)
             output = open(file_path, 'wb')
 
@@ -55,9 +53,9 @@ class XMLTestRunner(DiscoverRunner):
         )
 
     def run_suite(self, suite, **kwargs):
-        kwargs = self.get_test_runner_kwargs()
-        runner = self.test_runner(**kwargs)
+        runner_kwargs = self.get_test_runner_kwargs()
+        runner = self.test_runner(**runner_kwargs)
         results = runner.run(suite)
-        if hasattr(kwargs['output'], 'close'):
-            kwargs['output'].close()
+        if hasattr(runner_kwargs['output'], 'close'):
+            runner_kwargs['output'].close()
         return results
