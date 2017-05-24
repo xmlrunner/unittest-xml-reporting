@@ -460,9 +460,12 @@ class _XMLTestResult(_TextTestResult):
         """
         testsuite = xml_document.createElement('testsuite')
         parentElement.appendChild(testsuite)
+        module_name = suite_name.rpartition('.')[0]
+        file_name = module_name.replace('.', '/') + '.py'
 
         testsuite.setAttribute('name', suite_name)
         testsuite.setAttribute('tests', str(len(tests)))
+        testsuite.setAttribute('file', file_name)
 
         testsuite.setAttribute(
             'time', '%.3f' % sum(map(lambda e: e.elapsed_time, tests))
