@@ -486,28 +486,6 @@ class _XMLTestResult(_TextTestResult):
         for test in tests:
             _XMLTestResult._report_testcase(test, testsuite, xml_document)
 
-        systemout = xml_document.createElement('system-out')
-        testsuite.appendChild(systemout)
-
-        stdout = StringIO()
-        for test in tests:
-            # Merge the stdout from the tests in a class
-            if test.stdout is not None:
-                stdout.write(test.stdout)
-        _XMLTestResult._createCDATAsections(
-            xml_document, systemout, stdout.getvalue())
-
-        systemerr = xml_document.createElement('system-err')
-        testsuite.appendChild(systemerr)
-
-        stderr = StringIO()
-        for test in tests:
-            # Merge the stderr from the tests in a class
-            if test.stderr is not None:
-                stderr.write(test.stderr)
-        _XMLTestResult._createCDATAsections(
-            xml_document, systemerr, stderr.getvalue())
-
         return testsuite
 
     _report_testsuite = staticmethod(_report_testsuite)
@@ -549,6 +527,18 @@ class _XMLTestResult(_TextTestResult):
         )
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
         testcase.setAttribute('timestamp', test_result.timestamp)
+
+        if test_result.stdout:
+            systemout = xml_document.createElement('system-out')
+            testcase.appendChild(systemout)
+            _XMLTestResult._createCDATAsections(
+                xml_document, systemout, test_result.stdout)
+
+        if test_result.stderr:
+            systemout = xml_document.createElement('system-err')
+            testcase.appendChild(systemout)
+            _XMLTestResult._createCDATAsections(
+                xml_document, systemout, test_result.stderr)
 
         if (test_result.outcome != test_result.SUCCESS):
             elem_name = ('failure', 'error', 'skipped')[test_result.outcome-1]
