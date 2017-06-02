@@ -528,18 +528,6 @@ class _XMLTestResult(_TextTestResult):
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
         testcase.setAttribute('timestamp', test_result.timestamp)
 
-        if test_result.stdout:
-            systemout = xml_document.createElement('system-out')
-            testcase.appendChild(systemout)
-            _XMLTestResult._createCDATAsections(
-                xml_document, systemout, test_result.stdout)
-
-        if test_result.stderr:
-            systemout = xml_document.createElement('system-err')
-            testcase.appendChild(systemout)
-            _XMLTestResult._createCDATAsections(
-                xml_document, systemout, test_result.stderr)
-
         if (test_result.outcome != test_result.SUCCESS):
             elem_name = ('failure', 'error', 'skipped')[test_result.outcome-1]
             failure = xml_document.createElement(elem_name)
@@ -559,6 +547,18 @@ class _XMLTestResult(_TextTestResult):
             else:
                 failure.setAttribute('type', 'skip')
                 failure.setAttribute('message', test_result.test_exception_message)
+
+        if test_result.stdout:
+            systemout = xml_document.createElement('system-out')
+            testcase.appendChild(systemout)
+            _XMLTestResult._createCDATAsections(
+                xml_document, systemout, test_result.stdout)
+
+        if test_result.stderr:
+            systemout = xml_document.createElement('system-err')
+            testcase.appendChild(systemout)
+            _XMLTestResult._createCDATAsections(
+                xml_document, systemout, test_result.stderr)
 
     _report_testcase = staticmethod(_report_testcase)
 
