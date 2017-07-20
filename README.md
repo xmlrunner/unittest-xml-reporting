@@ -190,7 +190,7 @@ feel free to get in touch.
 Please use `tox` to test your changes before sending a pull request.
 You can find more information about `tox` at <https://testrun.org/tox/latest/>.
 
-````bash
+```bash
 $ pip install tox
 $ tox
 ```
