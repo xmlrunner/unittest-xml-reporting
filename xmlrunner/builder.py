@@ -1,5 +1,6 @@
 import re
 import sys
+import datetime
 import time
 import six
 
@@ -80,6 +81,7 @@ class TestXMLContext(object):
         """
         self._stop_time = time.time()
         self.element.setAttribute('time', self.elapsed_time())
+        self.element.setAttribute('timestamp', self.timestamp())
         self._set_result_counters()
         return self.element
 
@@ -120,6 +122,11 @@ class TestXMLContext(object):
         `begin()` and `end()`, in seconds.
         """
         return format(self._stop_time - self._start_time, '.3f')
+
+    def timestamp(self):
+        """Returns the time the context ended as ISO-8601-formatted timestamp.
+        """
+        return datetime.datetime.fromtimestamp(self._stop_time).replace(microsecond=0).isoformat()
 
 
 class TestXMLBuilder(object):
