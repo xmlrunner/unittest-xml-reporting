@@ -83,6 +83,12 @@ class TestXMLContextTest(unittest.TestCase):
 
         element.attributes['time'].value
 
+    def test_add_timestamp_attribute_on_end_context(self):
+        self.root.begin('testsuite', 'name')
+        element = self.root.end()
+
+        element.attributes['timestamp'].value
+
 
 class TestXMLBuilderTest(unittest.TestCase):
     """TestXMLBuilder test cases.
