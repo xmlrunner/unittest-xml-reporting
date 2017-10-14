@@ -1,6 +1,5 @@
 [![License](https://img.shields.io/pypi/l/unittest-xml-reporting.svg)](https://pypi.python.org/pypi/unittest-xml-reporting/)
 [![Latest Version](https://img.shields.io/pypi/v/unittest-xml-reporting.svg)](https://pypi.python.org/pypi/unittest-xml-reporting/)
-[![Downloads](https://img.shields.io/pypi/dm/unittest-xml-reporting.svg)](https://pypi.python.org/pypi/unittest-xml-reporting/)
 [![Development Status](https://img.shields.io/pypi/status/unittest-xml-reporting.svg)](https://pypi.python.org/pypi/unittest-xml-reporting/)
 [![Documentation Status](https://readthedocs.org/projects/unittest-xml-reporting/badge/?version=latest)](http://unittest-xml-reporting.readthedocs.io/en/latest/?badge=latest)
 
@@ -18,7 +17,7 @@ systems, IDEs and continuous integration servers.
 
 ## Requirements
 
-* Python 2.7+ or 3.3+
+* Python 2.7 or 3.3+
 * Please note Python 2.6 end-of-life was in Oct 2013, last version supporting 2.6 was 1.14.0
 
 ## Installation
