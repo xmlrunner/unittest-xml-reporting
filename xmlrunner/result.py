@@ -96,7 +96,7 @@ class _TestInfo(object):
         self.outcome = outcome
         self.elapsed_time = 0
         self.timestamp = datetime.datetime.min.replace(microsecond=0).isoformat()
-        if err:
+        if err is not None:
             if self.outcome != _TestInfo.SKIP:
                 self.test_exception_name = safe_unicode(err[0].__name__)
                 self.test_exception_message = safe_unicode(err[1])
