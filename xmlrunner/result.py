@@ -497,9 +497,9 @@ class _XMLTestResult(_TextTestResult):
                 with open(filename, 'wb') as report_file:
                     report_file.write(xml_content)
 
-        if not outputHandledAsString:
-            # Assume that test_runner.output is a stream
-            test_runner.output.write(xml_content)
+            if not outputHandledAsString:
+                # Assume that test_runner.output is a stream
+                test_runner.output.write(xml_content)
 
     def _exc_info_to_string(self, err, test):
         """Converts a sys.exc_info()-style tuple of values into a string."""
