@@ -1,4 +1,5 @@
 
+import io
 import os
 import sys
 import datetime
@@ -82,6 +83,37 @@ def testcase_name(test_method):
     return result
 
 
+class _DuplicateWriter(io.RawIOBase):
+    """
+    Duplicate output from the first handle to the second handle
+
+    The second handle is expected to be a StringIO and not to block.
+    """
+
+    def __init__(self, first, second):
+        super(_DuplicateWriter, self).__init__()
+        self._first = first
+        self._second = second
+
+    def flush(self):
+        self._first.flush()
+        self._second.flush()
+
+    def writable(self):
+        return True
+
+    def writelines(self, lines):
+        self._first.writelines(lines)
+        self._second.writelines(lines)
+
+    def write(self, b):
+        len = self._first.write(b)
+
+        # expected to always succeed to write
+        self._second.write(b[:len])
+        return len
+
+
 class _TestInfo(object):
     """
     This class keeps useful information about the execution of a
@@ -152,9 +184,12 @@ class _XMLTestResult(_TextTestResult):
     def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1,
                  elapsed_times=True, properties=None, infoclass=None):
         _TextTestResult.__init__(self, stream, descriptions, verbosity)
-        self.buffer = True  # we are capturing test output
         self._stdout_data = None
         self._stderr_data = None
+        self._stdout_capture = StringIO()
+        self.__stdout_saved = None
+        self._stderr_capture = StringIO()
+        self.__stderr_saved = None
         self.successes = []
         self.callback = None
         self.elapsed_times = elapsed_times
@@ -202,14 +237,35 @@ class _XMLTestResult(_TextTestResult):
             self.stream.write('  ' + self.getDescription(test))
             self.stream.write(" ... ")
 
+    def _setupStdout(self):
+        """
+        Capture stdout / stderr by replacing sys.stdout / sys.stderr
+        """
+        super(_XMLTestResult, self)._setupStdout()
+        self.__stdout_saved = sys.stdout
+        sys.stdout = _DuplicateWriter(sys.stdout, self._stdout_capture)
+        self.__stderr_saved = sys.stderr
+        sys.stderr = _DuplicateWriter(sys.stderr, self._stderr_capture)
+
+    def _restoreStdout(self):
+        """
+        Stop capturing stdout / stderr and recover sys.stdout / sys.stderr
+        """
+        if self.__stdout_saved:
+            sys.stdout = self.__stdout_saved
+            self.__stdout_saved = None
+        if self.__stderr_saved:
+            sys.stderr = self.__stderr_saved
+            self.__stderr_saved = None
+        self._stdout_capture.seek(0)
+        self._stdout_capture.truncate()
+        self._stderr_capture.seek(0)
+        self._stderr_capture.truncate()
+        super(_XMLTestResult, self)._restoreStdout()
+
     def _save_output_data(self):
-        # Only try to get sys.stdout and sys.sterr as they not be
-        # StringIO yet, e.g. when test fails during __call__
-        try:
-            self._stdout_data = sys.stdout.getvalue()
-            self._stderr_data = sys.stderr.getvalue()
-        except AttributeError:
-            pass
+        self._stdout_data = self._stdout_capture.getvalue()
+        self._stderr_data = self._stderr_capture.getvalue()
 
     def stopTest(self, test):
         """
@@ -526,16 +582,8 @@ class _XMLTestResult(_TextTestResult):
             msgLines = traceback.format_exception(exctype, value, tb)
 
         if self.buffer:
-            # Only try to get sys.stdout and sys.sterr as they not be
-            # StringIO yet, e.g. when test fails during __call__
-            try:
-                output = sys.stdout.getvalue()
-            except AttributeError:
-                output = None
-            try:
-                error = sys.stderr.getvalue()
-            except AttributeError:
-                error = None
+            output = self._stdout_capture.getvalue()
+            error = self._stdout_capture.getvalue()
             if output:
                 if not output.endswith('\n'):
                     output += '\n'
