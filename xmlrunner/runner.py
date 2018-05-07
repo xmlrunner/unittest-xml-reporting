@@ -52,6 +52,7 @@ class XMLTestRunner(TextTestRunner):
             # Prepare the test execution
             result = self._make_result()
             result.failfast = self.failfast
+            result.buffer = self.buffer
             if hasattr(test, 'properties'):
                 # junit testsuite properties
                 result.properties = test.properties

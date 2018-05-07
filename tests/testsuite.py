@@ -3,6 +3,8 @@
 
 """Executable module to test unittest-xml-reporting.
 """
+import contextlib
+import io
 import sys
 
 from xmlrunner.unittest import unittest
@@ -55,6 +57,22 @@ class DoctestTest(unittest.TestCase):
                       'name="twice"'.encode('utf8'), output)
 
 
+@contextlib.contextmanager
+def capture_stdout_stderr():
+    """
+    context manager to capture stdout and stderr
+    """
+    orig_stdout = sys.stdout
+    orig_stderr = sys.stderr
+    sys.stdout = StringIO()
+    sys.stderr = StringIO()
+    try:
+        yield (sys.stdout, sys.stderr)
+    finally:
+        sys.stdout = orig_stdout
+        sys.stderr = orig_stderr
+
+
 class XMLTestRunnerTestCase(unittest.TestCase):
     """
     XMLTestRunner test case.
@@ -101,6 +119,9 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         def test_runner_buffer_output_fail(self):
             print('should be printed')
             self.fail('expected to fail')
+
+        def test_output(self):
+            print('test message')
 
         def test_non_ascii_runner_buffer_output_fail(self):
             print(u'Where is the café ?')
@@ -270,7 +291,25 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner = xmlrunner.XMLTestRunner(
             stream=self.stream, output=outdir, verbosity=self.verbosity,
             **self.runner_kwargs)
-        runner.run(suite)
+
+        # allow output non-ascii letters to stdout
+        orig_stdout = sys.stdout
+        if getattr(sys.stdout, 'buffer', None):
+            # Python3
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+        else:
+            # Python2
+            import codecs
+            sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
+
+        try:
+            runner.run(suite)
+        finally:
+            if getattr(sys.stdout, 'buffer', None):
+                # Python3
+                # Not to be closed when TextIOWrapper is disposed.
+                sys.stdout.detach()
+            sys.stdout = orig_stdout
         outdir.seek(0)
         output = outdir.read()
         self.assertIn(
@@ -296,9 +335,51 @@ class XMLTestRunnerTestCase(unittest.TestCase):
     def test_xmlrunner_buffer_output_fail(self):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_runner_buffer_output_fail'))
+        # --buffer option
+        self.runner_kwargs['buffer'] = True
         self._test_xmlrunner(suite)
         testsuite_output = self.stream.getvalue()
         self.assertIn('should be printed', testsuite_output)
+
+    def test_xmlrunner_output_without_buffer(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_output'))
+        with capture_stdout_stderr() as r:
+            self._test_xmlrunner(suite)
+        output_from_test = r[0].getvalue()
+        self.assertIn('test message', output_from_test)
+
+    def test_xmlrunner_output_with_buffer(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_output'))
+        # --buffer option
+        self.runner_kwargs['buffer'] = True
+        with capture_stdout_stderr() as r:
+            self._test_xmlrunner(suite)
+        output_from_test = r[0].getvalue()
+        self.assertNotIn('test message', output_from_test)
+
+    def test_xmlrunner_stdout_stderr_recovered_without_buffer(self):
+        orig_stdout = sys.stdout
+        orig_stderr = sys.stderr
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        self._test_xmlrunner(suite)
+        self.assertIs(orig_stdout, sys.stdout)
+        self.assertIs(orig_stderr, sys.stderr)
+
+    def test_xmlrunner_stdout_stderr_recovered_with_buffer(self):
+        orig_stdout = sys.stdout
+        orig_stderr = sys.stderr
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        # --buffer option
+        self.runner_kwargs['buffer'] = True
+        self._test_xmlrunner(suite)
+        self.assertIs(orig_stdout, sys.stdout)
+        self.assertIs(orig_stderr, sys.stderr)
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
 
     @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
                      'unittest.TestCase.subTest not present.')
