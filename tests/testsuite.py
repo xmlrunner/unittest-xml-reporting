@@ -9,15 +9,18 @@ import sys
 
 from xmlrunner.unittest import unittest
 import xmlrunner
+from xmlrunner.result import _DuplicateWriter
 from xmlrunner.result import _XMLTestResult
 import doctest
 import tests.doctest_example
 from six import StringIO, BytesIO
 from tempfile import mkdtemp
+from tempfile import mkstemp
 from shutil import rmtree
 from glob import glob
 from xml.dom import minidom
 from lxml import etree
+import os
 import os.path
 
 
@@ -573,3 +576,48 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner = self._test_xmlrunner(suite)
         countAfterTest = sys.getrefcount(self.DummyRefCountTest.dummy)
         self.assertEqual(countBeforeTest, countAfterTest)
+
+
+class DuplicateWriterTestCase(unittest.TestCase):
+    def setUp(self):
+        fd, self.file = mkstemp()
+        self.fh = os.fdopen(fd, 'w')
+        self.buffer = StringIO()
+        self.writer = _DuplicateWriter(self.fh, self.buffer)
+
+    def tearDown(self):
+        self.buffer.close()
+        self.fh.close()
+        os.unlink(self.file)
+
+    def getFirstContent(self):
+        with open(self.file, 'r') as f:
+            return f.read()
+
+    def getSecondContent(self):
+        return self.buffer.getvalue()
+
+    def test_flush(self):
+        self.writer.write('foobarbaz')
+        self.writer.flush()
+        self.assertEqual(self.getFirstContent(), self.getSecondContent())
+
+    def test_writable(self):
+        self.assertTrue(self.writer.writable())
+
+    def test_writelines(self):
+        self.writer.writelines([
+            'foo\n',
+            'bar\n',
+            'baz\n',
+        ])
+        self.writer.flush()
+        self.assertEqual(self.getFirstContent(), self.getSecondContent())
+
+    def test_write(self):
+        # try long buffer (1M)
+        buffer = 'x' * (1024 * 1024)
+        wrote = self.writer.write(buffer)
+        self.writer.flush()
+        self.assertEqual(self.getFirstContent(), self.getSecondContent())
+        self.assertEqual(wrote, len(self.getSecondContent()))

@@ -83,7 +83,7 @@ def testcase_name(test_method):
     return result
 
 
-class _DuplicateWriter(io.RawIOBase):
+class _DuplicateWriter(io.TextIOBase):
     """
     Duplicate output from the first handle to the second handle
 
@@ -107,11 +107,20 @@ class _DuplicateWriter(io.RawIOBase):
         self._second.writelines(lines)
 
     def write(self, b):
-        len = self._first.write(b)
+        if isinstance(self._first, io.TextIOBase):
+            wrote = self._first.write(b)
 
-        # expected to always succeed to write
-        self._second.write(b[:len])
-        return len
+            if wrote is not None:
+                # expected to always succeed to write
+                self._second.write(b[:wrote])
+
+            return wrote
+        else:
+            # file-like object in Python2
+            # It doesn't return wrote bytes.
+            self._first.write(b)
+            self._second.write(b)
+            return len(b)
 
 
 class _TestInfo(object):
