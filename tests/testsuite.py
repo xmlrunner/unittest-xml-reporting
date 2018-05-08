@@ -632,6 +632,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         countAfterTest = sys.getrefcount(self.DummyRefCountTest.dummy)
         self.assertEqual(countBeforeTest, countAfterTest)
 
+<<<<<<< HEAD
     class StderrXMLTestRunner(xmlrunner.XMLTestRunner):
         """
         XMLTestRunner that outputs to sys.stderr that might be replaced
@@ -705,6 +706,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.assertIn('should be printed', r[0].getvalue())
         self.assertNotIn('should be printed', r[1].getvalue())
 
+=======
+>>>>>>> d6e413c... Improve coverages for _DuplicateWriter
 
 class DuplicateWriterTestCase(unittest.TestCase):
     def setUp(self):
@@ -749,6 +752,7 @@ class DuplicateWriterTestCase(unittest.TestCase):
         self.writer.flush()
         self.assertEqual(self.getFirstContent(), self.getSecondContent())
         self.assertEqual(wrote, len(self.getSecondContent()))
+<<<<<<< HEAD
 
 
 @unittest.skipIf(sys.version_info[0] < 3, 'Python 3 required')
@@ -773,3 +777,5 @@ class XMLProgramTestCase(unittest.TestCase):
         testrunner.assert_called_once_with(**kwargs)
 
         exiter.assert_called_once_with(False)
+=======
+>>>>>>> d6e413c... Improve coverages for _DuplicateWriter
