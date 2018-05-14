@@ -577,6 +577,79 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         countAfterTest = sys.getrefcount(self.DummyRefCountTest.dummy)
         self.assertEqual(countBeforeTest, countAfterTest)
 
+    class StderrXMLTestRunner(xmlrunner.XMLTestRunner):
+        """
+        XMLTestRunner that outputs to sys.stderr that might be replaced
+
+        Though XMLTestRunner defaults to use sys.stderr as stream,
+        it cannot be replaced e.g. by replaced by capture_stdout_stderr(),
+        as it's already resolved.
+        This class resolved sys.stderr lazily and outputs to replaced sys.stderr.
+        """
+        def __init__(self, **kwargs):
+            super(XMLTestRunnerTestCase.StderrXMLTestRunner, self).__init__(
+                stream=sys.stderr,
+                **kwargs
+            )
+
+    def test_test_program_succeed_with_buffer(self):
+        with capture_stdout_stderr() as r:
+            unittest.TestProgram(
+                module=self.__class__.__module__,
+                testRunner=self.StderrXMLTestRunner,
+                argv=[
+                    sys.argv[0],
+                    '-b',
+                    'XMLTestRunnerTestCase.DummyTest.test_runner_buffer_output_pass',
+                ],
+                exit=False,
+            )
+        self.assertNotIn('should not be printed', r[0].getvalue())
+        self.assertNotIn('should not be printed', r[1].getvalue())
+
+    def test_test_program_succeed_wo_buffer(self):
+        with capture_stdout_stderr() as r:
+            unittest.TestProgram(
+                module=self.__class__.__module__,
+                testRunner=self.StderrXMLTestRunner,
+                argv=[
+                    sys.argv[0],
+                    'XMLTestRunnerTestCase.DummyTest.test_runner_buffer_output_pass',
+                ],
+                exit=False,
+            )
+        self.assertIn('should not be printed', r[0].getvalue())
+        self.assertNotIn('should not be printed', r[1].getvalue())
+
+    def test_test_program_fail_with_buffer(self):
+        with capture_stdout_stderr() as r:
+            unittest.TestProgram(
+                module=self.__class__.__module__,
+                testRunner=self.StderrXMLTestRunner,
+                argv=[
+                    sys.argv[0],
+                    '-b',
+                    'XMLTestRunnerTestCase.DummyTest.test_runner_buffer_output_fail',
+                ],
+                exit=False,
+            )
+        self.assertNotIn('should be printed', r[0].getvalue())
+        self.assertIn('should be printed', r[1].getvalue())
+
+    def test_test_program_fail_wo_buffer(self):
+        with capture_stdout_stderr() as r:
+            unittest.TestProgram(
+                module=self.__class__.__module__,
+                testRunner=self.StderrXMLTestRunner,
+                argv=[
+                    sys.argv[0],
+                    'XMLTestRunnerTestCase.DummyTest.test_runner_buffer_output_fail',
+                ],
+                exit=False,
+            )
+        self.assertIn('should be printed', r[0].getvalue())
+        self.assertNotIn('should be printed', r[1].getvalue())
+
 
 class DuplicateWriterTestCase(unittest.TestCase):
     def setUp(self):
