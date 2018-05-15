@@ -14,13 +14,11 @@ class XMLTestRunner(TextTestRunner):
     """
     A test runner class that outputs the results in JUnit like XML files.
     """
-    def __init__(self, output='.', outsuffix=None, stream=sys.stderr,
-                 descriptions=True, verbosity=1, elapsed_times=True,
-                 failfast=False, buffer=False, encoding=UTF8,
-                 resultclass=None):
-        TextTestRunner.__init__(self, stream, descriptions, verbosity,
-                                failfast=failfast, buffer=buffer)
-        self.verbosity = verbosity
+    def __init__(self, output='.', outsuffix=None, 
+                 elapsed_times=True, encoding=UTF8,
+                 resultclass=None,
+                 **kwargs):
+        super(XMLTestRunner, self).__init__(**kwargs)
         self.output = output
         self.encoding = encoding
         # None means default timestamped suffix
