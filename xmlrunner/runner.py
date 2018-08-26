@@ -16,7 +16,7 @@ class XMLTestRunner(TextTestRunner):
     """
     def __init__(self, output='.', outsuffix=None, 
                  elapsed_times=True, encoding=UTF8,
-                 resultclass=None,
+                 resultclass=None, per_test_output=False,
                  **kwargs):
         super(XMLTestRunner, self).__init__(**kwargs)
         self.output = output
@@ -31,6 +31,7 @@ class XMLTestRunner(TextTestRunner):
             self.resultclass = _XMLTestResult
         else:
             self.resultclass = resultclass
+        self.per_test_output = per_test_output
 
     def _make_result(self):
         """
@@ -39,7 +40,7 @@ class XMLTestRunner(TextTestRunner):
         """
         # override in subclasses if necessary.
         return self.resultclass(
-            self.stream, self.descriptions, self.verbosity, self.elapsed_times
+            self.stream, self.descriptions, self.verbosity, self.elapsed_times, self.per_test_output
         )
 
     def run(self, test):

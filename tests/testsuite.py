@@ -59,6 +59,19 @@ class DoctestTest(unittest.TestCase):
         self.assertIn('classname="tests.doctest_example" '
                       'name="twice"'.encode('utf8'), output)
 
+    def test_doctest_example_per_test_output(self):
+        suite = doctest.DocTestSuite(tests.doctest_example)
+        outdir = BytesIO()
+        stream = StringIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=stream, output=outdir, verbosity=0, per_test_output=True)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        self.assertIn('classname="tests.doctest_example.Multiplicator" '
+                      'name="threetimes"'.encode('utf8'), output)
+        self.assertIn('classname="tests.doctest_example" '
+                      'name="twice"'.encode('utf8'), output)
 
 @contextlib.contextmanager
 def capture_stdout_stderr():
@@ -169,14 +182,14 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.runner_kwargs = {}
         self.addCleanup(rmtree, self.outdir)
 
-    def _test_xmlrunner(self, suite, runner=None):
+    def _test_xmlrunner(self, suite, runner=None, per_test_output=False):
         outdir = self.outdir
         stream = self.stream
         verbosity = self.verbosity
         runner_kwargs = self.runner_kwargs
         if runner is None:
             runner = xmlrunner.XMLTestRunner(
-                stream=stream, output=outdir, verbosity=verbosity,
+                stream=stream, output=outdir, verbosity=verbosity, per_test_output=per_test_output,
                 **runner_kwargs)
         self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
         runner.run(suite)
@@ -204,10 +217,10 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        self.assertIn('classname="tests.testsuite.DummyTest" '
+        self.assertIn('classname="tests.testsuite.XMLTestRunnerTestCase.DummyTest" '
                       'name="test_pass"'.encode('utf8'),
                       output)
-        self.assertIn('classname="tests.testsuite.DummySubTest" '
+        self.assertIn('classname="tests.testsuite.XMLTestRunnerTestCase.DummySubTest" '
                       'name="test_subTest_pass"'.encode('utf8'),
                       output)
 
@@ -279,6 +292,19 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir = BytesIO()
         runner = xmlrunner.XMLTestRunner(
             stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        self.assertIn(u"<![CDATA[ABCD\n]]>".encode('utf8'),
+                      output)
+
+    def test_xmlrunner_unsafe_unicode_per_test_output(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_unsafe_unicode'))
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity, per_test_output=True,
             **self.runner_kwargs)
         runner.run(suite)
         outdir.seek(0)
@@ -398,11 +424,11 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir.seek(0)
         output = outdir.read()
         self.assertIn(
-            b'<testcase classname="tests.testsuite.DummySubTest" '
+            b'<testcase classname="tests.testsuite.XMLTestRunnerTestCase.DummySubTest" '
             b'name="test_subTest_fail (i=0)"',
             output)
         self.assertIn(
-            b'<testcase classname="tests.testsuite.DummySubTest" '
+            b'<testcase classname="tests.testsuite.XMLTestRunnerTestCase.DummySubTest" '
             b'name="test_subTest_fail (i=1)"',
             output)
 
@@ -490,9 +516,52 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         i_properties = output.index('<properties>'.encode('utf8'))
         i_system_out = output.index('<system-out>'.encode('utf8'))
         i_system_err = output.index('<system-err>'.encode('utf8'))
-        i_testcase = output.index('<testcase'.encode('utf8'))
-        self.assertTrue(i_properties < i_testcase <
+        i_testcase_begin = output.index('<testcase'.encode('utf8'))
+        i_testcase_end = output.index('</testcase>'.encode('utf8'))
+        self.assertTrue(i_properties < i_testcase_begin < i_testcase_end <
                         i_system_out < i_system_err)
+        
+        self.assertEqual(output.count('<properties>'.encode('utf8')), 1)
+        self.assertEqual(output.count('</properties>'.encode('utf8')), 1)
+        self.assertEqual(output.count('<system-out>'.encode('utf8')), 1)
+        self.assertEqual(output.count('</system-out>'.encode('utf8')), 1)
+        self.assertEqual(output.count('<system-err>'.encode('utf8')), 1)
+        self.assertEqual(output.count('</system-err>'.encode('utf8')), 1)
+        self.assertEqual(output.count('<testcase'.encode('utf8')), 2)
+        self.assertEqual(output.count('</testcase>'.encode('utf8')), 1)
+        # XSD validation - for good measure.
+        validate_junit_report(output)
+
+    def test_junitxml_xsd_validation_order_per_test_output(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_fail'))
+        suite.addTest(self.DummyTest('test_pass'))
+        suite.properties = dict(key='value')
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity, per_test_output=True,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        # poor man's schema validation; see issue #90
+        i_properties = output.index('<properties>'.encode('utf8'))
+        i_system_out = output.index('<system-out>'.encode('utf8'))
+        i_system_err = output.index('<system-err>'.encode('utf8'))
+        i_testcase_begin = output.index('<testcase'.encode('utf8'))
+        i_testcase_end = output.index('</testcase>'.encode('utf8'))
+        self.assertTrue(i_properties < i_testcase_begin <
+                        i_system_out < i_system_err < i_testcase_end)
+
+        self.assertEqual(output.count('<properties>'.encode('utf8')), 1)
+        self.assertEqual(output.count('</properties>'.encode('utf8')), 1)
+        self.assertEqual(output.count('<system-out>'.encode('utf8')), 2)
+        self.assertEqual(output.count('</system-out>'.encode('utf8')), 2)
+        self.assertEqual(output.count('<system-err>'.encode('utf8')), 2)
+        self.assertEqual(output.count('</system-err>'.encode('utf8')), 2)
+        self.assertEqual(output.count('<testcase'.encode('utf8')), 2)
+        self.assertEqual(output.count('</testcase>'.encode('utf8')), 2)
+
         # XSD validation - for good measure.
         validate_junit_report(output)
 
@@ -525,6 +594,15 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite.addTest(self.DummyTest('test_pass'))
         self.runner_kwargs['resultclass'] = Result
         self._test_xmlrunner(suite)
+
+    def test_xmlrunner_resultclass_per_test_output(self):
+        class Result(_XMLTestResult):
+            pass
+
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        self.runner_kwargs['resultclass'] = Result
+        self._test_xmlrunner(suite, per_test_output=True)
 
     def test_xmlrunner_stream(self):
         stream = self.stream
