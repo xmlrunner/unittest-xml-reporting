@@ -217,10 +217,10 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        self.assertIn('classname="tests.testsuite.XMLTestRunnerTestCase.DummyTest" '
+        self.assertIn('classname="tests.testsuite.DummyTest" '
                       'name="test_pass"'.encode('utf8'),
                       output)
-        self.assertIn('classname="tests.testsuite.XMLTestRunnerTestCase.DummySubTest" '
+        self.assertIn('classname="tests.testsuite.DummySubTest" '
                       'name="test_subTest_pass"'.encode('utf8'),
                       output)
 
@@ -424,11 +424,11 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir.seek(0)
         output = outdir.read()
         self.assertIn(
-            b'<testcase classname="tests.testsuite.XMLTestRunnerTestCase.DummySubTest" '
+            b'<testcase classname="tests.testsuite.DummySubTest" '
             b'name="test_subTest_fail (i=0)"',
             output)
         self.assertIn(
-            b'<testcase classname="tests.testsuite.XMLTestRunnerTestCase.DummySubTest" '
+            b'<testcase classname="tests.testsuite.DummySubTest" '
             b'name="test_subTest_fail (i=1)"',
             output)
 
