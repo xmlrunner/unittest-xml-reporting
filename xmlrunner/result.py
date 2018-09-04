@@ -233,6 +233,9 @@ class _XMLTestResult(_TextTestResult):
                 )
             elif self.dots:
                 self.stream.write(short_str)
+
+            self.stream.flush()
+
         self.callback = callback
 
     def startTest(self, test):
@@ -245,6 +248,7 @@ class _XMLTestResult(_TextTestResult):
         if self.showAll:
             self.stream.write('  ' + self.getDescription(test))
             self.stream.write(" ... ")
+            self.stream.flush()
 
     def _setupStdout(self):
         """
@@ -364,6 +368,7 @@ class _XMLTestResult(_TextTestResult):
             )
             self.stream.writeln(self.separator2)
             self.stream.writeln('%s' % test_info.get_error_info())
+            self.stream.flush()
 
     def _get_info_by_testcase(self):
         """
