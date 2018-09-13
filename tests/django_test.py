@@ -4,7 +4,10 @@ import sys
 import os
 from os import path
 import glob
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 import tempfile
 import shutil
 
