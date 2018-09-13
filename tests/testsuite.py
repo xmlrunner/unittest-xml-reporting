@@ -204,12 +204,15 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        self.assertIn('classname="tests.testsuite.DummyTest" '
-                      'name="test_pass"'.encode('utf8'),
-                      output)
-        self.assertIn('classname="tests.testsuite.DummySubTest" '
-                      'name="test_subTest_pass"'.encode('utf8'),
-                      output)
+        self.assertRegexpMatches(
+            output,
+            r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
+            r'DummyTest" name="test_pass"'.encode('utf8'),
+        )
+        self.assertRegexpMatches(
+            output,
+            r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
+            r'DummySubTest" name="test_subTest_pass"'.encode('utf8'))
 
     def test_xmlrunner_non_ascii(self):
         suite = unittest.TestSuite()
@@ -397,14 +400,16 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        self.assertIn(
-            b'<testcase classname="tests.testsuite.DummySubTest" '
-            b'name="test_subTest_fail (i=0)"',
-            output)
-        self.assertIn(
-            b'<testcase classname="tests.testsuite.DummySubTest" '
-            b'name="test_subTest_fail (i=1)"',
-            output)
+        self.assertRegexpMatches(
+            output,
+            br'<testcase classname="tests\.testsuite\.'
+            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
+            br'name="test_subTest_fail \(i=0\)"')
+        self.assertRegexpMatches(
+            output,
+            br'<testcase classname="tests\.testsuite\.'
+            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
+            br'name="test_subTest_fail \(i=1\)"')
 
     @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
                      'unittest.TestCase.subTest not present.')
