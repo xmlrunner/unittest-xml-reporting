@@ -105,6 +105,10 @@ class XMLTestRunner(TextTestRunner):
             else:
                 self.stream.write("\n")
 
+            if self.output is None:
+                self.stream.writeln()
+                self.stream.writeln('NOT generating XML reports')
+            else:
             # Generate reports
             self.stream.writeln()
             self.stream.writeln('Generating XML reports...')
