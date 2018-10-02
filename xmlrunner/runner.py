@@ -109,10 +109,10 @@ class XMLTestRunner(TextTestRunner):
                 self.stream.writeln()
                 self.stream.writeln('NOT generating XML reports')
             else:
-            # Generate reports
-            self.stream.writeln()
-            self.stream.writeln('Generating XML reports...')
-            result.generate_reports(self)
+                # Generate reports
+                self.stream.writeln()
+                self.stream.writeln('Generating XML reports...')
+                result.generate_reports(self)
         finally:
             pass
 
