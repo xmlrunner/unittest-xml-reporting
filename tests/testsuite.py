@@ -23,6 +23,11 @@ from lxml import etree
 import os
 import os.path
 
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 
 def _load_schema():
     path = os.path.join(os.path.dirname(__file__),
@@ -699,3 +704,27 @@ class DuplicateWriterTestCase(unittest.TestCase):
         self.writer.flush()
         self.assertEqual(self.getFirstContent(), self.getSecondContent())
         self.assertEqual(wrote, len(self.getSecondContent()))
+
+
+@unittest.skipIf(sys.version_info[0] < 3, 'Python 3 required')
+class XMLProgramTestCase(unittest.TestCase):
+    @mock.patch('sys.argv', ['xmlrunner', '-o', 'flaf'])
+    @mock.patch('xmlrunner.runner.XMLTestRunner')
+    @mock.patch('sys.exit')
+    def test_xmlrunner_output(self, exiter, testrunner):
+        xmlrunner.runner.XMLTestProgram()
+
+        kwargs = dict(
+            buffer=False,
+            failfast=False,
+            verbosity=1,
+            warnings='default',
+            output='flaf',
+        )
+
+        if sys.version_info[:2] > (3, 4):
+            kwargs.update(tb_locals=False)
+
+        testrunner.assert_called_once_with(**kwargs)
+
+        exiter.assert_called_once_with(False)
