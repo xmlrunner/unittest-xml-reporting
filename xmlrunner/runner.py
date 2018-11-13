@@ -2,7 +2,7 @@
 import sys
 import time
 
-from .unittest import TextTestRunner
+from .unittest import TextTestRunner, TestProgram
 from .result import _XMLTestResult
 
 # see issue #74, the encoding name needs to be one of
@@ -113,3 +113,34 @@ class XMLTestRunner(TextTestRunner):
             pass
 
         return result
+
+
+class XMLTestProgram(TestProgram):
+    output = None
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('testRunner', XMLTestRunner)
+        super(XMLTestProgram, self).__init__(*args, **kwargs)
+
+    def _initArgParsers(self):
+        super(XMLTestProgram, self)._initArgParsers()
+
+        for parser in (self._main_parser, self._discovery_parser):
+            parser.add_argument('-o', '--output', metavar='DIR',
+                                help='Directory for storing XML reports '
+                                "('.' default)")
+
+    def runTests(self):
+        if self.output is not None:
+            kwargs = dict(verbosity=self.verbosity,
+                          failfast=self.failfast,
+                          buffer=self.buffer,
+                          warnings=self.warnings,
+                          output=self.output)
+
+            if sys.version_info[:2] > (3, 4):
+                kwargs.update(tb_locals=self.tb_locals)
+
+            self.testRunner = self.testRunner(**kwargs)
+
+        super(XMLTestProgram, self).runTests()

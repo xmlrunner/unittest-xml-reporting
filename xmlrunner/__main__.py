@@ -1,8 +1,7 @@
 """Main entry point"""
 
 import sys
-from .unittest import TestProgram
-from .runner import XMLTestRunner
+from .runner import XMLTestProgram
 
 if sys.argv[0].endswith("__main__.py"):
     import os.path
@@ -17,9 +16,4 @@ if sys.argv[0].endswith("__main__.py"):
 __unittest = True
 
 
-main = TestProgram
-
-main(
-    module=None, testRunner=XMLTestRunner,
-    # see issue #59
-    failfast=False, catchbreak=False, buffer=False)
+XMLTestProgram(module=None)
