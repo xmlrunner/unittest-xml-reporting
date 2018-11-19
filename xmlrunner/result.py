@@ -373,6 +373,39 @@ class _XMLTestResult(_TextTestResult):
         self.skipped.append((testinfo, reason))
         self._prepare_callback(testinfo, [], 'SKIP', 'S')
 
+    def addExpectedFailure(self, test, err):
+        """
+        Missing in xmlrunner, copy-pasted from xmlrunner addError.
+        """
+        self._save_output_data()
+
+        outcome = self.infoclass.ERROR  # this (easy) way the XML reports as error, which is not success neither fail
+
+        testinfo = self.infoclass(self, test, outcome, err)
+        testinfo.test_exception_name = 'ExpectedFailure'
+        testinfo.test_exception_message = 'EXPECTED FAILURE: {}'.format(testinfo.test_exception_message)
+
+        self.expectedFailures.append((testinfo, self._exc_info_to_string(err, test)))
+        self._prepare_callback(testinfo, [], 'EXPECTED FAILURE', 'EF')
+
+    @failfast
+    def addUnexpectedSuccess(self, test):
+        """
+        Missing in xmlrunner, copy-pasted from xmlrunner addSuccess.
+        """
+        self._save_output_data()
+
+        outcome = self.infoclass.ERROR  # this (easy) way the XML reports as error, which is not success neither fail
+
+        testinfo = self.infoclass(self, test)  # do not set outcome here because it will need exception
+        testinfo.outcome = outcome
+        # But since we want to have error outcome, we need to provide additional fields:
+        testinfo.test_exception_name = 'UnexpectedSuccess'
+        testinfo.test_exception_message = 'This test was marked as expected failure but passed, please review it'
+
+        self.unexpectedSuccesses.append(testinfo)
+        self._prepare_callback(testinfo, [], 'UNEXPECTED SUCCESS', 'US')
+
     def printErrorList(self, flavour, errors):
         """
         Writes information about the FAIL or ERROR to the stream.
