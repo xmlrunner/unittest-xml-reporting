@@ -156,8 +156,10 @@ class _TestInfo(object):
 
         self.test_name = testcase_name(test_method)
         self.test_id = test_method.id()
+        self.subDescription = None
         if subTest:
             self.test_id = subTest.id()
+            self.subDescription = subTest._subDescription()
 
     def id(self):
         return self.test_id
@@ -174,7 +176,12 @@ class _TestInfo(object):
         """
         Return a text representation of the test method.
         """
-        return self.test_description
+        description = self.test_description
+
+        if self.subDescription is not None:
+            description += ' ' + self.subDescription
+
+        return description
 
     def get_error_info(self):
         """
@@ -342,13 +349,11 @@ class _XMLTestResult(_TextTestResult):
             errorValue = None
             errorList = None
             if issubclass(err[0], test.failureException):
-                # FAIL
                 errorText = 'FAIL'
                 errorValue = self.infoclass.FAILURE
                 errorList = self.failures
 
             else:
-                # ERROR
                 errorText = 'ERROR'
                 errorValue = self.infoclass.ERROR
                 errorList = self.errors
@@ -379,14 +384,12 @@ class _XMLTestResult(_TextTestResult):
         """
         self._save_output_data()
 
-        outcome = self.infoclass.ERROR  # this (easy) way the XML reports as error, which is not success neither fail
-
-        testinfo = self.infoclass(self, test, outcome, err)
+        testinfo = self.infoclass(self, test, self.infoclass.ERROR, err)
         testinfo.test_exception_name = 'ExpectedFailure'
         testinfo.test_exception_message = 'EXPECTED FAILURE: {}'.format(testinfo.test_exception_message)
 
         self.expectedFailures.append((testinfo, self._exc_info_to_string(err, test)))
-        self._prepare_callback(testinfo, [], 'EXPECTED FAILURE', 'EF')
+        self._prepare_callback(testinfo, [], 'EXPECTED FAILURE', 'X')
 
     @failfast
     def addUnexpectedSuccess(self, test):
@@ -395,16 +398,15 @@ class _XMLTestResult(_TextTestResult):
         """
         self._save_output_data()
 
-        outcome = self.infoclass.ERROR  # this (easy) way the XML reports as error, which is not success neither fail
-
         testinfo = self.infoclass(self, test)  # do not set outcome here because it will need exception
-        testinfo.outcome = outcome
+        testinfo.outcome = self.infoclass.ERROR
         # But since we want to have error outcome, we need to provide additional fields:
         testinfo.test_exception_name = 'UnexpectedSuccess'
-        testinfo.test_exception_message = 'This test was marked as expected failure but passed, please review it'
+        testinfo.test_exception_message = ('UNEXPECTED SUCCESS: This test was marked as expected failure but passed, '
+                                           'please review it')
 
         self.unexpectedSuccesses.append(testinfo)
-        self._prepare_callback(testinfo, [], 'UNEXPECTED SUCCESS', 'US')
+        self._prepare_callback(testinfo, [], 'UNEXPECTED SUCCESS', 'U')
 
     def printErrorList(self, flavour, errors):
         """
