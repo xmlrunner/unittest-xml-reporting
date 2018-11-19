@@ -142,6 +142,11 @@ class XMLTestRunnerTestCase(unittest.TestCase):
                 with self.subTest(i=i):
                     self.fail('this is a subtest.')
 
+        def test_subTest_error(self):
+            for i in range(2):
+                with self.subTest(i=i):
+                    raise Exception('this is a subtest')
+
     class DummyErrorInCallTest(unittest.TestCase):
 
         def __call__(self, result):
@@ -410,6 +415,30 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             br'<testcase classname="tests\.testsuite\.'
             br'(XMLTestRunnerTestCase\.)?DummySubTest" '
             br'name="test_subTest_fail \(i=1\)"')
+
+    @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
+                     'unittest.TestCase.subTest not present.')
+    def test_unittest_subTest_error(self):
+        # test for issue #155
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummySubTest('test_subTest_error'))
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        self.assertRegexpMatches(
+            output,
+            br'<testcase classname="tests\.testsuite\.'
+            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
+            br'name="test_subTest_error \(i=0\)"')
+        self.assertRegexpMatches(
+            output,
+            br'<testcase classname="tests\.testsuite\.'
+            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
+            br'name="test_subTest_error \(i=1\)"')
 
     @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
                      'unittest.TestCase.subTest not present.')
