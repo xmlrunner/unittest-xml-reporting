@@ -337,14 +337,31 @@ class _XMLTestResult(_TextTestResult):
         Called when a subTest method raises an error.
         """
         if err is not None:
+
+            errorText = None
+            errorValue = None
+            errorList = None
+            if issubclass(err[0], test.failureException):
+                # FAIL
+                errorText = 'FAIL'
+                errorValue = self.infoclass.FAILURE
+                errorList = self.failures
+
+            else:
+                # ERROR
+                errorText = 'ERROR'
+                errorValue = self.infoclass.ERROR
+                errorList = self.errors
+
             self._save_output_data()
+
             testinfo = self.infoclass(
-                self, testcase, self.infoclass.ERROR, err, subTest=test)
-            self.errors.append((
+                self, testcase, errorValue, err, subTest=test)
+            errorList.append((
                 testinfo,
                 self._exc_info_to_string(err, testcase)
             ))
-            self._prepare_callback(testinfo, [], 'ERROR', 'E')
+            self._prepare_callback(testinfo, [], errorText, errorText[0])
 
     def addSkip(self, test, reason):
         """
