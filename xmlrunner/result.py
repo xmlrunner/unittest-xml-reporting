@@ -344,7 +344,7 @@ class _XMLTestResult(_TextTestResult):
                 self, testcase, self.infoclass.FAILURE, err, subTest=test)
             self.failures.append((
                 testinfo,
-                self._exc_info_to_string(err, test)
+                self._exc_info_to_string(err, testcase)
             ))
             self._prepare_callback(testinfo, [], 'FAIL', 'F')
         elif err is not None:
@@ -352,16 +352,12 @@ class _XMLTestResult(_TextTestResult):
                 self, testcase, self.infoclass.ERROR, err, subTest=test)
             self.errors.append((
                 testinfo,
-                self._exc_info_to_string(err, test)
+                self._exc_info_to_string(err, testcase)
             ))
             self._prepare_callback(testinfo, [], 'ERROR', 'E')
         else:
-            testinfo = self.infoclass(
-                self, testcase, subTest=test
-            )
-            self._prepare_callback(
-                testinfo, self.successes, 'OK', '.'
-            )
+            testinfo = self.infoclass(self, testcase, subTest=test)
+            self._prepare_callback(testinfo, self.successes, 'OK', '.')
 
     def addSkip(self, test, reason):
         """
