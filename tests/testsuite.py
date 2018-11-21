@@ -209,12 +209,12 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        self.assertRegex(
+        self.assertRegexpMatches(
             output,
             r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
             r'DummyTest" name="test_pass"'.encode('utf8'),
         )
-        self.assertRegex(
+        self.assertRegexpMatches(
             output,
             r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
             r'DummySubTest" name="test_subTest_pass"'.encode('utf8'))
