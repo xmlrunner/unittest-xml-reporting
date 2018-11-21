@@ -158,6 +158,7 @@ class _TestInfo(object):
         self.test_id = test_method.id()
         if subTest:
             self.test_id = subTest.id()
+            self.test_description = self.test_result.getDescription(subTest)
 
     def id(self):
         return self.test_id
@@ -336,15 +337,31 @@ class _XMLTestResult(_TextTestResult):
         """
         Called when a subTest method raises an error.
         """
-        if err is not None:
-            self._save_output_data()
+        self._save_output_data()
+
+        if err is not None and issubclass(err[0], test.failureException):
+            testinfo = self.infoclass(
+                self, testcase, self.infoclass.FAILURE, err, subTest=test)
+            self.failures.append((
+                testinfo,
+                self._exc_info_to_string(err, test)
+            ))
+            self._prepare_callback(testinfo, [], 'FAIL', 'F')
+        elif err is not None:
             testinfo = self.infoclass(
                 self, testcase, self.infoclass.ERROR, err, subTest=test)
             self.errors.append((
                 testinfo,
-                self._exc_info_to_string(err, testcase)
+                self._exc_info_to_string(err, test)
             ))
             self._prepare_callback(testinfo, [], 'ERROR', 'E')
+        else:
+            testinfo = self.infoclass(
+                self, testcase, subTest=test
+            )
+            self._prepare_callback(
+                testinfo, self.successes, 'OK', '.'
+            )
 
     def addSkip(self, test, reason):
         """

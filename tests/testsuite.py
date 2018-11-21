@@ -142,6 +142,11 @@ class XMLTestRunnerTestCase(unittest.TestCase):
                 with self.subTest(i=i):
                     self.fail('this is a subtest.')
 
+        def test_subTest_mixed(self):
+            for i in range(2):
+                with self.subTest(i=i):
+                    self.assertLess(i, 1, msg='this is a subtest.')
+
     class DummyErrorInCallTest(unittest.TestCase):
 
         def __call__(self, result):
@@ -204,12 +209,12 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        self.assertRegexpMatches(
+        self.assertRegex(
             output,
             r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
             r'DummyTest" name="test_pass"'.encode('utf8'),
         )
-        self.assertRegexpMatches(
+        self.assertRegex(
             output,
             r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
             r'DummySubTest" name="test_subTest_pass"'.encode('utf8'))
@@ -400,16 +405,52 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        self.assertRegexpMatches(
+
+        self.assertRegex(
             output,
             br'<testcase classname="tests\.testsuite\.'
             br'(XMLTestRunnerTestCase\.)?DummySubTest" '
             br'name="test_subTest_fail \(i=0\)"')
-        self.assertRegexpMatches(
+        self.assertRegex(
             output,
             br'<testcase classname="tests\.testsuite\.'
             br'(XMLTestRunnerTestCase\.)?DummySubTest" '
-            br'name="test_subTest_fail \(i=1\)"')
+            br'name="test_subTest_fail \(i=1\)" '
+            br'time=".*" timestamp=".*">')
+        self.assertRegex(
+            output,
+            br'<testsuite errors="0" failures="2" '
+            br'name="tests.testsuite.DummySubTest-[0-9]*" '
+            br'skipped="0" tests="2"'
+        )
+
+    def test_unittest_subTest_mixed(self):
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummySubTest('test_subTest_mixed'))
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+
+        self.assertRegex(
+            output,
+            br'<testcase classname="tests\.testsuite\.'
+            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
+            br'name="test_subTest_mixed \(i=0\)"')
+        self.assertRegex(
+            output,
+            br'<testcase classname="tests\.testsuite\.'
+            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
+            br'name="test_subTest_mixed \(i=1\)" '
+            br'time=".*" timestamp=".*">')
+        self.assertRegex(
+            output,
+            br'<testsuite errors="0" failures="1" '
+            br'name="tests.testsuite.DummySubTest-[0-9]*" '
+            br'skipped="0" tests="2"')
 
     @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
                      'unittest.TestCase.subTest not present.')
