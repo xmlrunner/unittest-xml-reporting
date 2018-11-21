@@ -567,6 +567,8 @@ class _XMLTestResult(_TextTestResult):
                 with open(filename, 'wb') as report_file:
                     report_file.write(xml_content)
 
+                self.stream.writeln('Generated XML report: {}'.format(filename))
+
         if not outputHandledAsString:
             # Assume that test_runner.output is a stream
             test_runner.output.write(xml_content)
