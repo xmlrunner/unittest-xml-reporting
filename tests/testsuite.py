@@ -406,18 +406,18 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir.seek(0)
         output = outdir.read()
 
-        self.assertRegex(
+        self.assertRegexpMatches(
             output,
             br'<testcase classname="tests\.testsuite\.'
             br'(XMLTestRunnerTestCase\.)?DummySubTest" '
             br'name="test_subTest_fail \(i=0\)"')
-        self.assertRegex(
+        self.assertRegexpMatches(
             output,
             br'<testcase classname="tests\.testsuite\.'
             br'(XMLTestRunnerTestCase\.)?DummySubTest" '
             br'name="test_subTest_fail \(i=1\)" '
             br'time=".*" timestamp=".*">')
-        self.assertRegex(
+        self.assertRegexpMatches(
             output,
             br'<testsuite errors="0" failures="2" '
             br'name="tests.testsuite.DummySubTest-[0-9]*" '
@@ -435,18 +435,18 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir.seek(0)
         output = outdir.read()
 
-        self.assertRegex(
+        self.assertRegexpMatches(
             output,
             br'<testcase classname="tests\.testsuite\.'
             br'(XMLTestRunnerTestCase\.)?DummySubTest" '
             br'name="test_subTest_mixed \(i=0\)"')
-        self.assertRegex(
+        self.assertRegexpMatches(
             output,
             br'<testcase classname="tests\.testsuite\.'
             br'(XMLTestRunnerTestCase\.)?DummySubTest" '
             br'name="test_subTest_mixed \(i=1\)" '
             br'time=".*" timestamp=".*">')
-        self.assertRegex(
+        self.assertRegexpMatches(
             output,
             br'<testsuite errors="0" failures="1" '
             br'name="tests.testsuite.DummySubTest-[0-9]*" '
