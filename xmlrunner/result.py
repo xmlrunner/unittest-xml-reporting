@@ -156,8 +156,10 @@ class _TestInfo(object):
 
         self.test_name = testcase_name(test_method)
         self.test_id = test_method.id()
+        self.subDescription = None
         if subTest:
             self.test_id = subTest.id()
+            self.subDescription = subTest._subDescription()
 
     def id(self):
         return self.test_id
@@ -174,7 +176,12 @@ class _TestInfo(object):
         """
         Return a text representation of the test method.
         """
-        return self.test_description
+        description = self.test_description
+
+        if self.subDescription is not None:
+            description += ' ' + self.subDescription
+
+        return description
 
     def get_error_info(self):
         """
@@ -337,14 +344,29 @@ class _XMLTestResult(_TextTestResult):
         Called when a subTest method raises an error.
         """
         if err is not None:
+
+            errorText = None
+            errorValue = None
+            errorList = None
+            if issubclass(err[0], test.failureException):
+                errorText = 'FAIL'
+                errorValue = self.infoclass.FAILURE
+                errorList = self.failures
+
+            else:
+                errorText = 'ERROR'
+                errorValue = self.infoclass.ERROR
+                errorList = self.errors
+
             self._save_output_data()
+
             testinfo = self.infoclass(
-                self, testcase, self.infoclass.ERROR, err, subTest=test)
-            self.errors.append((
+                self, testcase, errorValue, err, subTest=test)
+            errorList.append((
                 testinfo,
                 self._exc_info_to_string(err, testcase)
             ))
-            self._prepare_callback(testinfo, [], 'ERROR', 'E')
+            self._prepare_callback(testinfo, [], errorText, errorText[0])
 
     def addSkip(self, test, reason):
         """
@@ -355,6 +377,36 @@ class _XMLTestResult(_TextTestResult):
             self, test, self.infoclass.SKIP, reason)
         self.skipped.append((testinfo, reason))
         self._prepare_callback(testinfo, [], 'SKIP', 'S')
+
+    def addExpectedFailure(self, test, err):
+        """
+        Missing in xmlrunner, copy-pasted from xmlrunner addError.
+        """
+        self._save_output_data()
+
+        testinfo = self.infoclass(self, test, self.infoclass.ERROR, err)
+        testinfo.test_exception_name = 'ExpectedFailure'
+        testinfo.test_exception_message = 'EXPECTED FAILURE: {}'.format(testinfo.test_exception_message)
+
+        self.expectedFailures.append((testinfo, self._exc_info_to_string(err, test)))
+        self._prepare_callback(testinfo, [], 'EXPECTED FAILURE', 'X')
+
+    @failfast
+    def addUnexpectedSuccess(self, test):
+        """
+        Missing in xmlrunner, copy-pasted from xmlrunner addSuccess.
+        """
+        self._save_output_data()
+
+        testinfo = self.infoclass(self, test)  # do not set outcome here because it will need exception
+        testinfo.outcome = self.infoclass.ERROR
+        # But since we want to have error outcome, we need to provide additional fields:
+        testinfo.test_exception_name = 'UnexpectedSuccess'
+        testinfo.test_exception_message = ('UNEXPECTED SUCCESS: This test was marked as expected failure but passed, '
+                                           'please review it')
+
+        self.unexpectedSuccesses.append(testinfo)
+        self._prepare_callback(testinfo, [], 'UNEXPECTED SUCCESS', 'U')
 
     def printErrorList(self, flavour, errors):
         """
