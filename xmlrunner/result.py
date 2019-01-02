@@ -68,7 +68,7 @@ def to_unicode(data):
         return repr(data).decode('utf8', 'replace')
 
 
-def safe_unicode(data, encoding=None):
+def safe_unicode(data, encoding='utf-8'):
     return xml_safe_unicode(to_unicode(data), encoding)
 
 
