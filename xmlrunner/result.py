@@ -429,7 +429,7 @@ class _XMLTestResult(_TextTestResult):
         tests_by_testcase = {}
 
         for tests in (self.successes, self.failures, self.errors,
-                      self.skipped):
+                      self.skipped, self.expectedFailures, self.unexpectedSuccesses):
             for test_info in tests:
                 if isinstance(test_info, tuple):
                     # This is a skipped, error or a failure test case
