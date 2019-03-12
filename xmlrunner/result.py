@@ -46,18 +46,7 @@ STDOUT_LINE = '\nStdout:\n%s'
 STDERR_LINE = '\nStderr:\n%s'
 
 
-def xml_safe_unicode(base, encoding='utf-8'):
-    """Return a unicode string containing only valid XML characters.
-
-    encoding - if base is a byte string it is first decoded to unicode
-        using this encoding.
-    """
-    if isinstance(base, six.binary_type):
-        base = base.decode(encoding)
-    return INVALID_XML_1_0_UNICODE_RE.sub('', base)
-
-
-def to_unicode(data):
+def _to_unicode(data):
     """Returns unicode in Python2 and str in Python3"""
     if six.PY3:
         return six.text_type(data)
@@ -68,8 +57,17 @@ def to_unicode(data):
         return repr(data).decode('utf8', 'replace')
 
 
-def safe_unicode(data, encoding=None):
-    return xml_safe_unicode(to_unicode(data), encoding)
+def safe_unicode(data, encoding='utf8'):
+    """Return a unicode string containing only valid XML characters.
+
+    encoding - if data is a byte string it is first decoded to unicode
+        using this encoding.
+    """
+    data = _to_unicode(data)
+    if isinstance(data, six.binary_type):
+        # e.g. IronPython, see #182
+        data = data.decode(encoding)
+    return INVALID_XML_1_0_UNICODE_RE.sub('', data)
 
 
 def testcase_name(test_method):
