@@ -21,8 +21,10 @@ matrix:
     - python: "3.7-dev"
       env: TOXENV=py37
     - python: "pypy2.7-6.0"
+      dist: xenial
       env: TOXENV=pypy
     - python: "pypy3.5-6.0"
+      dist: xenial
       env: TOXENV=pypy3
 
 before_install:
