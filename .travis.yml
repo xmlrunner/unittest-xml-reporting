@@ -1,30 +1,30 @@
-sudo: true
-dist: xenial
 language: python
 
 matrix:
   include:
-    - python: "2.7"
+    - python: 2.7
       env: TOXENV=py27
-    - python: "2.7"
+    - python: 2.7
       env: TOXENV=py27-djangolts
-    - python: "2.7"
+    - python: 2.7
       env: TOXENV=py27-djangocurr
-    - python: "2.7"
+    - python: 2.7
       env: TOXENV=quality
-    - python: "3.4"
+    - python: 3.4
       env: TOXENV=py34
-    - python: "3.5"
+    - python: 3.5
       env: TOXENV=py35
-    - python: "3.6"
+    - python: 3.6
       env: TOXENV=py36
-    - python: "3.7-dev"
+    - python: 3.7-dev
       env: TOXENV=py37
-    - python: "pypy2.7-6.0"
+    - os: linux
       dist: xenial
+      python: pypy
       env: TOXENV=pypy
-    - python: "pypy3.5-6.0"
+    - os: linux
       dist: xenial
+      python: pypy3
       env: TOXENV=pypy3
 
 before_install:
