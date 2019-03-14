@@ -24,6 +24,16 @@ You may also find these resources useful:
 
 - https://stackoverflow.com/questions/4922867/what-is-the-junit-xml-format-specification-that-hudson-supports
 - https://stackoverflow.com/questions/11241781/python-unittests-in-jenkins
+- [Jenkins (junit-10.xsd)](https://github.com/jenkinsci/xunit-plugin/blob/master/src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd)
+- [JUnit-Schema (JUnit.xsd)](https://github.com/windyroad/JUnit-Schema/blob/master/JUnit.xsd)
+- [Windyroad (JUnit.xsd)](http://windyroad.com.au/dl/Open%20Source/JUnit.xsd)
+- [a gist (Jenkins xUnit test result schema)](https://gist.github.com/erikd/4192748)
+
+## Things that are somewhat broken
+
+Python 3 has the concept of sub-tests for a `unittest.TestCase`; this doesn't map well to an existing
+xUnit concept, so you won't find it in the schema. What that means, is that you lose some granularity
+in the reports for sub-tests.
 
 ## Requirements
 
