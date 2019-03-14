@@ -10,6 +10,11 @@ ver_path = convert_path('xmlrunner/version.py')
 with codecs.open(ver_path, 'rb', 'utf8') as ver_file:
     exec(ver_file.read(), main_ns)
 
+# Load README.md
+readme_path = convert_path('README.md')
+with codecs.open(readme_path, 'rb', 'utf8') as readme_file:
+    long_description = readme_file.read()
+
 install_requires = ['six>=1.4.0']
 
 # this is for sdist to work.
@@ -21,13 +26,14 @@ if sys.version_info < (2, 7):
 setup(
     name = 'unittest-xml-reporting',
     version = main_ns['__version__'],
-    author = 'Daniel Fernandes Martins',
-    author_email = 'daniel.tritone@gmail.com',
+    author = 'Daniel Fernandes Martins, Damien Nozay',
     description = 'unittest-based test runner with Ant/JUnit like XML reporting.',
+    long_description = long_description,
+    long_description_content_type = 'text/markdown',
     license = 'BSD',
     platforms = ['Any'],
     keywords = [
-        'pyunit', 'unittest', 'junit xml', 'report', 'testrunner', 'xmlrunner'
+        'pyunit', 'unittest', 'junit xml', 'xunit', 'report', 'testrunner', 'xmlrunner'
     ],
     url = 'http://github.com/xmlrunner/unittest-xml-reporting/tree/master/',
     classifiers = [
@@ -44,6 +50,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Software Development :: Libraries :: Python Modules',
