@@ -3,6 +3,8 @@
 
 """Executable module to test unittest-xml-reporting.
 """
+from __future__ import print_function
+
 import contextlib
 import io
 import sys
@@ -120,6 +122,10 @@ class XMLTestRunnerTestCase(unittest.TestCase):
 
         def test_unsafe_unicode(self):
             print(u"A\x00B\x08C\x0BD\x0C")
+
+        def test_output_stdout_and_stderr(self):
+            print('test on stdout')
+            print('test on stderr', file=sys.stderr)
 
         def test_runner_buffer_output_pass(self):
             print('should not be printed')
@@ -517,6 +523,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_fail'))
         suite.addTest(self.DummyTest('test_pass'))
+        suite.addTest(self.DummyTest('test_output_stdout_and_stderr'))
         suite.properties = dict(key='value')
         outdir = BytesIO()
         runner = xmlrunner.XMLTestRunner(
