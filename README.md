@@ -9,11 +9,21 @@
 [![Coveralls Coverage Status](https://coveralls.io/repos/xmlrunner/unittest-xml-reporting/badge.svg?branch=master&service=github)](https://coveralls.io/github/xmlrunner/unittest-xml-reporting?branch=master)
 [![Requirements Status](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements.svg?branch=master)](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements/?branch=master)
 
-# unittest-xml-reporting
+# unittest-xml-reporting (aka xmlrunner)
 
-unittest-xml-reporting is a unittest test runner that can save test results
-to XML files that can be consumed by a wide range of tools, such as build
-systems, IDEs and continuous integration servers.
+A unittest test runner that can save test results to XML files in xUnit format.
+The files can be consumed by a wide range of tools, such as build systems, IDEs
+and continuous integration servers.
+
+## Schema
+
+There are many schemas with minor differences.
+We use one that is compatible with Jenkins xUnit plugin, a copy is
+available under `tests/vendor/jenkins/xunit-plugin/junit-10.xsd` (see attached license).
+You may also find these resources useful:
+
+- https://stackoverflow.com/questions/4922867/what-is-the-junit-xml-format-specification-that-hudson-supports
+- https://stackoverflow.com/questions/11241781/python-unittests-in-jenkins
 
 ## Requirements
 
@@ -136,7 +146,7 @@ if __name__ == "__main__":
     xmlrunner.XMLTestRunner().run(suite)
 ````
 
-### Django
+### Django support
 
 In order to plug `XMLTestRunner` to a Django project, add the following
 to your `settings.py`:
