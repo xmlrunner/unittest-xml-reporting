@@ -391,7 +391,7 @@ class _XMLTestResult(_TextTestResult):
         """
         self._save_output_data()
 
-        testinfo = self.infoclass(self, test, self.infoclass.ERROR, err)
+        testinfo = self.infoclass(self, test, self.infoclass.SKIP, err)
         testinfo.test_exception_name = 'XFAIL'
         testinfo.test_exception_message = 'expected failure: {}'.format(testinfo.test_exception_message)
 

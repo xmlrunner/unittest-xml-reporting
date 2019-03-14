@@ -237,6 +237,42 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
             r'DummySubTest" name="test_subTest_pass"'.encode('utf8'))
 
+    def test_expected_failure(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_expected_failure'))
+        outdir = BytesIO()
+
+        self._test_xmlrunner(suite, outdir=outdir)
+
+        self.assertNotIn(b'<failure', outdir.getvalue())
+        self.assertNotIn(b'<error', outdir.getvalue())
+        self.assertIn(b'<skip', outdir.getvalue())
+
+    def test_unexpected_success(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_unexpected_success'))
+        outdir = BytesIO()
+
+        self._test_xmlrunner(suite, outdir=outdir)
+
+        self.assertNotIn(b'<failure', outdir.getvalue())
+        self.assertIn(b'<error', outdir.getvalue())
+        self.assertNotIn(b'<skip', outdir.getvalue())
+
+    def test_xmlrunner_safe_xml_encoding_name(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        firstline = output.splitlines()[0]
+        # test for issue #74
+        self.assertIn('encoding="UTF-8"'.encode('utf8'), firstline)
+
     def test_xmlrunner_non_ascii(self):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_non_ascii_skip'))
