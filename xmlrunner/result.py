@@ -313,7 +313,7 @@ class _XMLTestResult(_TextTestResult):
         """
         self._save_output_data()
         self._prepare_callback(
-            self.infoclass(self, test), self.successes, 'OK', '.'
+            self.infoclass(self, test), self.successes, 'ok', '.'
         )
 
     @failfast
@@ -380,8 +380,10 @@ class _XMLTestResult(_TextTestResult):
         self._save_output_data()
         testinfo = self.infoclass(
             self, test, self.infoclass.SKIP, reason)
+        testinfo.test_exception_name = 'skip'
+        testinfo.test_exception_message = reason
         self.skipped.append((testinfo, reason))
-        self._prepare_callback(testinfo, [], 'SKIP', 'S')
+        self._prepare_callback(testinfo, [], 'skip', 's')
 
     def addExpectedFailure(self, test, err):
         """
@@ -390,11 +392,11 @@ class _XMLTestResult(_TextTestResult):
         self._save_output_data()
 
         testinfo = self.infoclass(self, test, self.infoclass.ERROR, err)
-        testinfo.test_exception_name = 'ExpectedFailure'
-        testinfo.test_exception_message = 'EXPECTED FAILURE: {}'.format(testinfo.test_exception_message)
+        testinfo.test_exception_name = 'XFAIL'
+        testinfo.test_exception_message = 'expected failure: {}'.format(testinfo.test_exception_message)
 
         self.expectedFailures.append((testinfo, self._exc_info_to_string(err, test)))
-        self._prepare_callback(testinfo, [], 'EXPECTED FAILURE', 'X')
+        self._prepare_callback(testinfo, [], 'expected failure', 'x')
 
     @failfast
     def addUnexpectedSuccess(self, test):
@@ -407,11 +409,11 @@ class _XMLTestResult(_TextTestResult):
         testinfo.outcome = self.infoclass.ERROR
         # But since we want to have error outcome, we need to provide additional fields:
         testinfo.test_exception_name = 'UnexpectedSuccess'
-        testinfo.test_exception_message = ('UNEXPECTED SUCCESS: This test was marked as expected failure but passed, '
+        testinfo.test_exception_message = ('Unexpected success: This test was marked as expected failure but passed, '
                                            'please review it')
 
-        self.unexpectedSuccesses.append(testinfo)
-        self._prepare_callback(testinfo, [], 'UNEXPECTED SUCCESS', 'U')
+        self.unexpectedSuccesses.append((testinfo, 'unexpected success'))
+        self._prepare_callback(testinfo, [], 'unexpected success', 'u')
 
     def printErrorList(self, flavour, errors):
         """
