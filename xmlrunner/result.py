@@ -130,6 +130,13 @@ class _TestInfo(object):
     # Possible test outcomes
     (SUCCESS, FAILURE, ERROR, SKIP) = range(4)
 
+    OUTCOME_ELEMENTS = {
+        SUCCESS: None,
+        FAILURE: 'failure',
+        ERROR: 'error',
+        SKIP: 'skipped',
+    }
+
     def __init__(self, test_result, test_method, outcome=SUCCESS, err=None, subTest=None):
         self.test_result = test_result
         self.outcome = outcome
@@ -531,25 +538,39 @@ class _XMLTestResult(_TextTestResult):
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
         testcase.setAttribute('timestamp', test_result.timestamp)
 
-        if (test_result.outcome != test_result.SUCCESS):
-            elem_name = ('failure', 'error', 'skipped')[test_result.outcome-1]
-            failure = xml_document.createElement(elem_name)
-            testcase.appendChild(failure)
-            if test_result.outcome != test_result.SKIP:
-                failure.setAttribute(
-                    'type',
-                    test_result.test_exception_name
-                )
-                failure.setAttribute(
-                    'message',
-                    test_result.test_exception_message
-                )
+        if test_result.stdout:
+            systemout = xml_document.createElement('system-out')
+            testcase.appendChild(systemout)
+
+            _XMLTestResult._createCDATAsections(xml_document, systemout,
+                                                test_result.stdout)
+
+        if test_result.stderr:
+            systemerr = xml_document.createElement('system-err')
+            testcase.appendChild(systemerr)
+
+            _XMLTestResult._createCDATAsections(xml_document, systemerr,
+                                                test_result.stderr)
+
+
+        result_elem_name = test_result.OUTCOME_ELEMENTS[test_result.outcome]
+
+        if result_elem_name:
+            result_elem = xml_document.createElement(result_elem_name)
+            testcase.appendChild(result_elem)
+
+            result_elem.setAttribute(
+                'type',
+                test_result.test_exception_name
+            )
+            result_elem.setAttribute(
+                'message',
+                test_result.test_exception_message
+            )
+            if test_result.get_error_info():
                 error_info = safe_unicode(test_result.get_error_info())
                 _XMLTestResult._createCDATAsections(
-                    xml_document, failure, error_info)
-            else:
-                failure.setAttribute('type', 'skip')
-                failure.setAttribute('message', test_result.test_exception_message)
+                    xml_document, result_elem, error_info)
 
         if test_result.stdout:
             systemout = xml_document.createElement('system-out')
