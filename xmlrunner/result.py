@@ -10,6 +10,9 @@ import re
 from os import path
 from six.moves import StringIO
 
+# use direct import to bypass freezegun
+from time import time
+
 from .unittest import TestResult, _TextTestResult, failfast
 
 
@@ -247,7 +250,7 @@ class _XMLTestResult(_TextTestResult):
         """
         Called before execute each test method.
         """
-        self.start_time = time.time()
+        self.start_time = time()
         TestResult.startTest(self, test)
 
         if self.showAll:
@@ -294,7 +297,7 @@ class _XMLTestResult(_TextTestResult):
         # self._stderr_data = sys.stderr.getvalue()
 
         _TextTestResult.stopTest(self, test)
-        self.stop_time = time.time()
+        self.stop_time = time()
 
         if self.callback and callable(self.callback):
             self.callback()
