@@ -1,4 +1,5 @@
 
+import argparse
 import sys
 import time
 
@@ -126,21 +127,33 @@ class XMLTestProgram(TestProgram):
         super(XMLTestProgram, self)._initArgParsers()
 
         for parser in (self._main_parser, self._discovery_parser):
-            parser.add_argument('-o', '--output', metavar='DIR',
+            group = parser.add_mutually_exclusive_group()
+            group.add_argument('-o', '--output', metavar='DIR',
                                 help='Directory for storing XML reports '
                                 "('.' default)")
+            group.add_argument('--output-file', metavar='FILENAME',
+                                help='Filename for storing XML report')
 
     def runTests(self):
-        if self.output is not None:
-            kwargs = dict(verbosity=self.verbosity,
-                          failfast=self.failfast,
-                          buffer=self.buffer,
-                          warnings=self.warnings,
-                          output=self.output)
+        kwargs = dict(
+            verbosity=self.verbosity,
+            failfast=self.failfast,
+            buffer=self.buffer,
+            warnings=self.warnings,
+        )
+        if sys.version_info[:2] > (3, 4):
+            kwargs.update(tb_locals=self.tb_locals)
 
-            if sys.version_info[:2] > (3, 4):
-                kwargs.update(tb_locals=self.tb_locals)
+        output_file = None
+        try:
+            if self.output_file is not None:
+                output_file = open(self.output_file, 'wb')
+                kwargs.update(output=output_file)
+            elif self.output is not None:
+                kwargs.update(output=self.output)
 
             self.testRunner = self.testRunner(**kwargs)
-
-        super(XMLTestProgram, self).runTests()
+            super(XMLTestProgram, self).runTests()
+        finally:
+            if output_file is not None:
+                output_file.close()
