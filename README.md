@@ -206,6 +206,11 @@ You can find more information about `tox` at <https://testrun.org/tox/latest/>.
 
 ```bash
 $ pip install tox
+
+# basic sanity test, friendly output
+$ tox -e pytest
+
+# all combinations
 $ tox
 ```
 
