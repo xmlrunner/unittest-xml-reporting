@@ -185,8 +185,9 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.runner_kwargs = {}
         self.addCleanup(rmtree, self.outdir)
 
-    def _test_xmlrunner(self, suite, runner=None):
-        outdir = self.outdir
+    def _test_xmlrunner(self, suite, runner=None, outdir=None):
+        if outdir is None:
+            outdir = self.outdir
         stream = self.stream
         verbosity = self.verbosity
         runner_kwargs = self.runner_kwargs
@@ -194,9 +195,15 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             runner = xmlrunner.XMLTestRunner(
                 stream=stream, output=outdir, verbosity=verbosity,
                 **runner_kwargs)
-        self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
+        if isinstance(outdir, BytesIO):
+            self.assertFalse(outdir.getvalue())
+        else:
+            self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
         runner.run(suite)
-        self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
+        if isinstance(outdir, BytesIO):
+            self.assertTrue(outdir.getvalue())
+        else:
+            self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
         return runner
 
     def test_basic_unittest_constructs(self):
