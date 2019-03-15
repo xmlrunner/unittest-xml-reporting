@@ -61,10 +61,10 @@ class DoctestTest(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
-        self.assertIn('classname="tests.doctest_example.Multiplicator" '
-                      'name="threetimes"'.encode('utf8'), output)
-        self.assertIn('classname="tests.doctest_example" '
-                      'name="twice"'.encode('utf8'), output)
+        self.assertIn('classname="tests.doctest_example.Multiplicator"'.encode('utf8'), output)
+        self.assertIn('name="threetimes"'.encode('utf8'), output)
+        self.assertIn('classname="tests.doctest_example"'.encode('utf8'), output)
+        self.assertIn('name="twice"'.encode('utf8'), output)
 
 
 @contextlib.contextmanager
@@ -222,13 +222,20 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         output = outdir.read()
         self.assertRegexpMatches(
             output,
-            r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
-            r'DummyTest" name="test_pass"'.encode('utf8'),
+            r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?DummyTest'.encode('utf8'),
         )
         self.assertRegexpMatches(
             output,
-            r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
-            r'DummySubTest" name="test_subTest_pass"'.encode('utf8'))
+            r'name="test_pass"'.encode('utf8'),
+        )
+        self.assertRegexpMatches(
+            output,
+            r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?DummySubTest'.encode('utf8'),
+        )
+        self.assertRegexpMatches(
+            output,
+            r'name="test_subTest_pass"'.encode('utf8'),
+        )
 
     def test_xmlrunner_non_ascii(self):
         suite = unittest.TestSuite()
@@ -419,12 +426,16 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.assertRegexpMatches(
             output,
             br'<testcase classname="tests\.testsuite\.'
-            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
+            br'(XMLTestRunnerTestCase\.)?DummySubTest"')
+        self.assertRegexpMatches(
+            output,
             br'name="test_subTest_fail \(i=0\)"')
         self.assertRegexpMatches(
             output,
             br'<testcase classname="tests\.testsuite\.'
-            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
+            br'(XMLTestRunnerTestCase\.)?DummySubTest"')
+        self.assertRegexpMatches(
+            output,
             br'name="test_subTest_fail \(i=1\)"')
 
     @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
@@ -443,12 +454,16 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.assertRegexpMatches(
             output,
             br'<testcase classname="tests\.testsuite\.'
-            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
+            br'(XMLTestRunnerTestCase\.)?DummySubTest"')
+        self.assertRegexpMatches(
+            output,
             br'name="test_subTest_error \(i=0\)"')
         self.assertRegexpMatches(
             output,
             br'<testcase classname="tests\.testsuite\.'
-            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
+            br'(XMLTestRunnerTestCase\.)?DummySubTest"')
+        self.assertRegexpMatches(
+            output,
             br'name="test_subTest_error \(i=1\)"')
 
     @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
