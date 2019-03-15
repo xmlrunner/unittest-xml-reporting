@@ -12,8 +12,6 @@ matrix:
       env: TOXENV=py27-djangocurr
     - python: 2.7
       env: TOXENV=quality
-    - python: 3.4
-      env: TOXENV=py34
     - python: 3.5
       env: TOXENV=py35
     - python: 3.6
