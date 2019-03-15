@@ -269,7 +269,9 @@ class _XMLTestResult(_TextTestResult):
             else:
                 # regular unittest.TestCase?
                 test_method = getattr(test, test._testMethodName)
-                self.filename = inspect.getsourcefile(test_method)
+                test_class = type(test)
+                # Note: inspect can get confused with decorators, so use class.
+                self.filename = inspect.getsourcefile(test_class)
                 _, self.lineno = inspect.getsourcelines(test_method)
         finally:
             pass
@@ -556,7 +558,10 @@ class _XMLTestResult(_TextTestResult):
         testcase.setAttribute('timestamp', test_result.timestamp)
 
         if test_result.filename is not None:
-            testcase.setAttribute('file', os.path.relpath(test_result.filename))
+            # Try to make filename relative to current directory.
+            filename = os.path.relpath(test_result.filename)
+            filename = test_result.filename if filename.startswith('../') else filename
+            testcase.setAttribute('file', filename)
 
         if test_result.lineno is not None:
             testcase.setAttribute('line', str(test_result.lineno))
