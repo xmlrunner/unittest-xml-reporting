@@ -1,4 +1,5 @@
 
+import inspect
 import io
 import os
 import sys
@@ -133,7 +134,7 @@ class _TestInfo(object):
     # Possible test outcomes
     (SUCCESS, FAILURE, ERROR, SKIP) = range(4)
 
-    def __init__(self, test_result, test_method, outcome=SUCCESS, err=None, subTest=None):
+    def __init__(self, test_result, test_method, outcome=SUCCESS, err=None, subTest=None, filename=None, lineno=None):
         self.test_result = test_result
         self.outcome = outcome
         self.elapsed_time = 0
@@ -161,6 +162,9 @@ class _TestInfo(object):
         if subTest:
             self.test_id = subTest.id()
             self.subDescription = subTest._subDescription()
+
+        self.filename = filename
+        self.lineno = lineno
 
     def id(self):
         return self.test_id
@@ -211,6 +215,8 @@ class _XMLTestResult(_TextTestResult):
         self.callback = None
         self.elapsed_times = elapsed_times
         self.properties = properties  # junit testsuite properties
+        self.filename = None
+        self.lineno = None
         if infoclass is None:
             self.infoclass = _TestInfo
         else:
@@ -222,6 +228,8 @@ class _XMLTestResult(_TextTestResult):
         Appends a `infoclass` to the given target list and sets a callback
         method to be called by stopTest method.
         """
+        test_info.filename = self.filename
+        test_info.lineno = self.lineno
         target_list.append(test_info)
 
         def callback():
@@ -252,6 +260,19 @@ class _XMLTestResult(_TextTestResult):
         """
         self.start_time = time()
         TestResult.startTest(self, test)
+
+        try:
+            if getattr(test, '_dt_test', None) is not None:
+                # doctest.DocTestCase
+                self.filename = test._dt_test.filename
+                self.lineno = test._dt_test.lineno
+            else:
+                # regular unittest.TestCase?
+                test_method = getattr(test, test._testMethodName)
+                self.filename = inspect.getsourcefile(test_method)
+                _, self.lineno = inspect.getsourcelines(test_method)
+        finally:
+            pass
 
         if self.showAll:
             self.stream.write('  ' + self.getDescription(test))
@@ -533,6 +554,12 @@ class _XMLTestResult(_TextTestResult):
         )
         testcase.setAttribute('time', '%.3f' % test_result.elapsed_time)
         testcase.setAttribute('timestamp', test_result.timestamp)
+
+        if test_result.filename is not None:
+            testcase.setAttribute('file', os.path.relpath(test_result.filename))
+
+        if test_result.lineno is not None:
+            testcase.setAttribute('line', str(test_result.lineno))
 
         if (test_result.outcome != test_result.SUCCESS):
             elem_name = ('failure', 'error', 'skipped')[test_result.outcome-1]
