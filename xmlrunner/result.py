@@ -158,10 +158,10 @@ class _TestInfo(object):
 
         self.test_name = testcase_name(test_method)
         self.test_id = test_method.id()
-        self.subDescription = None
+
         if subTest:
             self.test_id = subTest.id()
-            self.subDescription = subTest._subDescription()
+            self.test_description = self.test_result.getDescription(subTest)
 
         self.filename = filename
         self.lineno = lineno
@@ -176,17 +176,6 @@ class _TestInfo(object):
             self.test_result.stop_time - self.test_result.start_time
         timestamp = datetime.datetime.fromtimestamp(self.test_result.stop_time)
         self.timestamp = timestamp.replace(microsecond=0).isoformat()
-
-    def get_description(self):
-        """
-        Return a text representation of the test method.
-        """
-        description = self.test_description
-
-        if self.subDescription is not None:
-            description += ' ' + self.subDescription
-
-        return description
 
     def get_error_info(self):
         """
@@ -440,7 +429,7 @@ class _XMLTestResult(_TextTestResult):
             self.stream.writeln(self.separator1)
             self.stream.writeln(
                 '%s [%.3fs]: %s' % (flavour, test_info.elapsed_time,
-                                    test_info.get_description())
+                                    test_info.test_description)
             )
             self.stream.writeln(self.separator2)
             self.stream.writeln('%s' % test_info.get_error_info())

@@ -83,6 +83,16 @@ def capture_stdout_stderr():
         sys.stderr = orig_stderr
 
 
+def _strip_xml(xml, changes):
+    doc = etree.fromstring(xml)
+    for xpath, attributes in changes.items():
+        for node in doc.xpath(xpath):
+            for attrib in node.attrib.keys():
+                if attrib not in attributes:
+                    del node.attrib[attrib]
+    return etree.tostring(doc)
+
+
 class XMLTestRunnerTestCase(unittest.TestCase):
     """
     XMLTestRunner test case.
@@ -158,6 +168,11 @@ class XMLTestRunnerTestCase(unittest.TestCase):
                 with self.subTest(i=i):
                     raise Exception('this is a subtest')
 
+        def test_subTest_mixed(self):
+            for i in range(2):
+                with self.subTest(i=i):
+                    self.assertLess(i, 1, msg='this is a subtest.')
+
     class DummyErrorInCallTest(unittest.TestCase):
 
         def __call__(self, result):
@@ -220,21 +235,20 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
+        output = _strip_xml(output, {
+            '//testsuite': (),
+            '//testcase': ('classname', 'name'),
+            '//failure': ('message',),
+        })
         self.assertRegexpMatches(
             output,
-            r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?DummyTest'.encode('utf8'),
+            r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
+            r'DummyTest" name="test_pass"'.encode('utf8'),
         )
         self.assertRegexpMatches(
             output,
-            r'name="test_pass"'.encode('utf8'),
-        )
-        self.assertRegexpMatches(
-            output,
-            r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?DummySubTest'.encode('utf8'),
-        )
-        self.assertRegexpMatches(
-            output,
-            r'name="test_subTest_pass"'.encode('utf8'),
+            r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
+            r'DummySubTest" name="test_subTest_pass"'.encode('utf8'),
         )
 
     def test_xmlrunner_non_ascii(self):
@@ -423,19 +437,20 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
+        output = _strip_xml(output, {
+            '//testsuite': (),
+            '//testcase': ('classname', 'name'),
+            '//failure': ('message',),
+        })
         self.assertRegexpMatches(
             output,
             br'<testcase classname="tests\.testsuite\.'
-            br'(XMLTestRunnerTestCase\.)?DummySubTest"')
-        self.assertRegexpMatches(
-            output,
+            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
             br'name="test_subTest_fail \(i=0\)"')
         self.assertRegexpMatches(
             output,
             br'<testcase classname="tests\.testsuite\.'
-            br'(XMLTestRunnerTestCase\.)?DummySubTest"')
-        self.assertRegexpMatches(
-            output,
+            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
             br'name="test_subTest_fail \(i=1\)"')
 
     @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
@@ -451,20 +466,47 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         runner.run(suite)
         outdir.seek(0)
         output = outdir.read()
+        output = _strip_xml(output, {
+            '//testsuite': (),
+            '//testcase': ('classname', 'name'),
+            '//failure': ('message',),
+        })
         self.assertRegexpMatches(
             output,
             br'<testcase classname="tests\.testsuite\.'
-            br'(XMLTestRunnerTestCase\.)?DummySubTest"')
-        self.assertRegexpMatches(
-            output,
+            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
             br'name="test_subTest_error \(i=0\)"')
         self.assertRegexpMatches(
             output,
             br'<testcase classname="tests\.testsuite\.'
-            br'(XMLTestRunnerTestCase\.)?DummySubTest"')
-        self.assertRegexpMatches(
-            output,
+            br'(XMLTestRunnerTestCase\.)?DummySubTest" '
             br'name="test_subTest_error \(i=1\)"')
+
+
+    @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
+                     'unittest.TestCase.subTest not present.')
+    def test_unittest_subTest_mixed(self):
+        # test for issue #155
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummySubTest('test_subTest_mixed'))
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        output = _strip_xml(output, {
+            '//testsuite': (),
+            '//testcase': ('classname', 'name'),
+            '//failure': ('message',),
+        })
+        self.assertNotIn(
+            'name="test_subTest_mixed (i=0)"'.encode('utf8'),
+            output)
+        self.assertIn(
+            'name="test_subTest_mixed (i=1)"'.encode('utf8'),
+            output)
 
     @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
                      'unittest.TestCase.subTest not present.')
