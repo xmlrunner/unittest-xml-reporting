@@ -720,6 +720,25 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.assertIn('should be printed', r[0].getvalue())
         self.assertNotIn('should be printed', r[1].getvalue())
 
+    def test_partialmethod(self):
+        try:
+            from functools import partialmethod
+        except ImportError:
+            raise unittest.SkipTest('functools.partialmethod is not available.')
+        def test_partialmethod(test):
+            pass
+        class TestWithPartialmethod(unittest.TestCase):
+            pass
+        setattr(
+            TestWithPartialmethod,
+            'test_partialmethod',
+            partialmethod(test_partialmethod),
+        )
+        suite = unittest.TestSuite()
+        suite.addTest(TestWithPartialmethod('test_partialmethod'))
+        self._test_xmlrunner(suite)
+
+
 
 class DuplicateWriterTestCase(unittest.TestCase):
     def setUp(self):
