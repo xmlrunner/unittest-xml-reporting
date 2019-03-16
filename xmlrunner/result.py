@@ -261,6 +261,8 @@ class _XMLTestResult(_TextTestResult):
                 test_class = type(test)
                 # Note: inspect can get confused with decorators, so use class.
                 self.filename = inspect.getsourcefile(test_class)
+                # Handle partial and partialmethod objects.
+                test_method = getattr(test_method, 'func', test_method)
                 _, self.lineno = inspect.getsourcelines(test_method)
         finally:
             pass
