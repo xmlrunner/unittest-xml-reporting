@@ -200,8 +200,9 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.runner_kwargs = {}
         self.addCleanup(rmtree, self.outdir)
 
-    def _test_xmlrunner(self, suite, runner=None):
-        outdir = self.outdir
+    def _test_xmlrunner(self, suite, runner=None, outdir=None):
+        if outdir is None:
+            outdir = self.outdir
         stream = self.stream
         verbosity = self.verbosity
         runner_kwargs = self.runner_kwargs
@@ -209,9 +210,15 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             runner = xmlrunner.XMLTestRunner(
                 stream=stream, output=outdir, verbosity=verbosity,
                 **runner_kwargs)
-        self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
+        if isinstance(outdir, BytesIO):
+            self.assertFalse(outdir.getvalue())
+        else:
+            self.assertEqual(0, len(glob(os.path.join(outdir, '*xml'))))
         runner.run(suite)
-        self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
+        if isinstance(outdir, BytesIO):
+            self.assertTrue(outdir.getvalue())
+        else:
+            self.assertEqual(1, len(glob(os.path.join(outdir, '*xml'))))
         return runner
 
     def test_basic_unittest_constructs(self):
@@ -250,6 +257,42 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
             r'DummySubTest" name="test_subTest_pass"'.encode('utf8'),
         )
+
+    def test_expected_failure(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_expected_failure'))
+        outdir = BytesIO()
+
+        self._test_xmlrunner(suite, outdir=outdir)
+
+        self.assertNotIn(b'<failure', outdir.getvalue())
+        self.assertNotIn(b'<error', outdir.getvalue())
+        self.assertIn(b'<skip', outdir.getvalue())
+
+    def test_unexpected_success(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_unexpected_success'))
+        outdir = BytesIO()
+
+        self._test_xmlrunner(suite, outdir=outdir)
+
+        self.assertNotIn(b'<failure', outdir.getvalue())
+        self.assertIn(b'<error', outdir.getvalue())
+        self.assertNotIn(b'<skip', outdir.getvalue())
+
+    def test_xmlrunner_safe_xml_encoding_name(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        firstline = output.splitlines()[0]
+        # test for issue #74
+        self.assertIn('encoding="UTF-8"'.encode('utf8'), firstline)
 
     def test_xmlrunner_non_ascii(self):
         suite = unittest.TestSuite()

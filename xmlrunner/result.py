@@ -134,6 +134,13 @@ class _TestInfo(object):
     # Possible test outcomes
     (SUCCESS, FAILURE, ERROR, SKIP) = range(4)
 
+    OUTCOME_ELEMENTS = {
+        SUCCESS: None,
+        FAILURE: 'failure',
+        ERROR: 'error',
+        SKIP: 'skipped',
+    }
+
     def __init__(self, test_result, test_method, outcome=SUCCESS, err=None, subTest=None, filename=None, lineno=None):
         self.test_result = test_result
         self.outcome = outcome
@@ -323,7 +330,7 @@ class _XMLTestResult(_TextTestResult):
         """
         self._save_output_data()
         self._prepare_callback(
-            self.infoclass(self, test), self.successes, 'OK', '.'
+            self.infoclass(self, test), self.successes, 'ok', '.'
         )
 
     @failfast
@@ -390,8 +397,10 @@ class _XMLTestResult(_TextTestResult):
         self._save_output_data()
         testinfo = self.infoclass(
             self, test, self.infoclass.SKIP, reason)
+        testinfo.test_exception_name = 'skip'
+        testinfo.test_exception_message = reason
         self.skipped.append((testinfo, reason))
-        self._prepare_callback(testinfo, [], 'SKIP', 'S')
+        self._prepare_callback(testinfo, [], 'skip', 's')
 
     def addExpectedFailure(self, test, err):
         """
@@ -399,12 +408,12 @@ class _XMLTestResult(_TextTestResult):
         """
         self._save_output_data()
 
-        testinfo = self.infoclass(self, test, self.infoclass.ERROR, err)
-        testinfo.test_exception_name = 'ExpectedFailure'
-        testinfo.test_exception_message = 'EXPECTED FAILURE: {}'.format(testinfo.test_exception_message)
+        testinfo = self.infoclass(self, test, self.infoclass.SKIP, err)
+        testinfo.test_exception_name = 'XFAIL'
+        testinfo.test_exception_message = 'expected failure: {}'.format(testinfo.test_exception_message)
 
         self.expectedFailures.append((testinfo, self._exc_info_to_string(err, test)))
-        self._prepare_callback(testinfo, [], 'EXPECTED FAILURE', 'X')
+        self._prepare_callback(testinfo, [], 'expected failure', 'x')
 
     @failfast
     def addUnexpectedSuccess(self, test):
@@ -417,11 +426,11 @@ class _XMLTestResult(_TextTestResult):
         testinfo.outcome = self.infoclass.ERROR
         # But since we want to have error outcome, we need to provide additional fields:
         testinfo.test_exception_name = 'UnexpectedSuccess'
-        testinfo.test_exception_message = ('UNEXPECTED SUCCESS: This test was marked as expected failure but passed, '
+        testinfo.test_exception_message = ('Unexpected success: This test was marked as expected failure but passed, '
                                            'please review it')
 
-        self.unexpectedSuccesses.append(testinfo)
-        self._prepare_callback(testinfo, [], 'UNEXPECTED SUCCESS', 'U')
+        self.unexpectedSuccesses.append((testinfo, 'unexpected success'))
+        self._prepare_callback(testinfo, [], 'unexpected success', 'u')
 
     def printErrorList(self, flavour, errors):
         """
@@ -557,33 +566,32 @@ class _XMLTestResult(_TextTestResult):
         if test_result.lineno is not None:
             testcase.setAttribute('line', str(test_result.lineno))
 
-        if (test_result.outcome != test_result.SUCCESS):
-            elem_name = ('failure', 'error', 'skipped')[test_result.outcome-1]
-            failure = xml_document.createElement(elem_name)
-            testcase.appendChild(failure)
-            if test_result.outcome != test_result.SKIP:
-                failure.setAttribute(
-                    'type',
-                    test_result.test_exception_name
-                )
-                failure.setAttribute(
-                    'message',
-                    test_result.test_exception_message
-                )
+        result_elem_name = test_result.OUTCOME_ELEMENTS[test_result.outcome]
+
+        if result_elem_name is not None:
+            result_elem = xml_document.createElement(result_elem_name)
+            testcase.appendChild(result_elem)
+
+            result_elem.setAttribute(
+                'type',
+                test_result.test_exception_name
+            )
+            result_elem.setAttribute(
+                'message',
+                test_result.test_exception_message
+            )
+            if test_result.get_error_info():
                 error_info = safe_unicode(test_result.get_error_info())
                 _XMLTestResult._createCDATAsections(
-                    xml_document, failure, error_info)
-            else:
-                failure.setAttribute('type', 'skip')
-                failure.setAttribute('message', test_result.test_exception_message)
+                    xml_document, result_elem, error_info)
 
-        if test_result.stdout:
+        if test_result.stdout is not None:
             systemout = xml_document.createElement('system-out')
             testcase.appendChild(systemout)
             _XMLTestResult._createCDATAsections(
                 xml_document, systemout, test_result.stdout)
 
-        if test_result.stderr:
+        if test_result.stderr is not None:
             systemout = xml_document.createElement('system-err')
             testcase.appendChild(systemout)
             _XMLTestResult._createCDATAsections(
