@@ -856,7 +856,6 @@ class DuplicateWriterTestCase(unittest.TestCase):
         self.assertEqual(wrote, len(self.getSecondContent()))
 
 
-@unittest.skipIf(sys.version_info[0] < 3, 'Python 3 required')
 class XMLProgramTestCase(unittest.TestCase):
     @mock.patch('sys.argv', ['xmlrunner', '-o', 'flaf'])
     @mock.patch('xmlrunner.runner.XMLTestRunner')
@@ -865,16 +864,38 @@ class XMLProgramTestCase(unittest.TestCase):
         xmlrunner.runner.XMLTestProgram()
 
         kwargs = dict(
-            buffer=False,
-            failfast=False,
-            verbosity=1,
-            warnings='default',
+            buffer=mock.ANY,
+            failfast=mock.ANY,
+            verbosity=mock.ANY,
+            warnings=mock.ANY,
             output='flaf',
         )
 
         if sys.version_info[:2] > (3, 4):
-            kwargs.update(tb_locals=False)
+            kwargs.update(tb_locals=mock.ANY)
 
         testrunner.assert_called_once_with(**kwargs)
+        exiter.assert_called_once_with(False)
 
+    @mock.patch('sys.argv', ['xmlrunner', '--output-file', 'test.xml'])
+    @mock.patch('xmlrunner.runner.open')
+    @mock.patch('xmlrunner.runner.XMLTestRunner')
+    @mock.patch('sys.exit')
+    def test_xmlrunner_output_file(self, exiter, testrunner, opener):
+        xmlrunner.runner.XMLTestProgram()
+        opener.assert_called_once_with('test.xml', 'wb')
+        opener().close.assert_called()
+
+        kwargs = dict(
+            buffer=mock.ANY,
+            failfast=mock.ANY,
+            verbosity=mock.ANY,
+            warnings=mock.ANY,
+            output=opener('test.xml', 'wb'),
+        )
+
+        if sys.version_info[:2] > (3, 4):
+            kwargs.update(tb_locals=mock.ANY)
+
+        testrunner.assert_called_once_with(**kwargs)
         exiter.assert_called_once_with(False)

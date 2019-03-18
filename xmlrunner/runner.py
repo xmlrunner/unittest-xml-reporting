@@ -117,22 +117,44 @@ class XMLTestRunner(TextTestRunner):
 
 
 class XMLTestProgram(TestProgram):
-    output = None
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('testRunner', XMLTestRunner)
+        self.warnings = None  # python2 fix
+        self._parseKnownArgs(kwargs)
         super(XMLTestProgram, self).__init__(*args, **kwargs)
 
+    def _parseKnownArgs(self, kwargs):
+        argv = kwargs.get('argv')
+        if argv is None:
+            argv = sys.argv
+
+        # python2 argparse fix
+        parser = argparse.ArgumentParser(prog='xmlrunner')
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument(
+            '-o', '--output', metavar='DIR',
+            help='Directory for storing XML reports (\'.\' default)')
+        group.add_argument(
+            '--output-file', metavar='FILENAME',
+            help='Filename for storing XML report')
+        namespace, argv = parser.parse_known_args(argv)
+        self.output = namespace.output
+        self.output_file = namespace.output_file
+        kwargs['argv'] = argv
+
     def _initArgParsers(self):
+        # this code path is only called in python3 (optparse vs argparse)
         super(XMLTestProgram, self)._initArgParsers()
 
         for parser in (self._main_parser, self._discovery_parser):
             group = parser.add_mutually_exclusive_group()
-            group.add_argument('-o', '--output', metavar='DIR',
-                                help='Directory for storing XML reports '
-                                "('.' default)")
-            group.add_argument('--output-file', metavar='FILENAME',
-                                help='Filename for storing XML report')
+            group.add_argument(
+                '-o', '--output', metavar='DIR', nargs=1,
+                help='Directory for storing XML reports (\'.\' default)')
+            group.add_argument(
+                '--output-file', metavar='FILENAME', nargs=1,
+                help='Filename for storing XML report')
 
     def runTests(self):
         kwargs = dict(
