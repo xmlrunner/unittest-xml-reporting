@@ -280,20 +280,6 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.assertIn(b'<error', outdir.getvalue())
         self.assertNotIn(b'<skip', outdir.getvalue())
 
-    def test_xmlrunner_safe_xml_encoding_name(self):
-        suite = unittest.TestSuite()
-        suite.addTest(self.DummyTest('test_pass'))
-        outdir = BytesIO()
-        runner = xmlrunner.XMLTestRunner(
-            stream=self.stream, output=outdir, verbosity=self.verbosity,
-            **self.runner_kwargs)
-        runner.run(suite)
-        outdir.seek(0)
-        output = outdir.read()
-        firstline = output.splitlines()[0]
-        # test for issue #74
-        self.assertIn('encoding="UTF-8"'.encode('utf8'), firstline)
-
     def test_xmlrunner_non_ascii(self):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_non_ascii_skip'))
