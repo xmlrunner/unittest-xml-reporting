@@ -884,14 +884,15 @@ class XMLProgramTestCase(unittest.TestCase):
     def test_xmlrunner_output_file(self, exiter, testrunner, opener):
         xmlrunner.runner.XMLTestProgram()
         opener.assert_called_once_with('test.xml', 'wb')
-        opener().close.assert_called()
+        open_file = opener()
+        open_file.close.assert_called_with()
 
         kwargs = dict(
             buffer=mock.ANY,
             failfast=mock.ANY,
             verbosity=mock.ANY,
             warnings=mock.ANY,
-            output=opener('test.xml', 'wb'),
+            output=open_file,
         )
 
         if sys.version_info[:2] > (3, 4):
