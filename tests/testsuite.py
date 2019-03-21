@@ -50,6 +50,20 @@ def validate_junit_report(text):
     JUnitSchema.assertValid(document)
 
 
+class TestCaseSubclassWithNoSuper(unittest.TestCase):
+    def __init__(self, description):
+        # no super, see #189
+        pass
+
+    def run(self, result):
+        result = _XMLTestResult()
+        result.startTest(self)
+        result.stopTest(self)
+
+    def test_something(self):
+        pass
+
+
 class DoctestTest(unittest.TestCase):
 
     def test_doctest_example(self):

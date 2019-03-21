@@ -271,8 +271,8 @@ class _XMLTestResult(_TextTestResult):
                 # Handle partial and partialmethod objects.
                 test_method = getattr(test_method, 'func', test_method)
                 _, self.lineno = inspect.getsourcelines(test_method)
-        except TypeError:
-            # issue #188, some frameworks can make test method opaque.
+        except (AttributeError, TypeError):
+            # issue #188, #189, some frameworks can make test method opaque.
             pass
 
         if self.showAll:
