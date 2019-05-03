@@ -693,6 +693,8 @@ class _XMLTestResult(_TextTestResult):
                 msgLines.append(STDERR_LINE % error)
         # This is the extra magic to make sure all lines are str
         encoding = getattr(sys.stdout, 'encoding', 'utf-8')
+        if encoding is None:
+            encoding = 'utf-8'
         lines = []
         for line in msgLines:
             if not isinstance(line, str):
