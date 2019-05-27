@@ -370,13 +370,19 @@ class XMLTestRunnerTestCase(unittest.TestCase):
                       output)
 
     def test_xmlrunner_non_ascii_failures(self):
+        self._xmlrunner_non_ascii_failures()
+
+    def test_xmlrunner_non_ascii_failures_buffered_output(self):
+        self._xmlrunner_non_ascii_failures(buffer=True)
+
+    def _xmlrunner_non_ascii_failures(self, buffer=False):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest(
             'test_non_ascii_runner_buffer_output_fail'))
         outdir = BytesIO()
         runner = xmlrunner.XMLTestRunner(
             stream=self.stream, output=outdir, verbosity=self.verbosity,
-            **self.runner_kwargs)
+            buffer=buffer, **self.runner_kwargs)
 
         # allow output non-ascii letters to stdout
         orig_stdout = sys.stdout
