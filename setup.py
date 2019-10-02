@@ -15,7 +15,9 @@ readme_path = convert_path('README.md')
 with codecs.open(readme_path, 'rb', 'utf8') as readme_file:
     long_description = readme_file.read()
 
-install_requires = ['six>=1.4.0']
+install_requires = []
+with open("./requirements.txt") as f:
+    install_requires = f.read().splitlines()
 
 # this is for sdist to work.
 import sys
