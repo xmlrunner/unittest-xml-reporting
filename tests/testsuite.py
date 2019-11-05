@@ -15,7 +15,7 @@ from xmlrunner.result import _DuplicateWriter
 from xmlrunner.result import _XMLTestResult
 import doctest
 import tests.doctest_example
-from six import StringIO, BytesIO
+from six import StringIO, BytesIO, exec_
 from tempfile import mkdtemp
 from tempfile import mkstemp
 from shutil import rmtree
@@ -107,6 +107,17 @@ def _strip_xml(xml, changes):
     return etree.tostring(doc)
 
 
+def some_decorator(f):
+    # for issue #195
+    code = """\
+def wrapper(*args, **kwargs):
+    return func(*args, **kwargs)
+"""
+    evaldict = dict(func=f)
+    exec_(code, evaldict)
+    return evaldict['wrapper']
+
+
 class XMLTestRunnerTestCase(unittest.TestCase):
     """
     XMLTestRunner test case.
@@ -186,6 +197,12 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             for i in range(2):
                 with self.subTest(i=i):
                     self.assertLess(i, 1, msg='this is a subtest.')
+
+    class DecoratedUnitTest(unittest.TestCase):
+
+        @some_decorator
+        def test_pass(self):
+            pass
 
     class DummyErrorInCallTest(unittest.TestCase):
 
@@ -711,6 +728,13 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             self._test_xmlrunner(suite)
         finally:
             sys.stdout, sys.stderr = old_stdout, old_stderr
+
+    def test_opaque_decorator(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DecoratedUnitTest('test_pass'))
+        self._test_xmlrunner(suite)
+        testsuite_output = self.stream.getvalue()
+        self.assertNotIn('IOError:', testsuite_output)
 
     def test_xmlrunner_error_in_call(self):
         suite = unittest.TestSuite()
