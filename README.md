@@ -20,11 +20,14 @@ and continuous integration servers.
 There are many schemas with minor differences.
 We use one that is compatible with Jenkins xUnit plugin, a copy is
 available under `tests/vendor/jenkins/xunit-plugin/junit-10.xsd` (see attached license).
+
+- [Jenkins (junit-10.xsd), xunit plugin (2014-2018)](https://github.com/jenkinsci/xunit-plugin/blob/14c6e39c38408b9ed6280361484a13c6f5becca7/src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd), please note the latest versions (2.2.4 and above are not backwards compatible)
+
 You may also find these resources useful:
 
 - https://stackoverflow.com/questions/4922867/what-is-the-junit-xml-format-specification-that-hudson-supports
 - https://stackoverflow.com/questions/11241781/python-unittests-in-jenkins
-- [Jenkins (junit-10.xsd)](https://github.com/jenkinsci/xunit-plugin/blob/master/src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd)
+- [Jenkins (junit-10.xsd), xunit plugin 2.2.4+](https://github.com/jenkinsci/xunit-plugin/blob/master/src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd)
 - [JUnit-Schema (JUnit.xsd)](https://github.com/windyroad/JUnit-Schema/blob/master/JUnit.xsd)
 - [Windyroad (JUnit.xsd)](http://windyroad.com.au/dl/Open%20Source/JUnit.xsd)
 - [a gist (Jenkins xUnit test result schema)](https://gist.github.com/erikd/4192748)
