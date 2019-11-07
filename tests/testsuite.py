@@ -323,8 +323,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir.seek(0)
         output = outdir.read()
         self.assertIn(
-            u'<skipped message="demonstrating non-ascii skipping: éçà" '
-            u'type="skip"/>'.encode('utf8'),
+            u'message="demonstrating non-ascii skipping: éçà"'.encode('utf8'),
             output)
 
     def test_xmlrunner_safe_xml_encoding_name(self):
