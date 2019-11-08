@@ -215,10 +215,3 @@ $ tox -e pytest
 # all combinations
 $ tox
 ```
-
-## Work in progress
-
-There is a [rewrite branch](https://github.com/xmlrunner/unittest-xml-reporting/tree/rewrite) which contains better unit tests and uses a different runner. It
-introduces a `CompositeTestResult` which allows the use of both `TextTestResult`
-and `XMLTestResult` as delegates. If you would like to help reconcile both
-branches, pull requests are welcome.
