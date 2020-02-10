@@ -39,7 +39,9 @@ in the reports for sub-tests.
 
 ## Requirements
 
-* Python 2.7 or 3.3+
+* Python 3.5+
+* Please note Python 2.7 end-of-life was in Jan 2020, last version supporting 2.7 was 2.5.2
+* Please note Python 3.4 end-of-life was in Mar 2019, last version supporting 3.4 was 2.5.2
 * Please note Python 2.6 end-of-life was in Oct 2013, last version supporting 2.6 was 1.14.0
 
 ## Installation
