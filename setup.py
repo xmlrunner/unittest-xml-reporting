@@ -15,8 +15,6 @@ readme_path = convert_path('README.md')
 with codecs.open(readme_path, 'rb', 'utf8') as readme_file:
     long_description = readme_file.read()
 
-install_requires = ['six>=1.4.0']
-
 # this is for sdist to work.
 import sys
 if sys.version_info < (3, 5):
@@ -56,6 +54,5 @@ setup(
     packages = ['xmlrunner', 'xmlrunner.extra'],
     zip_safe = False,
     include_package_data = True,
-    install_requires = install_requires,
     test_suite = 'tests'
 )

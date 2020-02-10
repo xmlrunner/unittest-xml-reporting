@@ -6,10 +6,9 @@ import sys
 import datetime
 import time
 import traceback
-import six
 import re
 from os import path
-from six.moves import StringIO
+from io import StringIO
 
 # use direct import to bypass freezegun
 from time import time
@@ -39,7 +38,7 @@ if sys.maxunicode >= 0x10000:  # not narrow build
     ])
 
 _illegal_ranges = [
-    "%s-%s" % (six.unichr(low), six.unichr(high))
+    "%s-%s" % (chr(low), chr(high))
     for (low, high) in _illegal_unichrs
 ]
 
@@ -50,25 +49,14 @@ STDOUT_LINE = '\nStdout:\n%s'
 STDERR_LINE = '\nStderr:\n%s'
 
 
-def _to_unicode(data):
-    """Returns unicode in Python2 and str in Python3"""
-    if six.PY3:
-        return six.text_type(data)
-    try:
-        # Try utf8
-        return six.text_type(data)
-    except UnicodeDecodeError:
-        return repr(data).decode('utf8', 'replace')
-
-
 def safe_unicode(data, encoding='utf8'):
     """Return a unicode string containing only valid XML characters.
 
     encoding - if data is a byte string it is first decoded to unicode
         using this encoding.
     """
-    data = _to_unicode(data)
-    if isinstance(data, six.binary_type):
+    data = str(data)
+    if isinstance(data, bytes):
         # e.g. IronPython, see #182
         data = data.decode(encoding)
     return INVALID_XML_1_0_UNICODE_RE.sub('', data)
@@ -103,6 +91,9 @@ class _DuplicateWriter(io.TextIOBase):
 
     def writable(self):
         return True
+
+    def getvalue(self):
+        return self._second.getvalue()
 
     def writelines(self, lines):
         self._first.writelines(lines)
@@ -609,7 +600,7 @@ class _XMLTestResult(_TextTestResult):
         all_results = self._get_info_by_testcase()
 
         outputHandledAsString = \
-            isinstance(test_runner.output, six.string_types)
+            isinstance(test_runner.output, str)
 
         if (outputHandledAsString and not os.path.exists(test_runner.output)):
             os.makedirs(test_runner.output)
@@ -659,49 +650,4 @@ class _XMLTestResult(_TextTestResult):
 
     def _exc_info_to_string(self, err, test):
         """Converts a sys.exc_info()-style tuple of values into a string."""
-        if six.PY3:
-            # It works fine in python 3
-            try:
-                return super(_XMLTestResult, self)._exc_info_to_string(
-                    err, test)
-            except AttributeError:
-                # We keep going using the legacy python <= 2 way
-                pass
-
-        # This comes directly from python2 unittest
-        exctype, value, tb = err
-        # Skip test runner traceback levels
-        while tb and self._is_relevant_tb_level(tb):
-            tb = tb.tb_next
-
-        if exctype is test.failureException:
-            # Skip assert*() traceback levels
-            length = self._count_relevant_tb_levels(tb)
-            msgLines = traceback.format_exception(exctype, value, tb, length)
-        else:
-            msgLines = traceback.format_exception(exctype, value, tb)
-
-        if self.buffer:
-            output = self._stdout_capture.getvalue()
-            error = self._stdout_capture.getvalue()
-            if output:
-                if not output.endswith('\n'):
-                    output += '\n'
-                msgLines.append(STDOUT_LINE % output)
-            if error:
-                if not error.endswith('\n'):
-                    error += '\n'
-                msgLines.append(STDERR_LINE % error)
-        # This is the extra magic to make sure all lines are str
-        encoding = getattr(sys.stdout, 'encoding', 'utf-8')
-        if encoding is None:
-            encoding = 'utf-8'
-
-        lines = []
-        for line in msgLines:
-            if not isinstance(line, str):
-                # utf8 shouldnt be hard-coded, but not sure f
-                line = line.encode(encoding)
-            lines.append(line)
-
-        return ''.join(lines)
+        return super(_XMLTestResult, self)._exc_info_to_string(err, test)

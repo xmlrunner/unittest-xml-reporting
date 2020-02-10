@@ -15,7 +15,7 @@ from xmlrunner.result import _DuplicateWriter
 from xmlrunner.result import _XMLTestResult
 import doctest
 import tests.doctest_example
-from six import StringIO, BytesIO, exec_
+from io import StringIO, BytesIO
 from tempfile import mkdtemp
 from tempfile import mkstemp
 from shutil import rmtree
@@ -114,7 +114,7 @@ def wrapper(*args, **kwargs):
     return func(*args, **kwargs)
 """
     evaldict = dict(func=f)
-    exec_(code, evaldict)
+    exec(code, evaldict)
     return evaldict['wrapper']
 
 

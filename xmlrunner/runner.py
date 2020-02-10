@@ -3,8 +3,6 @@ import argparse
 import sys
 import time
 
-import six
-
 from .unittest import TextTestRunner, TestProgram
 from .result import _XMLTestResult
 
@@ -19,10 +17,8 @@ class XMLTestRunner(TextTestRunner):
     """
     def __init__(self, output='.', outsuffix=None, 
                  elapsed_times=True, encoding=UTF8,
-                 resultclass=None, warnings=None,
+                 resultclass=None,
                  **kwargs):
-        if six.PY3:
-            kwargs['warnings'] = warnings
         super(XMLTestRunner, self).__init__(**kwargs)
         self.output = output
         self.encoding = encoding

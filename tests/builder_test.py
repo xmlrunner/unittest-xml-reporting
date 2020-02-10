@@ -6,7 +6,6 @@ import xml.etree.ElementTree as ET
 from xml.dom.minidom import Document
 
 from xmlrunner import builder
-import six
 
 
 class TestXMLContextTest(unittest.TestCase):
@@ -27,9 +26,9 @@ class TestXMLContextTest(unittest.TestCase):
         self.assertEqual(name, 'context-name')
 
     def test_current_context_invalid_unicode_name(self):
-        self.root.begin('tag', six.u('context-name\x01\x0B'))
+        self.root.begin('tag', u'context-name\x01\x0B')
         name = self.root.element.getAttribute('name')
-        self.assertEqual(name, six.u('context-name\uFFFD\uFFFD'))
+        self.assertEqual(name, u'context-name\uFFFD\uFFFD')
 
     def test_increment_valid_testsuites_counters(self):
         self.root.begin('testsuites', 'name')
@@ -99,10 +98,10 @@ class TestXMLBuilderTest(unittest.TestCase):
         self.doc = self.builder._xml_doc
         self.builder.begin_context('testsuites', 'name')
 
-        self.valid_chars = six.u('выбор')
+        self.valid_chars = u'выбор'
 
         self.invalid_chars = '\x01'
-        self.invalid_chars_replace = six.u('\ufffd')
+        self.invalid_chars_replace = u'\ufffd'
 
     def test_root_has_no_parent(self):
         self.assertIsNone(self.builder.current_context().parent)
