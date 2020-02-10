@@ -97,13 +97,19 @@ class _DuplicateWriter(io.TextIOBase):
         self._second.writelines(lines)
 
     def write(self, b):
-        wrote = self._first.write(b)
+        if isinstance(self._first, io.TextIOBase):
+            wrote = self._first.write(b)
 
-        if wrote is not None:
-            # expected to always succeed to write
-            self._second.write(b[:wrote])
+            if wrote is not None:
+                # expected to always succeed to write
+                self._second.write(b[:wrote])
 
-        return wrote
+            return wrote
+        else:
+            # file-like object that doesn't return wrote bytes.
+            self._first.write(b)
+            self._second.write(b)
+            return len(b)
 
 
 class _TestInfo(object):
