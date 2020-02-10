@@ -4,14 +4,6 @@ cache: pip
 
 matrix:
   include:
-    - python: 2.7
-      env: TOXENV=py27
-    - python: 2.7
-      env: TOXENV=py27-djangolts
-    - python: 2.7
-      env: TOXENV=py27-djangocurr
-    - python: 2.7
-      env: TOXENV=quality
     - python: 3.5
       env: TOXENV=py35
     - python: 3.6
@@ -20,14 +12,14 @@ matrix:
       env: TOXENV=py37
     - python: 3.8
       env: TOXENV=py38
+    - python: 3.8
+      env: TOXENV=py38-djangolts
+    - python: 3.8
+      env: TOXENV=py38-djangocurr
+    - python: 3.8
+      env: TOXENV=quality
     - python: 3.8-dev
       env: TOXENV=pytest
-    - os: linux
-      dist: xenial
-      python: pypy2.7-6.0
-      env: TOXENV=pypy
-      services:
-        - docker
     - os: linux
       dist: xenial
       python: pypy3.5-6.0

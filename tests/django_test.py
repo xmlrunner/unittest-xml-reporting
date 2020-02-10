@@ -4,10 +4,7 @@ import sys
 import os
 from os import path
 import glob
-try:
-    from unittest import mock
-except ImportError:
-    import mock
+from unittest import mock
 import tempfile
 import shutil
 
@@ -19,6 +16,7 @@ else:
     from django.test.utils import get_runner
     from django.conf import settings, UserSettingsHolder
     from django.apps import apps
+    settings.configure(DEBUG=True)
 
 
 TESTS_DIR = path.dirname(__file__)
@@ -37,6 +35,7 @@ class DjangoTest(unittest.TestCase):
         self.old_settings = settings._wrapped
         os.environ['DJANGO_SETTINGS_MODULE'] = 'example.settings'
         settings.INSTALLED_APPS  # load settings on first access
+        settings.DATABASES['default'] = {}
         settings.DATABASES['default']['NAME'] = path.join(
             self.tmpdir, 'db.sqlilte3')
         # this goes around the "settings already loaded" issue.
