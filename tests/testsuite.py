@@ -24,11 +24,7 @@ from xml.dom import minidom
 from lxml import etree
 import os
 import os.path
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
+from unittest import mock
 
 
 def _load_schema():
@@ -402,21 +398,13 @@ class XMLTestRunnerTestCase(unittest.TestCase):
 
         # allow output non-ascii letters to stdout
         orig_stdout = sys.stdout
-        if getattr(sys.stdout, 'buffer', None):
-            # Python3
-            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-        else:
-            # Python2
-            import codecs
-            sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
         try:
             runner.run(suite)
         finally:
-            if getattr(sys.stdout, 'buffer', None):
-                # Python3
-                # Not to be closed when TextIOWrapper is disposed.
-                sys.stdout.detach()
+            # Not to be closed when TextIOWrapper is disposed.
+            sys.stdout.detach()
             sys.stdout = orig_stdout
         outdir.seek(0)
         output = outdir.read()
@@ -835,10 +823,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.assertNotIn('should be printed', r[1].getvalue())
 
     def test_partialmethod(self):
-        try:
-            from functools import partialmethod
-        except ImportError:
-            raise unittest.SkipTest('functools.partialmethod is not available.')
+        from functools import partialmethod
         def test_partialmethod(test):
             pass
         class TestWithPartialmethod(unittest.TestCase):

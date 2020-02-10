@@ -56,9 +56,6 @@ def safe_unicode(data, encoding='utf8'):
         using this encoding.
     """
     data = str(data)
-    if isinstance(data, bytes):
-        # e.g. IronPython, see #182
-        data = data.decode(encoding)
     return INVALID_XML_1_0_UNICODE_RE.sub('', data)
 
 
@@ -100,20 +97,13 @@ class _DuplicateWriter(io.TextIOBase):
         self._second.writelines(lines)
 
     def write(self, b):
-        if isinstance(self._first, io.TextIOBase):
-            wrote = self._first.write(b)
+        wrote = self._first.write(b)
 
-            if wrote is not None:
-                # expected to always succeed to write
-                self._second.write(b[:wrote])
+        if wrote is not None:
+            # expected to always succeed to write
+            self._second.write(b[:wrote])
 
-            return wrote
-        else:
-            # file-like object in Python2
-            # It doesn't return wrote bytes.
-            self._first.write(b)
-            self._second.write(b)
-            return len(b)
+        return wrote
 
 
 class _TestInfo(object):
