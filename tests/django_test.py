@@ -57,12 +57,16 @@ class DjangoTest(unittest.TestCase):
         test_ids = [test.id() for test in suite]
         self.assertEqual(test_ids, [
             'app2.tests.DummyTestCase.test_pass',
+            'app.tests.DummyTestCase.test_negative_comment1',
+            'app.tests.DummyTestCase.test_negative_comment2',
             'app.tests.DummyTestCase.test_pass',
         ])
         suite = runner.build_suite(test_labels=[])
         test_ids = [test.id() for test in suite]
         self.assertEqual(set(test_ids), set([
             'app.tests.DummyTestCase.test_pass',
+            'app.tests.DummyTestCase.test_negative_comment1',
+            'app.tests.DummyTestCase.test_negative_comment2',
             'app2.tests.DummyTestCase.test_pass',
         ]))
 
