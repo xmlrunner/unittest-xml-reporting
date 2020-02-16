@@ -128,7 +128,7 @@ class _TestInfo(object):
         SKIP: 'skipped',
     }
 
-    def __init__(self, test_result, test_method, outcome=SUCCESS, err=None, subTest=None, filename=None, lineno=None):
+    def __init__(self, test_result, test_method, outcome=SUCCESS, err=None, subTest=None, filename=None, lineno=None, doc=None):
         self.test_result = test_result
         self.outcome = outcome
         self.elapsed_time = 0
@@ -159,6 +159,7 @@ class _TestInfo(object):
 
         self.filename = filename
         self.lineno = lineno
+        self.doc = doc
 
     def id(self):
         return self.test_id
@@ -200,6 +201,7 @@ class _XMLTestResult(_TextTestResult):
         self.properties = properties  # junit testsuite properties
         self.filename = None
         self.lineno = None
+        self.doc = None
         if infoclass is None:
             self.infoclass = _TestInfo
         else:
@@ -213,6 +215,7 @@ class _XMLTestResult(_TextTestResult):
         """
         test_info.filename = self.filename
         test_info.lineno = self.lineno
+        test_info.doc = self.doc
         target_list.append(test_info)
 
         def callback():
@@ -258,6 +261,8 @@ class _XMLTestResult(_TextTestResult):
                 # Handle partial and partialmethod objects.
                 test_method = getattr(test_method, 'func', test_method)
                 _, self.lineno = inspect.getsourcelines(test_method)
+
+                self.doc = test_method.__doc__
         except (AttributeError, IOError, TypeError):
             # issue #188, #189, #195
             # some frameworks can make test method opaque.
@@ -554,6 +559,12 @@ class _XMLTestResult(_TextTestResult):
 
         if test_result.lineno is not None:
             testcase.setAttribute('line', str(test_result.lineno))
+
+        if test_result.doc is not None:
+            comment = str(test_result.doc)
+            # The use of '--' is forbidden in XML comments
+            comment = comment.replace('--', '&#45;&#45;')
+            testcase.appendChild(xml_document.createComment(comment))
 
         result_elem_name = test_result.OUTCOME_ELEMENTS[test_result.outcome]
 
