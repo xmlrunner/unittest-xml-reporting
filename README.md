@@ -14,28 +14,6 @@ A unittest test runner that can save test results to XML files in xUnit format.
 The files can be consumed by a wide range of tools, such as build systems, IDEs
 and continuous integration servers.
 
-## Schema
-
-There are many schemas with minor differences.
-We use one that is compatible with Jenkins xUnit plugin, a copy is
-available under `tests/vendor/jenkins/xunit-plugin/junit-10.xsd` (see attached license).
-
-- [Jenkins (junit-10.xsd), xunit plugin (2014-2018)](https://github.com/jenkinsci/xunit-plugin/blob/14c6e39c38408b9ed6280361484a13c6f5becca7/src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd), please note the latest versions (2.2.4 and above are not backwards compatible)
-
-You may also find these resources useful:
-
-- https://stackoverflow.com/questions/4922867/what-is-the-junit-xml-format-specification-that-hudson-supports
-- https://stackoverflow.com/questions/11241781/python-unittests-in-jenkins
-- [Jenkins (junit-10.xsd), xunit plugin 2.2.4+](https://github.com/jenkinsci/xunit-plugin/blob/master/src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd)
-- [JUnit-Schema (JUnit.xsd)](https://github.com/windyroad/JUnit-Schema/blob/master/JUnit.xsd)
-- [Windyroad (JUnit.xsd)](http://windyroad.com.au/dl/Open%20Source/JUnit.xsd)
-- [a gist (Jenkins xUnit test result schema)](https://gist.github.com/erikd/4192748)
-
-## Things that are somewhat broken
-
-Python 3 has the concept of sub-tests for a `unittest.TestCase`; this doesn't map well to an existing
-xUnit concept, so you won't find it in the schema. What that means, is that you lose some granularity
-in the reports for sub-tests.
 
 ## Requirements
 
@@ -43,6 +21,75 @@ in the reports for sub-tests.
 * Please note Python 2.7 end-of-life was in Jan 2020, last version supporting 2.7 was 2.5.2
 * Please note Python 3.4 end-of-life was in Mar 2019, last version supporting 3.4 was 2.5.2
 * Please note Python 2.6 end-of-life was in Oct 2013, last version supporting 2.6 was 1.14.0
+
+
+## Limited support for `unittest.TestCase.subTest`
+
+https://docs.python.org/3/library/unittest.html#unittest.TestCase.subTest
+
+`unittest` has the concept of sub-tests for a `unittest.TestCase`; this doesn't map well to an existing xUnit concept, so you won't find it in the schema. What that means, is that you lose some granularity
+in the reports for sub-tests.
+
+`unittest` also does not report successful sub-tests, so the accounting won't be exact.
+
+## Jenkins plugins
+
+- Jenkins JUnit plugin : https://plugins.jenkins.io/junit/
+- Jenkins xUnit plugin : https://plugins.jenkins.io/xunit/
+
+### Jenkins JUnit plugin
+
+This plugin does not perform XSD validation (at time of writing) and should parse the XML file without issues.
+
+### Jenkins xUnit plugin version 1.100
+
+- [Jenkins (junit-10.xsd), xunit plugin (2014-2018)](https://github.com/jenkinsci/xunit-plugin/blob/14c6e39c38408b9ed6280361484a13c6f5becca7/src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd), version `1.100`.
+
+This plugin does perfom XSD validation and uses the more lax XSD. This should parse the XML file without issues.
+
+### Jenkins xUnit plugin version 1.104+
+
+- [Jenkins (junit-10.xsd), xunit plugin (2018-current)](https://github.com/jenkinsci/xunit-plugin/blob/ae25da5089d4f94ac6c4669bf736e4d416cc4665/src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd), version `1.104`+.
+
+This plugin does perfom XSD validation and uses the more strict XSD.
+
+See https://github.com/xmlrunner/unittest-xml-reporting/issues/209
+
+```
+import io
+import unittest
+import xmlrunner
+
+# run the tests storing results in memory
+out = io.BytesIO()
+unittest.main(
+    testRunner=xmlrunner.XMLTestRunner(output=out),
+    failfast=False, buffer=False, catchbreak=False, exit=False)
+```
+
+Transform the results removing extra attributes.
+```
+from xmlrunner.extra.xunit_plugin import transform
+
+with open('TEST-report.xml', 'wb') as report:
+    report.write(transform(out.getvalue()))
+
+```
+
+## JUnit Schema ?
+
+There are many tools claiming to write JUnit reports, so you will find many schemas with minor differences.
+
+We used the XSD that was available in the Jenkins xUnit plugin version `1.100`; a copy is available under `tests/vendor/jenkins/xunit-plugin/.../junit-10.xsd` (see attached license).
+
+You may also find these resources useful:
+
+- https://stackoverflow.com/questions/4922867/what-is-the-junit-xml-format-specification-that-hudson-supports
+- https://stackoverflow.com/questions/11241781/python-unittests-in-jenkins
+- [JUnit-Schema (JUnit.xsd)](https://github.com/windyroad/JUnit-Schema/blob/master/JUnit.xsd)
+- [Windyroad (JUnit.xsd)](http://windyroad.com.au/dl/Open%20Source/JUnit.xsd)
+- [a gist (Jenkins xUnit test result schema)](https://gist.github.com/erikd/4192748)
+
 
 ## Installation
 
