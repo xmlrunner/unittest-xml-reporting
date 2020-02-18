@@ -27,10 +27,10 @@ import os.path
 from unittest import mock
 
 
-def _load_schema():
-    path = os.path.join(os.path.dirname(__file__),
-                        'vendor/jenkins/xunit-plugin',
-                        'junit-10.xsd')
+def _load_schema(version):
+    path = os.path.join(
+        os.path.dirname(__file__),
+        'vendor/jenkins/xunit-plugin', version, 'junit-10.xsd')
     with open(path, 'r') as schema_file:
         schema_doc = etree.parse(schema_file)
         schema = etree.XMLSchema(schema_doc)
@@ -38,12 +38,10 @@ def _load_schema():
     raise RuntimeError('Could not load JUnit schema')  # pragma: no cover
 
 
-JUnitSchema = _load_schema()
-
-
-def validate_junit_report(text):
+def validate_junit_report(version, text):
     document = etree.parse(BytesIO(text))
-    JUnitSchema.assertValid(document)
+    schema = _load_schema(version)
+    schema.assertValid(document)
 
 
 class TestCaseSubclassWithNoSuper(unittest.TestCase):
@@ -650,7 +648,7 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.assertTrue(i_properties < i_testcase <
                         i_system_out < i_system_err)
         # XSD validation - for good measure.
-        validate_junit_report(output)
+        validate_junit_report('14c6e39c38408b9ed6280361484a13c6f5becca7', output)
 
     def test_junitxml_xsd_validation_empty_properties(self):
         suite = unittest.TestSuite()
@@ -665,7 +663,31 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         outdir.seek(0)
         output = outdir.read()
         self.assertNotIn('<properties>'.encode('utf8'), output)
-        validate_junit_report(output)
+        validate_junit_report('14c6e39c38408b9ed6280361484a13c6f5becca7', output)
+
+    def test_xunit_plugin_transform(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_fail'))
+        suite.addTest(self.DummyTest('test_pass'))
+        suite.properties = None
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+
+        validate_junit_report('14c6e39c38408b9ed6280361484a13c6f5becca7', output)
+        with self.assertRaises(etree.DocumentInvalid):
+            validate_junit_report('ae25da5089d4f94ac6c4669bf736e4d416cc4665', output)
+
+        from xmlrunner.extra.xunit_plugin import transform
+        transformed = transform(output)
+        validate_junit_report('14c6e39c38408b9ed6280361484a13c6f5becca7', transformed)
+        validate_junit_report('ae25da5089d4f94ac6c4669bf736e4d416cc4665', transformed)
+        self.assertIn('test_pass'.encode('utf8'), transformed)
+        self.assertIn('test_fail'.encode('utf8'), transformed)
 
     def test_xmlrunner_elapsed_times(self):
         self.runner_kwargs['elapsed_times'] = False
