@@ -665,6 +665,8 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         self.assertNotIn('<properties>'.encode('utf8'), output)
         validate_junit_report('14c6e39c38408b9ed6280361484a13c6f5becca7', output)
 
+    @unittest.skipIf(hasattr(sys, 'pypy_version_info'),
+                     'skip - PyPy + lxml seems to be hanging')
     def test_xunit_plugin_transform(self):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_fail'))
