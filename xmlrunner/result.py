@@ -4,7 +4,6 @@ import io
 import os
 import sys
 import datetime
-import time
 import traceback
 import re
 from os import path
@@ -517,7 +516,11 @@ class _XMLTestResult(_TextTestResult):
         """
         Returns the test method name.
         """
-        return test_id.split('.')[-1]
+        # Trick subtest referencing objects
+        subtest_parts = test_id.split(' ')
+        test_method_name = subtest_parts[0].split('.')[-1]
+        subtest_method_name = [test_method_name] + subtest_parts[1:]
+        return ' '.join(subtest_method_name)
 
     _test_method_name = staticmethod(_test_method_name)
 
@@ -543,7 +546,10 @@ class _XMLTestResult(_TextTestResult):
         xml_testsuite.appendChild(testcase)
 
         class_name = re.sub(r'^__main__.', '', test_result.id())
-        class_name = class_name.rpartition('.')[0]
+
+        # Trick subtest referencing objects
+        class_name = class_name.split(' ')[0].rpartition('.')[0]
+
         testcase.setAttribute('classname', class_name)
         testcase.setAttribute(
             'name', _XMLTestResult._test_method_name(test_result.test_id)
