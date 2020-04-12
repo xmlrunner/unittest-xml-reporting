@@ -591,13 +591,13 @@ class _XMLTestResult(_TextTestResult):
                 _XMLTestResult._createCDATAsections(
                     xml_document, result_elem, error_info)
 
-        if test_result.stdout is not None:
+        if test_result.stdout:
             systemout = xml_document.createElement('system-out')
             testcase.appendChild(systemout)
             _XMLTestResult._createCDATAsections(
                 xml_document, systemout, test_result.stdout)
 
-        if test_result.stderr is not None:
+        if test_result.stderr:
             systemout = xml_document.createElement('system-err')
             testcase.appendChild(systemout)
             _XMLTestResult._createCDATAsections(
