@@ -178,6 +178,11 @@ class XMLTestRunnerTestCase(unittest.TestCase):
                 with self.subTest(i=i):
                     self.assertLess(i, 1, msg='this is a subtest.')
 
+        def test_subTest_with_dots(self):
+            for i in range(2):
+                with self.subTest(module='hello.world.subTest{}'.format(i)):
+                    self.fail('this is a subtest.')
+
     class DecoratedUnitTest(unittest.TestCase):
 
         @some_decorator
@@ -552,6 +557,27 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite = unittest.TestSuite()
         suite.addTest(self.DummySubTest('test_subTest_pass'))
         self._test_xmlrunner(suite)
+
+    @unittest.skipIf(not hasattr(unittest.TestCase, 'subTest'),
+                     'unittest.TestCase.subTest not present.')
+    def test_unittest_subTest_with_dots(self):
+        # Test for issue #85
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummySubTest('test_subTest_with_dots'))
+        outdir = BytesIO()
+
+        self._test_xmlrunner(suite, outdir=outdir)
+
+        xmlcontent = outdir.getvalue().decode()
+
+        # Method name
+        self.assertNotIn('name="subTest', xmlcontent, 'parsing of test method name is not done correctly')
+        self.assertIn('name="test_subTest_with_dots (module=\'hello.world.subTest', xmlcontent)
+
+        # Class name
+        matchString = 'classname="tests.testsuite.XMLTestRunnerTestCase.DummySubTest.test_subTest_with_dots (module=\'hello.world"'
+        self.assertNotIn(matchString, xmlcontent, 'parsing of class name is not done correctly')
+        self.assertIn('classname="tests.testsuite.XMLTestRunnerTestCase.DummySubTest"', xmlcontent)
 
     def test_xmlrunner_pass(self):
         suite = unittest.TestSuite()
