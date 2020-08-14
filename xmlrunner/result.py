@@ -69,6 +69,16 @@ def testcase_name(test_method):
     return result
 
 
+def resolve_filename(filename):
+    # Try to make filename relative to current directory.
+    try:
+        rel_filename = os.path.relpath(filename)
+    except ValueError:
+        return filename
+    # if not inside folder, keep as-is
+    return filename if rel_filename.startswith('../') else rel_filename
+
+
 class _DuplicateWriter(io.TextIOBase):
     """
     Duplicate output from the first handle to the second handle
@@ -559,8 +569,7 @@ class _XMLTestResult(_TextTestResult):
 
         if test_result.filename is not None:
             # Try to make filename relative to current directory.
-            filename = os.path.relpath(test_result.filename)
-            filename = test_result.filename if filename.startswith('../') else filename
+            filename = resolve_filename(test_result.filename)
             testcase.setAttribute('file', filename)
 
         if test_result.lineno is not None:

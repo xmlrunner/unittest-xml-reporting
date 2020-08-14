@@ -13,6 +13,7 @@ from xmlrunner.unittest import unittest
 import xmlrunner
 from xmlrunner.result import _DuplicateWriter
 from xmlrunner.result import _XMLTestResult
+from xmlrunner.result import resolve_filename
 import doctest
 import tests.doctest_example
 from io import StringIO, BytesIO
@@ -964,3 +965,23 @@ class XMLProgramTestCase(unittest.TestCase):
 
         testrunner.assert_called_once_with(**kwargs)
         exiter.assert_called_once_with(False)
+
+
+class ResolveFilenameTestCase(unittest.TestCase):
+    @mock.patch('os.path.relpath')
+    def test_resolve_filename_relative(self, relpath):
+        relpath.return_value = 'somefile.py'
+        filename = resolve_filename('/path/to/somefile.py')
+        self.assertEqual(filename, 'somefile.py')
+
+    @mock.patch('os.path.relpath')
+    def test_resolve_filename_outside(self, relpath):
+        relpath.return_value = '../../../tmp/somefile.py'
+        filename = resolve_filename('/tmp/somefile.py')
+        self.assertEqual(filename, '/tmp/somefile.py')
+
+    @mock.patch('os.path.relpath')
+    def test_resolve_filename_error(self, relpath):
+        relpath.side_effect = ValueError("ValueError: path is on mount 'C:', start on mount 'D:'")
+        filename = resolve_filename('C:\\path\\to\\somefile.py')
+        self.assertEqual(filename, 'C:\\path\\to\\somefile.py')
