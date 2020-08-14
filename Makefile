@@ -1,10 +1,10 @@
 
 build/tox/bin:
-	virtualenv build/tox
+	python3 -m venv build/tox
 	build/tox/bin/pip install tox
 
 build/publish/bin:
-	virtualenv build/publish
+	python3 -m venv build/publish
 	build/publish/bin/pip install wheel twine
 
 checkversion:
