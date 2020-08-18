@@ -133,6 +133,12 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         def test_cdata_section(self):
             print('<![CDATA[content]]>')
 
+        def test_invalid_xml_chars_in_doc(self):
+            """
+            Testing comments, -- is not allowed, or invalid xml 1.0 chars such as \x0c
+            """
+            pass
+
         def test_non_ascii_error(self):
             self.assertEqual(u"éçà", 42)
 
@@ -616,6 +622,23 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_cdata_section'))
         self._test_xmlrunner(suite)
+
+    def test_xmlrunner_invalid_xml_chars_in_doc(self):
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_invalid_xml_chars_in_doc'))
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        # Finally check if we have a valid XML document or not.
+        try:
+            minidom.parseString(output)
+        except Exception as e:  # pragma: no cover
+            # note: we could remove the try/except, but it's more crude.
+            self.fail(e)
 
     def test_xmlrunner_outsuffix(self):
         self.runner_kwargs['outsuffix'] = '.somesuffix'

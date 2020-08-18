@@ -579,7 +579,7 @@ class _XMLTestResult(_TextTestResult):
             comment = str(test_result.doc)
             # The use of '--' is forbidden in XML comments
             comment = comment.replace('--', '&#45;&#45;')
-            testcase.appendChild(xml_document.createComment(comment))
+            testcase.appendChild(xml_document.createComment(safe_unicode(comment)))
 
         result_elem_name = test_result.OUTCOME_ELEMENTS[test_result.outcome]
 
