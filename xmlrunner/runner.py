@@ -1,8 +1,10 @@
 
 import argparse
 import sys
+
 import time
 
+from .time import get_real_time_if_possible
 from .unittest import TextTestRunner, TestProgram
 from .result import _XMLTestResult
 
@@ -15,7 +17,7 @@ class XMLTestRunner(TextTestRunner):
     """
     A test runner class that outputs the results in JUnit like XML files.
     """
-    def __init__(self, output='.', outsuffix=None, 
+    def __init__(self, output='.', outsuffix=None,
                  elapsed_times=True, encoding=UTF8,
                  resultclass=None,
                  **kwargs):
@@ -62,9 +64,9 @@ class XMLTestRunner(TextTestRunner):
             self.stream.writeln(result.separator2)
 
             # Execute tests
-            start_time = time.time()
+            start_time = get_real_time_if_possible()
             test(result)
-            stop_time = time.time()
+            stop_time = get_real_time_if_possible()
             time_taken = stop_time - start_time
 
             # Print results

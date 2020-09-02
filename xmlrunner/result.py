@@ -9,9 +9,7 @@ import re
 from os import path
 from io import StringIO
 
-# use direct import to bypass freezegun
-from time import time
-
+from .time import get_real_time_if_possible
 from .unittest import TestResult, _TextTestResult, failfast
 
 
@@ -253,7 +251,7 @@ class _XMLTestResult(_TextTestResult):
         """
         Called before execute each test method.
         """
-        self.start_time = time()
+        self.start_time = get_real_time_if_possible()
         TestResult.startTest(self, test)
 
         try:
@@ -321,7 +319,8 @@ class _XMLTestResult(_TextTestResult):
         # self._stderr_data = sys.stderr.getvalue()
 
         _TextTestResult.stopTest(self, test)
-        self.stop_time = time()
+
+        self.stop_time = get_real_time_if_possible()
 
         if self.callback and callable(self.callback):
             self.callback()
