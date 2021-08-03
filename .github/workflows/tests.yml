@@ -43,8 +43,6 @@ jobs:
           TOXENV: ${{ matrix.toxenv }}
         run: |
           pip install tox codecov coveralls
-          virtualenv --version
-          easy_install --version
           pip --version
           tox --version
       - name: Script
