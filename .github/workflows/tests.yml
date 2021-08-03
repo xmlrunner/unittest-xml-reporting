@@ -1,0 +1,62 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - python-version: 3.5
+            toxenv: py35
+          - python-version: 3.6
+            toxenv: py36
+          - python-version: 3.7
+            toxenv: py37
+          - python-version: 3.8
+            toxenv: py38
+          - python-version: 3.8
+            toxenv: py38-djangolts
+          - python-version: 3.8
+            toxenv: py38-djangocurr
+          - python-version: 3.8
+            toxenv: py38-quality
+          - python-version: 3.9
+            toxenv: py39
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Before Install
+        run: |
+          python --version
+          uname -a
+          lsb_release -a
+      - name: Install
+        env:
+          TOXENV: ${{ matrix.toxenv }}
+        run: |
+          pip install tox codecov coveralls
+          virtualenv --version
+          easy_install --version
+          pip --version
+          tox --version
+      - name: Script
+        run: |
+          tox -v
+      - name: After Failure
+        if: ${{ failure() }}
+        run: |
+          more .tox/log/* | cat
+          more .tox/*/log/* | cat
+      - name: After Success
+        if: ${{ success() }}
+        run: |
+          codecov
+          coveralls
