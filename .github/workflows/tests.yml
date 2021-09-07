@@ -42,7 +42,7 @@ jobs:
         env:
           TOXENV: ${{ matrix.toxenv }}
         run: |
-          pip install tox codecov coveralls
+          pip install tox-gh-actions codecov coveralls
           pip --version
           tox --version
       - name: Script
