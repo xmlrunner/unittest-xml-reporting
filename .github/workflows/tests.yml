@@ -57,6 +57,8 @@ jobs:
           more .tox/*/log/* | cat
       - name: After Success
         if: ${{ success() }}
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
           codecov
           coveralls
