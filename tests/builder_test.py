@@ -4,8 +4,10 @@ from xmlrunner.unittest import unittest
 
 import xml.etree.ElementTree as ET
 from xml.dom.minidom import Document
+from freezegun import freeze_time
 
 from xmlrunner import builder
+import time
 
 
 class TestXMLContextTest(unittest.TestCase):
@@ -88,6 +90,19 @@ class TestXMLContextTest(unittest.TestCase):
 
         element.attributes['timestamp'].value
 
+    @freeze_time('2012-12-21')
+    def test_time_and_timestamp_attributes_are_not_affected_by_freezegun(self):
+        self.root.begin('testsuite', 'name')
+        time.sleep(.015)
+        element = self.root.end()
+
+        current_year = int(element.attributes['timestamp'].value[:4])
+        self.assertGreater(current_year, 2012)
+        self.assertLess(current_year, 2100)
+
+        current_time = float(element.attributes['time'].value)
+        self.assertGreater(current_time, .012)
+        self.assertLess(current_time, .020)
 
 class TestXMLBuilderTest(unittest.TestCase):
     """TestXMLBuilder test cases.

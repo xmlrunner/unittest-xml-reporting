@@ -1,9 +1,10 @@
 import re
 import sys
 import datetime
-import time
 
 from xml.dom.minidom import Document
+
+from .time import get_real_time_if_possible
 
 
 __all__ = ('TestXMLBuilder', 'TestXMLContext')
@@ -72,13 +73,13 @@ class TestXMLContext(object):
         """
         self.element = self.xml_doc.createElement(tag)
         self.element.setAttribute('name', replace_nontext(name))
-        self._start_time = time.time()
+        self._start_time = get_real_time_if_possible()
 
     def end(self):
         """Closes this context (started with a call to `begin`) and creates an
         attribute for each counter and another for the elapsed time.
         """
-        self._stop_time = time.time()
+        self._stop_time = get_real_time_if_possible()
         self.element.setAttribute('time', self.elapsed_time())
         self.element.setAttribute('timestamp', self.timestamp())
         self._set_result_counters()

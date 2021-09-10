@@ -26,6 +26,9 @@ from lxml import etree
 import os
 import os.path
 from unittest import mock
+from time import sleep
+from freezegun import freeze_time
+import re
 
 
 def _load_schema(version):
@@ -115,6 +118,9 @@ class XMLTestRunnerTestCase(unittest.TestCase):
 
         def test_pass(self):
             pass
+
+        def test_pass_after_30ms(self):
+            sleep(.030)
 
         def test_fail(self):
             self.assertTrue(False)
@@ -732,6 +738,24 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_pass'))
         self._test_xmlrunner(suite)
+
+    @freeze_time('2012-12-21')
+    def test_xmlrunner_time_measurement_unaffected_by_freezegun(self):
+        suite = unittest.TestSuite()
+        outdir = BytesIO()
+        suite.addTest(self.DummyTest('test_pass_after_30ms'))
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        runner.run(suite)
+        outdir.seek(0)
+        output = outdir.read()
+        match = re.search(br'time="(.+?)"', output)
+        self.assertIsNotNone(match)
+        time_value = float(match.group(1))
+        # Provide a generous margin for this 30ms test to make flakes unlikely.
+        self.assertGreater(time_value, 0.025)
+        self.assertLess(time_value, 0.050)
 
     def test_xmlrunner_resultclass(self):
         class Result(_XMLTestResult):
