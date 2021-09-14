@@ -62,9 +62,9 @@ class XMLTestRunner(TextTestRunner):
             self.stream.writeln(result.separator2)
 
             # Execute tests
-            start_time = time.time()
+            start_time = time.monotonic()
             test(result)
-            stop_time = time.time()
+            stop_time = time.monotonic()
             time_taken = stop_time - start_time
 
             # Print results

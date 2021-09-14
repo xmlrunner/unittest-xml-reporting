@@ -58,7 +58,9 @@ class TestXMLContext(object):
         """
         self.xml_doc = xml_doc
         self.parent = parent_context
-        self._start_time = self._stop_time = 0
+        self._start_time_m = 0
+        self._stop_time_m = 0
+        self._stop_time = 0
         self.counters = {}
 
     def element_tag(self):
@@ -72,12 +74,15 @@ class TestXMLContext(object):
         """
         self.element = self.xml_doc.createElement(tag)
         self.element.setAttribute('name', replace_nontext(name))
-        self._start_time = time.time()
+        self._start_time = time.monotonic()
 
     def end(self):
         """Closes this context (started with a call to `begin`) and creates an
         attribute for each counter and another for the elapsed time.
         """
+        # time.monotonic is reliable for measuring differences, not affected by NTP
+        self._stop_time_m = time.monotonic()
+        # time.time is used for reference point
         self._stop_time = time.time()
         self.element.setAttribute('time', self.elapsed_time())
         self.element.setAttribute('timestamp', self.timestamp())
@@ -120,7 +125,7 @@ class TestXMLContext(object):
         """Returns the time the context took to run between the calls to
         `begin()` and `end()`, in seconds.
         """
-        return format(self._stop_time - self._start_time, '.3f')
+        return format(self._stop_time_m - self._start_time_m, '.3f')
 
     def timestamp(self):
         """Returns the time the context ended as ISO-8601-formatted timestamp.
