@@ -1,8 +1,10 @@
 name: Tests
 
 on:
-  pull_request:
   push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   build:
@@ -42,19 +44,17 @@ jobs:
         env:
           TOXENV: ${{ matrix.toxenv }}
         run: |
-          pip install tox codecov coveralls
+          pip install tox-gh-actions codecov coveralls
           pip --version
           tox --version
       - name: Script
         run: |
           tox -v
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       - name: After Failure
         if: ${{ failure() }}
         run: |
           more .tox/log/* | cat
           more .tox/*/log/* | cat
-      - name: After Success
-        if: ${{ success() }}
-        run: |
-          codecov
-          coveralls
