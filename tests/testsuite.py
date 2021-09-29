@@ -989,6 +989,27 @@ class XMLProgramTestCase(unittest.TestCase):
         testrunner.assert_called_once_with(**kwargs)
         exiter.assert_called_once_with(False)
 
+    @mock.patch('sys.argv', ['xmlrunner', '--outsuffix', ''])
+    @mock.patch('xmlrunner.runner.open')
+    @mock.patch('xmlrunner.runner.XMLTestRunner')
+    @mock.patch('sys.exit')
+    def test_xmlrunner_outsuffix(self, exiter, testrunner, opener):
+        xmlrunner.runner.XMLTestProgram()
+
+        kwargs = dict(
+            buffer=mock.ANY,
+            failfast=mock.ANY,
+            verbosity=mock.ANY,
+            warnings=mock.ANY,
+            outsuffix='',
+        )
+
+        if sys.version_info[:2] > (3, 4):
+            kwargs.update(tb_locals=mock.ANY)
+
+        testrunner.assert_called_once_with(**kwargs)
+        exiter.assert_called_once_with(False)
+
 
 class ResolveFilenameTestCase(unittest.TestCase):
     @mock.patch('os.path.relpath')

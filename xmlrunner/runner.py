@@ -15,7 +15,8 @@ class XMLTestRunner(TextTestRunner):
     """
     A test runner class that outputs the results in JUnit like XML files.
     """
-    def __init__(self, output='.', outsuffix=None, 
+
+    def __init__(self, output='.', outsuffix=None,
                  elapsed_times=True, encoding=UTF8,
                  resultclass=None,
                  **kwargs):
@@ -138,9 +139,13 @@ class XMLTestProgram(TestProgram):
         group.add_argument(
             '--output-file', metavar='FILENAME',
             help='Filename for storing XML report')
+        parser.add_argument(
+            '--outsuffix', metavar='STRING',
+            help='Output suffix (timestamp is default)')
         namespace, argv = parser.parse_known_args(argv)
         self.output = namespace.output
         self.output_file = namespace.output_file
+        self.outsuffix = namespace.outsuffix
         kwargs['argv'] = argv
 
     def _initArgParsers(self):
@@ -155,6 +160,9 @@ class XMLTestProgram(TestProgram):
             group.add_argument(
                 '--output-file', metavar='FILENAME', nargs=1,
                 help='Filename for storing XML report')
+            group.add_argument(
+                '--outsuffix', metavar='STRING', nargs=1,
+                help='Output suffix (timestamp is default)')
 
     def runTests(self):
         kwargs = dict(
@@ -173,6 +181,9 @@ class XMLTestProgram(TestProgram):
                 kwargs.update(output=output_file)
             elif self.output is not None:
                 kwargs.update(output=self.output)
+
+            if self.outsuffix is not None:
+                kwargs.update(outsuffix=self.outsuffix)
 
             self.testRunner = self.testRunner(**kwargs)
             super(XMLTestProgram, self).runTests()
