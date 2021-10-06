@@ -270,12 +270,12 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             '//testcase': ('classname', 'name'),
             '//failure': ('message',),
         })
-        self.assertRegexpMatches(
+        self.assertRegex(
             output,
             r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
             r'DummyTest" name="test_pass"'.encode('utf8'),
         )
-        self.assertRegexpMatches(
+        self.assertRegex(
             output,
             r'classname="tests\.testsuite\.(XMLTestRunnerTestCase\.)?'
             r'DummySubTest" name="test_subTest_pass"'.encode('utf8'),
@@ -491,12 +491,12 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             '//testcase': ('classname', 'name'),
             '//failure': ('message',),
         })
-        self.assertRegexpMatches(
+        self.assertRegex(
             output,
             br'<testcase classname="tests\.testsuite\.'
             br'(XMLTestRunnerTestCase\.)?DummySubTest" '
             br'name="test_subTest_fail \(i=0\)"')
-        self.assertRegexpMatches(
+        self.assertRegex(
             output,
             br'<testcase classname="tests\.testsuite\.'
             br'(XMLTestRunnerTestCase\.)?DummySubTest" '
@@ -520,12 +520,12 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             '//testcase': ('classname', 'name'),
             '//failure': ('message',),
         })
-        self.assertRegexpMatches(
+        self.assertRegex(
             output,
             br'<testcase classname="tests\.testsuite\.'
             br'(XMLTestRunnerTestCase\.)?DummySubTest" '
             br'name="test_subTest_error \(i=0\)"')
-        self.assertRegexpMatches(
+        self.assertRegex(
             output,
             br'<testcase classname="tests\.testsuite\.'
             br'(XMLTestRunnerTestCase\.)?DummySubTest" '
