@@ -12,7 +12,7 @@ from io import StringIO
 # use direct import to bypass freezegun
 from time import time
 
-from .unittest import TestResult, _TextTestResult, failfast
+from .unittest import TestResult, TextTestResult, failfast
 
 
 # Matches invalid XML1.0 unicode characters, like control characters:
@@ -189,7 +189,7 @@ class _TestInfo(object):
         return self.test_exception_info
 
 
-class _XMLTestResult(_TextTestResult):
+class _XMLTestResult(TextTestResult):
     """
     A test result class that can express test results in a XML report.
 
@@ -197,7 +197,7 @@ class _XMLTestResult(_TextTestResult):
     """
     def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1,
                  elapsed_times=True, properties=None, infoclass=None):
-        _TextTestResult.__init__(self, stream, descriptions, verbosity)
+        TextTestResult.__init__(self, stream, descriptions, verbosity)
         self._stdout_data = None
         self._stderr_data = None
         self._stdout_capture = StringIO()
@@ -320,7 +320,7 @@ class _XMLTestResult(_TextTestResult):
         # self._stdout_data = sys.stdout.getvalue()
         # self._stderr_data = sys.stderr.getvalue()
 
-        _TextTestResult.stopTest(self, test)
+        TextTestResult.stopTest(self, test)
         self.stop_time = time()
 
         if self.callback and callable(self.callback):
