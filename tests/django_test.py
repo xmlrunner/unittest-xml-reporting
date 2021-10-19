@@ -37,7 +37,7 @@ class DjangoTest(unittest.TestCase):
         settings.INSTALLED_APPS  # load settings on first access
         settings.DATABASES['default'] = {}
         settings.DATABASES['default']['NAME'] = path.join(
-            self.tmpdir, 'db.sqlilte3')
+            self.tmpdir, 'db.sqlite3')
         # this goes around the "settings already loaded" issue.
         self.override = UserSettingsHolder(settings._wrapped)
         settings._wrapped = self.override
