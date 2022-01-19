@@ -12,10 +12,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - python-version: 3.5
-            toxenv: py35
-          - python-version: 3.6
-            toxenv: py36
           - python-version: 3.7
             toxenv: py37
           - python-version: 3.8
@@ -28,6 +24,8 @@ jobs:
             toxenv: py38-quality
           - python-version: 3.9
             toxenv: py39
+          - python-version: "3.10"
+            toxenv: py310
     steps:
       - name: Checkout
         uses: actions/checkout@v2
