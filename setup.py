@@ -27,6 +27,7 @@ setup(
     description = 'unittest-based test runner with Ant/JUnit like XML reporting.',
     long_description = long_description,
     long_description_content_type = 'text/markdown',
+    data_files = [('', ['LICENSE'])],
     install_requires = ['lxml'],
     license = 'BSD',
     platforms = ['Any'],
