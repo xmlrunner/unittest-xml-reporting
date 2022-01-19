@@ -16,7 +16,9 @@ and continuous integration servers.
 
 ## Requirements
 
-* Python 3.5+
+* Python 3.7+
+* Please note Python 3.6 end-of-life was in Dec 2021, last version supporting 3.6 was 3.1.0
+* Please note Python 3.5 end-of-life was in Sep 2020, last version supporting 3.5 was 3.1.0
 * Please note Python 2.7 end-of-life was in Jan 2020, last version supporting 2.7 was 2.5.2
 * Please note Python 3.4 end-of-life was in Mar 2019, last version supporting 3.4 was 2.5.2
 * Please note Python 2.6 end-of-life was in Oct 2013, last version supporting 2.6 was 1.14.0

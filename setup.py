@@ -17,8 +17,8 @@ with codecs.open(readme_path, 'rb', 'utf8') as readme_file:
 
 # this is for sdist to work.
 import sys
-if sys.version_info < (3, 5):
-    raise RuntimeError('This version requires Python 3.5+')  # pragma: no cover
+if sys.version_info < (3, 7):
+    raise RuntimeError('This version requires Python 3.7+')  # pragma: no cover
 
 setup(
     name = 'unittest-xml-reporting',
@@ -31,7 +31,7 @@ setup(
     install_requires = ['lxml'],
     license = 'BSD',
     platforms = ['Any'],
-    python_requires='>=3.5',
+    python_requires='>=3.7',
     keywords = [
         'pyunit', 'unittest', 'junit xml', 'xunit', 'report', 'testrunner', 'xmlrunner'
     ],
@@ -44,9 +44,11 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Software Development :: Libraries :: Python Modules',
