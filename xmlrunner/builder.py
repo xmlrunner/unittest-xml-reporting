@@ -130,7 +130,7 @@ class TestXMLContext(object):
     def timestamp(self):
         """Returns the time the context ended as ISO-8601-formatted timestamp.
         """
-        return datetime.datetime.fromtimestamp(self._stop_time).replace(microsecond=0).isoformat()
+        return datetime.datetime.fromtimestamp(self._stop_time).replace(microsecond=0).astimezone().isoformat()
 
 
 class TestXMLBuilder(object):
