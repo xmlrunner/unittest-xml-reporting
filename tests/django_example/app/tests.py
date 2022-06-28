@@ -3,6 +3,8 @@ from django.test import TestCase
 
 # Create your tests here.
 class DummyTestCase(TestCase):
+    """Collection of dummy test cases"""
+
     def test_pass(self):
         """Test Pass"""
         pass
