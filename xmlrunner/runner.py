@@ -64,7 +64,15 @@ class XMLTestRunner(TextTestRunner):
 
             # Execute tests
             start_time = time.monotonic()
-            test(result)
+            startTestRun = getattr(result, 'startTestRun', None)
+            if startTestRun is not None:
+                startTestRun()
+            try:
+                test(result)
+            finally:
+                stopTestRun = getattr(result, 'stopTestRun', None)
+                if stopTestRun is not None:
+                    stopTestRun()
             stop_time = time.monotonic()
             time_taken = stop_time - start_time
 
