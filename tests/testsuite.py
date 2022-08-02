@@ -318,6 +318,33 @@ class XMLTestRunnerTestCase(unittest.TestCase):
             u'message="demonstrating non-ascii skipping: éçà"'.encode('utf8'),
             output)
 
+    def test_start_and_stop_test(self):
+        def startTestRun(self):
+            self.stream.writeln('startTestRun called')
+        def stopTestRun(self):
+            self.stream.writeln('stopTestRun called')
+
+        suite = unittest.TestSuite()
+        suite.addTest(self.DummyTest('test_pass'))
+        outdir = BytesIO()
+        runner = xmlrunner.XMLTestRunner(
+            stream=self.stream, output=outdir, verbosity=self.verbosity,
+            **self.runner_kwargs)
+        old_test_run_start = unittest.result.TestResult.startTestRun
+        old_test_run_stop = unittest.result.TestResult.stopTestRun
+        unittest.result.TestResult.startTestRun = startTestRun
+        unittest.result.TestResult.stopTestRun = stopTestRun
+        try:
+            runner.run(suite)
+            outdir.seek(0)
+            output = outdir.read()
+            testsuite_output = self.stream.getvalue()
+            self.assertIn('startTestRun called',testsuite_output)
+            self.assertIn('stopTestRun called',testsuite_output)
+        finally:
+            unittest.result.TestResult.startTestRun = old_test_run_start
+            unittest.result.TestResult.stopTestRun = old_test_run_stop
+
     def test_xmlrunner_safe_xml_encoding_name(self):
         suite = unittest.TestSuite()
         suite.addTest(self.DummyTest('test_pass'))
