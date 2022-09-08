@@ -593,7 +593,7 @@ class _XMLTestResult(TextTestResult):
             )
             result_elem.setAttribute(
                 'message',
-                test_result.test_exception_message
+                str(test_result.test_exception_message)
             )
             if test_result.get_error_info():
                 error_info = safe_unicode(test_result.get_error_info())

@@ -53,9 +53,10 @@ class DjangoTest(unittest.TestCase):
             setattr(self.override, key, new_value)
 
     def _check_runner(self, runner):
-        suite = runner.build_suite(test_labels=['app2', 'app'])
+        suite = runner.build_suite(test_labels=['app3', 'app2', 'app'])
         test_ids = [test.id() for test in suite]
         self.assertEqual(test_ids, [
+            'app3.tests.SkipTestCase.test_skip',
             'app2.tests.DummyTestCase.test_pass',
             'app.tests.DummyTestCase.test_negative_comment1',
             'app.tests.DummyTestCase.test_negative_comment2',
@@ -68,6 +69,7 @@ class DjangoTest(unittest.TestCase):
             'app.tests.DummyTestCase.test_negative_comment1',
             'app.tests.DummyTestCase.test_negative_comment2',
             'app2.tests.DummyTestCase.test_pass',
+            'app3.tests.SkipTestCase.test_skip',
         ]))
 
     def test_django_runner(self):
@@ -135,7 +137,7 @@ class DjangoTest(unittest.TestCase):
         test_files = glob.glob(path.join(self.tmpdir, 'TEST*.xml'))
         self.assertTrue(test_files,
                         'did not generate xml reports where expected.')
-        self.assertEqual(2, len(test_files))
+        self.assertEqual(3, len(test_files))
 
     def test_django_runner_extension(self):
         from xmlrunner.extra.djangotestrunner import XMLTestRunner
