@@ -190,3 +190,27 @@ class XMLTestProgram(TestProgram):
         finally:
             if output_file is not None:
                 output_file.close()
+
+def annotate(*args):
+    """
+    Add further information as xml attributes to a test cases or a test suite
+    """
+    def decorator(test_item): # data as dict
+        data = {}
+        if len(args) == 1 and isinstance(args[0], dict):
+            for key, value in args[0].items():
+                if not (isinstance(key, str) or isinstance(value, (str, int, float, bool))):
+                    raise TypeError("add_info takes (key: str, value: (str, int, float)) or (dict(key:str, value, (str, int, float, bool)))")
+            data = args[0]
+        elif (
+            len(args) == 2 and
+            isinstance(args[0], str) and
+            isinstance(args[1], (str, int, float, bool))):
+            data = {args[0]: args[1]}
+        elif not args:
+            return test_item
+        else:
+            raise TypeError("add_info takes (key: str, value: (str, int, float)) or (dict(key:str, value, (str, int, float, bool)))")
+        test_item._annotations = data
+        return test_item
+    return decorator
