@@ -291,6 +291,10 @@ class _XMLTestResult(TextTestResult):
         sys.stdout = _DuplicateWriter(sys.stdout, self._stdout_capture)
         self.__stderr_saved = sys.stderr
         sys.stderr = _DuplicateWriter(sys.stderr, self._stderr_capture)
+        # avoid issues where modules like python-subunit try to write directly to sys.stdout.buffer
+        # when there is no buffer
+        if not hasattr(sys.stdout, 'buffer'):
+            sys.stdout.buffer = _DuplicateWriter(sys.stdout, self._stdout_capture)
 
     def _restoreStdout(self):
         """
