@@ -355,7 +355,7 @@ class _XMLTestResult(TextTestResult):
         ))
         # Adding allure listener fail test
         self.allure_listener.add_failure(test, err, message=testinfo.test_exception_message,
-                                         trace_back=testinfo.test_exception_info)
+                                         info_traceback=testinfo.test_exception_info)
         self._prepare_callback(testinfo, [], 'FAIL', 'F')
 
     @failfast
@@ -368,7 +368,7 @@ class _XMLTestResult(TextTestResult):
             self, test, self.infoclass.ERROR, err)
         # Adding allure listener error test
         self.allure_listener.add_error(test, err, message=testinfo.test_exception_message,
-                                       trace_back=testinfo.test_exception_info)
+                                       info_traceback=testinfo.test_exception_info)
         self.errors.append((
             testinfo,
             self._exc_info_to_string(err, test)

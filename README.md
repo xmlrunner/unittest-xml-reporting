@@ -13,6 +13,17 @@ A unittest test runner that can save test results to XML files in xUnit format.
 The files can be consumed by a wide range of tools, such as build systems, IDEs
 and continuous integration servers.
 
+## Allure Report Add-on
+
+Note: This repo has been forked from the unittest-xml-reporting.
+This repo including the allure report add on to help generate the report when you run the testcase on unittest.
+- We add the allure report folder that contains the core method for allure report to work with unittest.
+- The `hook.py` contains methods that regiter and unregister the allure plugin when the test start. These methods will
+be added to the `runner` method.
+- The `listener.py` contains methods that listener to unittest events including `startTest` `stopTest` `addFailure` `addError`
+- For any event, we create custom method that can modify the test case.
+
+
 
 ## Requirements
 

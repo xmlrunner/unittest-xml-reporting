@@ -67,7 +67,7 @@ class XMLTestRunner(TextTestRunner):
 
             # Running allure report
             test_runner = test._tests[-1]._tests[0]
-            self.hook.register_allure_plugins(test_runner)
+            self.allure_hook.register_allure_plugins(test_runner)
 
             # Execute tests
             start_time = time.monotonic()
@@ -120,7 +120,7 @@ class XMLTestRunner(TextTestRunner):
             result.generate_reports(self)
         finally:
             # Unregister allure hook to generate allure report result
-            self.hook.unregister_allure_plugins()
+            self.allure_hook.unregister_allure_plugins()
             pass
 
         return result

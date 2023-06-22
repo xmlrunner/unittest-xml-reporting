@@ -11,7 +11,7 @@ from allure_commons.utils import now
 from allure_commons.utils import platform_label
 
 # -------------------------------------------------
-from q2_atf.lib.allure_report.utils import get_suit_name, fullname, name, labels, params
+from xmlrunner.allure_report.utils import get_suit_name, fullname, name, labels, params
 
 
 class AllureListener:
@@ -59,9 +59,9 @@ class AllureListener:
         self.reporter.schedule_test(self.current_test_uuid, test_case)
 
     def add_error(self, test, err, info_traceback, message="The test is error"):
-        screenshot_name = get_suit_name(test) + '_' + name(test)
         test_case = self.reporter.get_test(None)
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
+        screenshot_name = get_suit_name(test) + '_' + name(test)
         test_case.attachments.append(
             Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
         test_case.status = Status.BROKEN

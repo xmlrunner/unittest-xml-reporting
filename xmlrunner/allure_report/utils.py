@@ -1,5 +1,4 @@
 import inspect
-
 from allure_commons.model2 import Label
 from allure_commons.model2 import Parameter
 from allure_commons.utils import represent
@@ -48,14 +47,12 @@ def update_attrs(test, name, values):
 
 
 def labels(test):
-    # ToDo move to commons
     ALLURE_LABELS = [
         'epic',
         'feature',
         'story',
         'severity'
     ]
-
     def _get_attrs(obj, keys):
         key_pairs = set()
         for key in keys:

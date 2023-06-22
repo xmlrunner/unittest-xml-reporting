@@ -1,11 +1,8 @@
-import allure_commons
+import os
 from allure_commons import plugin_manager
 from allure_commons.logger import AllureFileLogger
-
-from q2_atf.lib.allure_report.listener import AllureListener
-# Utils function
-import os
-from q2_atf.lib.allure_report.utils import get_suit_name, get_domain_name
+from xmlrunner.allure_report.listener import AllureListener
+from xmlrunner.allure_report.utils import get_suit_name, get_domain_name
 
 
 class AllureHook:
