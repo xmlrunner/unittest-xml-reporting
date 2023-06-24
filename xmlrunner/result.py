@@ -1,4 +1,3 @@
-
 import inspect
 import io
 import os
@@ -13,7 +12,7 @@ from io import StringIO
 from time import time
 
 from .unittest import TestResult, TextTestResult, failfast
-
+from xmlrunner.allure_report.listener import AllureListener
 
 # Matches invalid XML1.0 unicode characters, like control characters:
 # http://www.w3.org/TR/2006/REC-xml-20060816/#charsets
@@ -42,7 +41,6 @@ _illegal_ranges = [
 ]
 
 INVALID_XML_1_0_UNICODE_RE = re.compile(u'[%s]' % u''.join(_illegal_ranges))
-
 
 STDOUT_LINE = '\nStdout:\n%s'
 STDERR_LINE = '\nStderr:\n%s'
@@ -137,7 +135,8 @@ class _TestInfo(object):
         SKIP: 'skipped',
     }
 
-    def __init__(self, test_result, test_method, outcome=SUCCESS, err=None, subTest=None, filename=None, lineno=None, doc=None):
+    def __init__(self, test_result, test_method, outcome=SUCCESS, err=None, subTest=None, filename=None, lineno=None,
+                 doc=None):
         self.test_result = test_result
         self.outcome = outcome
         self.elapsed_time = 0
@@ -156,7 +155,7 @@ class _TestInfo(object):
         self.test_exception_info = (
             '' if outcome in (self.SUCCESS, self.SKIP)
             else self.test_result._exc_info_to_string(
-                    err, test_method)
+                err, test_method)
         )
 
         self.test_name = testcase_name(test_method)
@@ -195,6 +194,7 @@ class _XMLTestResult(TextTestResult):
 
     Used by XMLTestRunner.
     """
+
     def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1,
                  elapsed_times=True, properties=None, infoclass=None):
         TextTestResult.__init__(self, stream, descriptions, verbosity)
@@ -211,6 +211,8 @@ class _XMLTestResult(TextTestResult):
         self.filename = None
         self.lineno = None
         self.doc = None
+        # Adding allure listener
+        self.allure_listener = AllureListener()
         if infoclass is None:
             self.infoclass = _TestInfo
         else:
@@ -265,6 +267,8 @@ class _XMLTestResult(TextTestResult):
                 # regular unittest.TestCase?
                 test_method = getattr(test, test._testMethodName)
                 test_class = type(test)
+                # Adding allure listener start_test
+                self.allure_listener.start_test(test)
                 # Note: inspect can get confused with decorators, so use class.
                 self.filename = inspect.getsourcefile(test_class)
                 # Handle partial and partialmethod objects.
@@ -319,7 +323,8 @@ class _XMLTestResult(TextTestResult):
         self._save_output_data()
         # self._stdout_data = sys.stdout.getvalue()
         # self._stderr_data = sys.stderr.getvalue()
-
+        # Adding allure listener start_test
+        self.allure_listener.stop_test(test)
         TextTestResult.stopTest(self, test)
         self.stop_time = time()
 
@@ -348,6 +353,9 @@ class _XMLTestResult(TextTestResult):
             testinfo,
             self._exc_info_to_string(err, test)
         ))
+        # Adding allure listener fail test
+        self.allure_listener.add_failure(test, err, message=testinfo.test_exception_message,
+                                         info_traceback=testinfo.test_exception_info)
         self._prepare_callback(testinfo, [], 'FAIL', 'F')
 
     @failfast
@@ -358,6 +366,9 @@ class _XMLTestResult(TextTestResult):
         self._save_output_data()
         testinfo = self.infoclass(
             self, test, self.infoclass.ERROR, err)
+        # Adding allure listener error test
+        self.allure_listener.add_error(test, err, message=testinfo.test_exception_message,
+                                       info_traceback=testinfo.test_exception_info)
         self.errors.append((
             testinfo,
             self._exc_info_to_string(err, test)
@@ -538,10 +549,10 @@ class _XMLTestResult(TextTestResult):
         text = safe_unicode(text)
         pos = text.find(']]>')
         while pos >= 0:
-            tmp = text[0:pos+2]
+            tmp = text[0:pos + 2]
             cdata = xmldoc.createCDATASection(tmp)
             node.appendChild(cdata)
-            text = text[pos+2:]
+            text = text[pos + 2:]
             pos = text.find(']]>')
         cdata = xmldoc.createCDATASection(text)
         node.appendChild(cdata)

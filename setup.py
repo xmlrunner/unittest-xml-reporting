@@ -17,26 +17,27 @@ with codecs.open(readme_path, 'rb', 'utf8') as readme_file:
 
 # this is for sdist to work.
 import sys
+
 if sys.version_info < (3, 7):
     raise RuntimeError('This version requires Python 3.7+')  # pragma: no cover
 
 setup(
-    name = 'unittest-xml-reporting',
-    version = main_ns['__version__'],
-    author = 'Daniel Fernandes Martins, Damien Nozay',
-    description = 'unittest-based test runner with Ant/JUnit like XML reporting.',
-    long_description = long_description,
-    long_description_content_type = 'text/markdown',
-    data_files = [('', ['LICENSE'])],
-    install_requires = ['lxml'],
-    license = 'BSD',
-    platforms = ['Any'],
+    name='unittest-xml-reporting',
+    version=main_ns['__version__'],
+    author='Daniel Fernandes Martins, Damien Nozay',
+    description='unittest-based test runner with Ant/JUnit like XML reporting.',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    data_files=[('', ['LICENSE'])],
+    install_requires=['lxml', 'allure-python-commons==2.13.2'],
+    license='BSD',
+    platforms=['Any'],
     python_requires='>=3.7',
-    keywords = [
+    keywords=[
         'pyunit', 'unittest', 'junit xml', 'xunit', 'report', 'testrunner', 'xmlrunner'
     ],
-    url = 'http://github.com/xmlrunner/unittest-xml-reporting/tree/master/',
-    classifiers = [
+    url='http://github.com/xmlrunner/unittest-xml-reporting/tree/master/',
+    classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
@@ -54,8 +55,8 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Testing'
     ],
-    packages = ['xmlrunner', 'xmlrunner.extra'],
-    zip_safe = False,
-    include_package_data = True,
-    test_suite = 'tests'
+    packages=['xmlrunner', 'xmlrunner.extra'],
+    zip_safe=False,
+    include_package_data=True,
+    test_suite='tests'
 )

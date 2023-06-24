@@ -6,6 +6,8 @@ import time
 from .unittest import TextTestRunner, TestProgram
 from .result import _XMLTestResult
 
+#---------------------------------------------------
+from xmlrunner.allure_report.hook import AllureHook
 # see issue #74, the encoding name needs to be one of
 # http://www.iana.org/assignments/character-sets/character-sets.xhtml
 UTF8 = 'UTF-8'
@@ -21,6 +23,7 @@ class XMLTestRunner(TextTestRunner):
                  resultclass=None,
                  **kwargs):
         super(XMLTestRunner, self).__init__(**kwargs)
+        self.allure_hook = AllureHook()
         self.output = output
         self.encoding = encoding
         # None means default timestamped suffix
@@ -61,6 +64,10 @@ class XMLTestRunner(TextTestRunner):
             self.stream.writeln()
             self.stream.writeln('Running tests...')
             self.stream.writeln(result.separator2)
+
+            # Running allure report
+            test_runner = test._tests[-1]._tests[0]
+            self.allure_hook.register_allure_plugins(test_runner)
 
             # Execute tests
             start_time = time.monotonic()
@@ -112,6 +119,8 @@ class XMLTestRunner(TextTestRunner):
             self.stream.writeln('Generating XML reports...')
             result.generate_reports(self)
         finally:
+            # Unregister allure hook to generate allure report result
+            self.allure_hook.unregister_allure_plugins()
             pass
 
         return result
