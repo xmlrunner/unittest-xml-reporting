@@ -116,7 +116,8 @@ class XMLTestRunner(TextTestRunner):
 
             # Generate reports
             self.stream.writeln()
-            self.stream.writeln('Generating XML reports...')
+            self.stream.writeln('Generating XML and allure reports...')
+
             result.generate_reports(self)
         finally:
             # Unregister allure hook to generate allure report result
