@@ -11,7 +11,7 @@ from allure_commons.utils import now
 from allure_commons.utils import platform_label
 
 # -------------------------------------------------
-from xmlrunner.allure_report.utils import get_suit_name, fullname, name, labels, params
+from xmlrunner.allure_report.utils import get_suit_name, fullname, name, labels, params,get_domain_name
 
 
 class AllureListener:
@@ -37,7 +37,7 @@ class AllureListener:
         test_case.labels.append(Label(name=LabelType.FRAMEWORK, value='unittest'))
         test_case.labels.append(Label(name=LabelType.LANGUAGE, value='python'))
         test_case.labels.append(Label(name=LabelType.LANGUAGE, value=platform_label()))
-        test_case.labels.append(Label(name=LabelType.PARENT_SUITE, value=test.DOMAIN))
+        test_case.labels.append(Label(name=LabelType.PARENT_SUITE, value=get_domain_name(test)))
         test_case.labels.append(Label(name=LabelType.SUB_SUITE, value=get_suit_name(test)))
         test_case.parameters = params(test)
         self.reporter.schedule_test(self.current_test_uuid, test_case)
