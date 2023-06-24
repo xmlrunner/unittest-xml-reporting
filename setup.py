@@ -55,7 +55,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Testing'
     ],
-    packages=['xmlrunner', 'xmlrunner.extra' ,'xmlrunner.allure-report'],
+    packages=['xmlrunner', 'xmlrunner.extra' ,'xmlrunner.allure_report'],
     zip_safe=False,
     include_package_data=True,
     test_suite='tests'
