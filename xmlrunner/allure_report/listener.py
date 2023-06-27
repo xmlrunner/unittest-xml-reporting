@@ -11,7 +11,7 @@ from allure_commons.utils import now
 from allure_commons.utils import platform_label
 
 # -------------------------------------------------
-from xmlrunner.allure_report.utils import get_suit_name, fullname, name, labels, params,get_domain_name
+from xmlrunner.allure_report.utils import get_file_name, fullname, name, labels, params,get_domain_name
 
 
 class AllureListener:
@@ -38,19 +38,19 @@ class AllureListener:
         test_case.labels.append(Label(name=LabelType.LANGUAGE, value='python'))
         test_case.labels.append(Label(name=LabelType.LANGUAGE, value=platform_label()))
         test_case.labels.append(Label(name=LabelType.PARENT_SUITE, value=get_domain_name(test)))
-        test_case.labels.append(Label(name=LabelType.SUB_SUITE, value=get_suit_name(test)))
+        test_case.labels.append(Label(name=LabelType.SUB_SUITE, value=get_file_name(test)))
         test_case.parameters = params(test)
         self.reporter.schedule_test(self.current_test_uuid, test_case)
 
     def stop_test(self, test):
         test_case = self.reporter.get_test(None)
         test_case.attachments.append(
-            Attachment(name=f"{get_suit_name(test)}.log", source=f"{get_suit_name(test)}.log", type="text/plain"))
+            Attachment(name=f"{get_file_name(test)}.log", source=f"{get_file_name(test)}.log", type="text/plain"))
         test_case.stop = now()
         self.reporter.close_test(self.current_test_uuid)
 
     def add_failure(self, test, err, info_traceback, message="The test is failed"):
-        screenshot_name = get_suit_name(test) + '_' + name(test)
+        screenshot_name = get_file_name(test) + '_' + name(test)
         test_case = self.reporter.get_test(None)
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
         test_case.attachments.append(
@@ -61,7 +61,7 @@ class AllureListener:
     def add_error(self, test, err, info_traceback, message="The test is error"):
         test_case = self.reporter.get_test(None)
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
-        screenshot_name = get_suit_name(test) + '_' + name(test)
+        screenshot_name = get_file_name(test) + '_' + name(test)
         test_case.attachments.append(
             Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
         test_case.status = Status.BROKEN
