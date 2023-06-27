@@ -42,9 +42,9 @@ def copy_log_file(test):
     test_name = get_file_name(test)
     org_file = posixpath.join("logs", test_name + ".log")
     if os.path.isfile(org_file):
-        des_file = posixpath.join("test-reports", "allure-results", get_domain_name(test), test_name, test_name + ".log")
+        des_file = posixpath.join("test-reports", "allure-results", get_domain_name(test), test_name,
+                                  test_name + ".log")
         shutil.copy2(org_file, des_file)
-
 
 
 def update_attrs(test, name, values):
