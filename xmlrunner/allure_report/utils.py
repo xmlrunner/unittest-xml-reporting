@@ -1,7 +1,9 @@
 import inspect
+import shutil
 from allure_commons.model2 import Label
 from allure_commons.model2 import Parameter
 from allure_commons.utils import represent
+import posixpath
 import os
 
 
@@ -34,6 +36,13 @@ def get_domain_name(test):
     if test.DOMAIN is None:
         return "Default"
     return str(test.DOMAIN)
+
+
+def copy_log_file(test):
+    test_name = get_file_name(test)
+    org_file = posixpath.join("logs", test_name + ".log")
+    des_file = posixpath.join("test-reports", "allure-results", get_domain_name(test), test_name, test_name + ".log")
+    shutil.copy2(org_file, des_file)
 
 
 def update_attrs(test, name, values):
