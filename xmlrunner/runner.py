@@ -66,8 +66,7 @@ class XMLTestRunner(TextTestRunner):
             self.stream.writeln(result.separator2)
 
             # Running allure report
-            test_runner = test._tests[-1]._tests[0]
-            self.allure_hook.register_allure_plugins(test_runner)
+            self.allure_hook.register_allure_plugins(test)
 
             # Execute tests
             start_time = time.monotonic()

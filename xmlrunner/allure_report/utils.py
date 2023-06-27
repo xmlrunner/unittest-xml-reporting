@@ -2,6 +2,7 @@ import inspect
 from allure_commons.model2 import Label
 from allure_commons.model2 import Parameter
 from allure_commons.utils import represent
+import os
 
 
 def name(test):
@@ -24,9 +25,9 @@ def fullname(test):
     return f"{suit_name}.{test_name}"
 
 
-def get_suit_name(test):
-    suit_name = test.id().split(".")[1]
-    return suit_name
+def get_file_name(test):
+    file_name = os.path.basename(inspect.getfile(type(test))).split(".")[0]
+    return file_name
 
 
 def get_domain_name(test):
@@ -53,6 +54,7 @@ def labels(test):
         'story',
         'severity'
     ]
+
     def _get_attrs(obj, keys):
         key_pairs = set()
         for key in keys:
