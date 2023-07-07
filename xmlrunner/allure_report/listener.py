@@ -1,7 +1,6 @@
 import allure_commons
 from allure_commons.utils import host_tag, thread_tag
 from allure_commons.utils import md5
-# Going to use for Allure class
 from allure_commons.reporter import AllureReporter
 from allure_commons.types import LabelType, LinkType
 from allure_commons.model2 import TestResult
@@ -9,9 +8,7 @@ from allure_commons.model2 import Parameter, Label, Link, StatusDetails, Status,
 from allure_commons.utils import uuid4
 from allure_commons.utils import now
 from allure_commons.utils import platform_label
-
-# -------------------------------------------------
-from xmlrunner.allure_report.utils import get_file_name, fullname, name, labels, params,get_domain_name
+from xmlrunner.allure_report.utils import get_file_name, fullname, name, labels, params,get_domain_name,copy_log_file
 
 
 class AllureListener:
@@ -47,6 +44,7 @@ class AllureListener:
         test_case.attachments.append(
             Attachment(name=f"{get_file_name(test)}.log", source=f"{get_file_name(test)}.log", type="text/plain"))
         test_case.stop = now()
+        copy_log_file(test)
         self.reporter.close_test(self.current_test_uuid)
 
     def add_failure(self, test, err, info_traceback, message="The test is failed"):
