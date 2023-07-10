@@ -8,7 +8,7 @@ from allure_commons.model2 import Parameter, Label, Link, StatusDetails, Status,
 from allure_commons.utils import uuid4
 from allure_commons.utils import now
 from allure_commons.utils import platform_label
-from xmlrunner.allure_report.utils import get_file_name, fullname, name, labels, params,get_domain_name,copy_log_file
+from xmlrunner.allure_report.utils import get_file_name, fullname, name, labels, params, get_domain_name, copy_log_file
 
 
 class AllureListener:
@@ -19,15 +19,51 @@ class AllureListener:
         self._thread = thread_tag()
         self.reporter = AllureReporter()
         self.current_test_uuid = None
+        self.isAPITest = False
 
     def start_test(self, test):
+        test_case = self.reporter.get_test(None)
+        if test_case is None:
+            test_case = self.create_test_case(test)
+        self.reporter.schedule_test(self.current_test_uuid, test_case)
+
+    def stop_test(self, test):
+        test_case = self.reporter.get_test(None)
+        if copy_log_file(test):
+            test_case.attachments.append(
+                Attachment(name=f"{get_file_name(test)}.log", source=f"{get_file_name(test)}.log", type="text/plain"))
+        test_case.stop = now()
+        self.reporter.close_test(self.current_test_uuid)
+
+    def add_failure(self, test, err, info_traceback, message="The test is failed"):
+        if self.current_test_uuid is None:
+            self.create_test_case(test)
+        test_case = self.reporter.get_test(None)
+        test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
+        screenshot_name = get_file_name(test) + '_' + name(test)
+        test_case.attachments.append(
+            Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
+        test_case.status = Status.FAILED
+        self.reporter.schedule_test(self.current_test_uuid, test_case)
+
+    def add_error(self, test, err, info_traceback, message="The test is error"):
+        if self.current_test_uuid is None:
+            self.create_test_case(test)
+        test_case = self.reporter.get_test(None)
+        screenshot_name = get_file_name(test) + '_' + name(test)
+        test_case.attachments.append(
+            Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
+        test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
+        test_case.status = Status.BROKEN
+        self.reporter.schedule_test(self.current_test_uuid, test_case)
+
+    def create_test_case(self, test):
         self.current_test_uuid = uuid4()
         test_case = TestResult(uuid=self.current_test_uuid, start=now())
         test_case.name = name(test)
         test_case.fullName = fullname(test)
         test_case.testCaseId = md5(test_case.fullName)
         test_case.historyId = md5(test.id())
-        test_case.status = Status.PASSED
         test_case.labels.extend(labels(test))
         test_case.labels.append(Label(name=LabelType.HOST, value=self._host))
         test_case.labels.append(Label(name=LabelType.THREAD, value=self._thread))
@@ -37,33 +73,8 @@ class AllureListener:
         test_case.labels.append(Label(name=LabelType.PARENT_SUITE, value=get_domain_name(test)))
         test_case.labels.append(Label(name=LabelType.SUB_SUITE, value=get_file_name(test)))
         test_case.parameters = params(test)
-        self.reporter.schedule_test(self.current_test_uuid, test_case)
+        return test_case
 
-    def stop_test(self, test):
-        test_case = self.reporter.get_test(None)
-        test_case.attachments.append(
-            Attachment(name=f"{get_file_name(test)}.log", source=f"{get_file_name(test)}.log", type="text/plain"))
-        test_case.stop = now()
-        copy_log_file(test)
-        self.reporter.close_test(self.current_test_uuid)
-
-    def add_failure(self, test, err, info_traceback, message="The test is failed"):
-        screenshot_name = get_file_name(test) + '_' + name(test)
-        test_case = self.reporter.get_test(None)
-        test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
-        test_case.attachments.append(
-            Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
-        test_case.status = Status.FAILED
-        self.reporter.schedule_test(self.current_test_uuid, test_case)
-
-    def add_error(self, test, err, info_traceback, message="The test is error"):
-        test_case = self.reporter.get_test(None)
-        test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
-        screenshot_name = get_file_name(test) + '_' + name(test)
-        test_case.attachments.append(
-            Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
-        test_case.status = Status.BROKEN
-        self.reporter.schedule_test(self.current_test_uuid, test_case)
 
     # Allure Hooks Spec
     @allure_commons.hookimpl
