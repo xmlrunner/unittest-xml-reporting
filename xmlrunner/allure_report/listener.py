@@ -48,7 +48,6 @@ class AllureListener:
 
     def add_failure(self, test, err, info_traceback, message="The test is failed"):
         test_case = self.reporter.get_test(None)
-        test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
         screenshot_name = get_file_name(test) + '_' + name(test)
         test_case.attachments.append(
             Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
@@ -57,8 +56,8 @@ class AllureListener:
         self.reporter.schedule_test(self.current_test_uuid, test_case)
 
     def add_error(self, test, err, info_traceback, message="The test is error"):
-        screenshot_name = get_file_name(test) + '_' + name(test)
         test_case = self.reporter.get_test(None)
+        screenshot_name = get_file_name(test) + '_' + name(test)
         test_case.attachments.append(
             Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
