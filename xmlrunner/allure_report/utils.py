@@ -1,4 +1,6 @@
 import inspect
+import shutil
+import posixpath
 from allure_commons.model2 import Label
 from allure_commons.model2 import Parameter
 from allure_commons.utils import represent
@@ -34,6 +36,24 @@ def get_domain_name(test):
     if test.DOMAIN is None:
         return "Default"
     return str(test.DOMAIN)
+
+
+def copy_log_file(test):
+    """ Copy the log file from logs folder to specific test suite.
+
+    :param test: The current test from TestCase Class
+    :return:     True (if the file is existed in the logs folder) False (if the file doesn't exist)
+
+    """
+    test_name = get_file_name(test)
+    org_file = posixpath.join("logs", test_name + ".log")
+    if os.path.isfile(org_file):
+        des_file = posixpath.join("test-reports", "allure-results", get_domain_name(test), test_name,
+                                  test_name + ".log")
+        shutil.copy2(org_file, des_file)
+        return True
+    else:
+        return False
 
 
 def update_attrs(test, name, values):
