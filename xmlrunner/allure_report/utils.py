@@ -39,6 +39,12 @@ def get_domain_name(test):
 
 
 def copy_log_file(test):
+    """ Copy the log file from logs folder to specific test suite.
+
+    :param test: The current test from TestCase Class
+    :return:     True (if the file is existed in the logs folder) False (if the file doesn't exist)
+
+    """
     test_name = get_file_name(test)
     org_file = posixpath.join("logs", test_name + ".log")
     if os.path.isfile(org_file):

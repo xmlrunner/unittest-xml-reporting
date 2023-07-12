@@ -40,6 +40,7 @@ class AllureListener:
 
     def stop_test(self, test):
         test_case = self.reporter.get_test(None)
+        # Check if the file is copied successfully.
         if copy_log_file(test):
             test_case.attachments.append(
                 Attachment(name=f"{get_file_name(test)}.log", source=f"{get_file_name(test)}.log", type="text/plain"))
@@ -93,7 +94,6 @@ class AllureListener:
         self.reporter.attach_file(self.current_test_uuid, source, name=name, attachment_type=attachment_type,
                                   extension=extension)
 
-    #
     @allure_commons.hookimpl
     def add_link(self, url, link_type, name):
         test_case = self.reporter.get_test(None)
