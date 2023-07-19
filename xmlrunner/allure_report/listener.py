@@ -13,31 +13,16 @@ from xmlrunner.allure_report.utils import get_file_name, fullname, name, labels,
 
 class AllureListener:
 
-    def __init__(self):
+    def __init__(self,domain=None):
         # need to add config here
         self._host = host_tag()
         self._thread = thread_tag()
         self.reporter = AllureReporter()
+        self.test_domain = domain
         self.current_test_uuid = None
 
     def start_test(self, test):
-        self.current_test_uuid = uuid4()
-        test_case = TestResult(uuid=self.current_test_uuid, start=now())
-        test_case.name = name(test)
-        test_case.fullName = fullname(test)
-        test_case.testCaseId = md5(test_case.fullName)
-        test_case.historyId = md5(test.id())
-        test_case.labels.extend(labels(test))
-        test_case.labels.append(Label(name=LabelType.HOST, value=self._host))
-        test_case.labels.append(Label(name=LabelType.THREAD, value=self._thread))
-        test_case.labels.append(Label(name=LabelType.FRAMEWORK, value='unittest'))
-        test_case.labels.append(Label(name=LabelType.LANGUAGE, value='python'))
-        test_case.labels.append(Label(name=LabelType.LANGUAGE, value=platform_label()))
-        test_case.labels.append(Label(name=LabelType.PARENT_SUITE, value=get_domain_name(test)))
-        test_case.labels.append(Label(name=LabelType.SUB_SUITE, value=get_file_name(test)))
-        test_case.status = Status.PASSED
-        test_case.parameters = params(test)
-        self.reporter.schedule_test(self.current_test_uuid, test_case)
+        self.create_test_case(test)
 
     def stop_test(self, test):
         test_case = self.reporter.get_test(None)
@@ -58,12 +43,34 @@ class AllureListener:
         self.reporter.schedule_test(self.current_test_uuid, test_case)
 
     def add_error(self, test, err, info_traceback, message="The test is error"):
+
+        if self.current_test_uuid == None:
+            self.create_test_case(test)
         test_case = self.reporter.get_test(None)
         screenshot_name = get_file_name(test) + '_' + name(test)
         test_case.attachments.append(
             Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
         test_case.status = Status.BROKEN
+        self.reporter.schedule_test(self.current_test_uuid, test_case)
+
+    def create_test_case(self, test):
+        self.current_test_uuid = uuid4()
+        test_case = TestResult(uuid=self.current_test_uuid, start=now())
+        test_case.name = name(test)
+        test_case.fullName = fullname(test)
+        test_case.testCaseId = md5(test_case.fullName)
+        test_case.historyId = md5(test.id())
+        test_case.labels.extend(labels(test))
+        test_case.labels.append(Label(name=LabelType.HOST, value=self._host))
+        test_case.labels.append(Label(name=LabelType.THREAD, value=self._thread))
+        test_case.labels.append(Label(name=LabelType.FRAMEWORK, value='unittest'))
+        test_case.labels.append(Label(name=LabelType.LANGUAGE, value='python'))
+        test_case.labels.append(Label(name=LabelType.LANGUAGE, value=platform_label()))
+        test_case.labels.append(Label(name=LabelType.PARENT_SUITE, value=get_domain_name(test)))
+        test_case.labels.append(Label(name=LabelType.SUB_SUITE, value=get_file_name(test)))
+        test_case.status = Status.PASSED
+        test_case.parameters = params(test)
         self.reporter.schedule_test(self.current_test_uuid, test_case)
 
     # Allure Hooks Spec

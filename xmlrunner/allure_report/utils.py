@@ -1,6 +1,7 @@
 import inspect
 import shutil
 import posixpath
+import re
 from allure_commons.model2 import Label
 from allure_commons.model2 import Parameter
 from allure_commons.utils import represent
@@ -22,8 +23,16 @@ def fullname(test):
         suit_name = test._testFunc.__module__
         test_name = test._testFunc.__name__
         return f"{suit_name}.{test_name}"
-    test_id = test.id()
-    suit_name, test_name = test_id.split(".")[1:]
+    test_info = test.id()
+    suit_name = test_name = ""
+    # check if this is a setup class
+    if test_info.startswith("setUpClass"):
+        test_splits = test_info.split(" ")
+        test_name = test_splits[0]
+        suit_name = test_splits[1].strip('()').split('.')[1]
+        print(suit_name)
+    else:
+        suit_name, test_name = test_info.split(".")[1:]
     return f"{suit_name}.{test_name}"
 
 
@@ -36,6 +45,7 @@ def get_domain_name(test):
     if test.DOMAIN is None:
         return "Default"
     return str(test.DOMAIN)
+
 
 
 def copy_log_file(test):

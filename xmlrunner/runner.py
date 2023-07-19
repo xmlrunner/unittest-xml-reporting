@@ -1,4 +1,3 @@
-
 import argparse
 import sys
 import time
@@ -6,8 +5,9 @@ import time
 from .unittest import TextTestRunner, TestProgram
 from .result import _XMLTestResult
 
-#---------------------------------------------------
+# ---------------------------------------------------
 from xmlrunner.allure_report.hook import AllureHook
+
 # see issue #74, the encoding name needs to be one of
 # http://www.iana.org/assignments/character-sets/character-sets.xhtml
 UTF8 = 'UTF-8'
@@ -37,14 +37,14 @@ class XMLTestRunner(TextTestRunner):
         else:
             self.resultclass = resultclass
 
-    def _make_result(self):
+    def _make_result(self, domain="Default"):
         """
         Creates a TestResult object which will be used to store
         information about the executed tests.
         """
         # override in subclasses if necessary.
         return self.resultclass(
-            self.stream, self.descriptions, self.verbosity, self.elapsed_times
+            domain, self.stream, self.descriptions, self.verbosity, self.elapsed_times
         )
 
     def run(self, test):
@@ -53,7 +53,8 @@ class XMLTestRunner(TextTestRunner):
         """
         try:
             # Prepare the test execution
-            result = self._make_result()
+            test_runner = test._tests[-1]._tests[0]
+            result = self._make_result(test_runner.DOMAIN)
             result.failfast = self.failfast
             result.buffer = self.buffer
             if hasattr(test, 'properties'):
@@ -80,7 +81,7 @@ class XMLTestRunner(TextTestRunner):
             run = result.testsRun
             self.stream.writeln("Ran %d test%s in %.3fs" % (
                 run, run != 1 and "s" or "", time_taken)
-            )
+                                )
             self.stream.writeln()
 
             # other metrics
