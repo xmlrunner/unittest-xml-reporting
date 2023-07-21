@@ -70,8 +70,8 @@ class AllureListener:
         test_case.labels.append(Label(name=LabelType.FRAMEWORK, value='unittest'))
         test_case.labels.append(Label(name=LabelType.LANGUAGE, value='python'))
         test_case.labels.append(Label(name=LabelType.LANGUAGE, value=platform_label()))
-        test_case.labels.append(Label(name=LabelType.PARENT_SUITE, value=self.file_name))
-        test_case.labels.append(Label(name=LabelType.SUB_SUITE, value=self.test_domain))
+        test_case.labels.append(Label(name=LabelType.PARENT_SUITE, value=self.test_domain))
+        test_case.labels.append(Label(name=LabelType.SUB_SUITE, value=self.file_name))
         test_case.status = Status.PASSED
         test_case.parameters = params(test)
         self.reporter.schedule_test(self.current_test_uuid, test_case)
