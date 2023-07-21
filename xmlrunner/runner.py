@@ -39,16 +39,11 @@ class XMLTestRunner(TextTestRunner):
         else:
             self.resultclass = resultclass
 
-    def _make_result(self, **kwargs):
+    def _make_result(self):
         """
         Creates a TestResult object which will be used to store
         information about the executed tests.
         """
-        if kwargs.get("domain", None) and kwargs.get("file_name", None):
-            return self.resultclass(
-                kwargs["file_name"], kwargs["domain"], self.stream, self.descriptions, self.verbosity,
-                self.elapsed_times
-            )
         # override in subclasses if necessary.
         return self.resultclass(
             self.stream, self.descriptions, self.verbosity, self.elapsed_times
@@ -65,7 +60,9 @@ class XMLTestRunner(TextTestRunner):
             domain = test_runner.DOMAIN
             if domain is None:
                 domain = "Default"
-            result = self._make_result(file_name=file_name, domain=domain)
+            result = self._make_result()
+            result.allure_listener.file_name = file_name
+            result.allure_listener.test_domain = domain
             result.failfast = self.failfast
             result.buffer = self.buffer
             if hasattr(test, 'properties'):

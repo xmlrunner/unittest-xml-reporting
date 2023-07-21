@@ -195,7 +195,7 @@ class _XMLTestResult(TextTestResult):
     Used by XMLTestRunner.
     """
 
-    def __init__(self, file_name=None, domain=None, stream=sys.stderr, descriptions=1, verbosity=1,
+    def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1,
                  elapsed_times=True, properties=None, infoclass=None):
         TextTestResult.__init__(self, stream, descriptions, verbosity)
         self._stdout_data = None
@@ -211,7 +211,7 @@ class _XMLTestResult(TextTestResult):
         self.filename = None
         self.lineno = None
         self.doc = None
-        self.allure_listener = AllureListener(domain, file_name)
+        self.allure_listener = AllureListener()
         if infoclass is None:
             self.infoclass = _TestInfo
         else:
