@@ -8,17 +8,18 @@ from allure_commons.model2 import Parameter, Label, Link, StatusDetails, Status,
 from allure_commons.utils import uuid4
 from allure_commons.utils import now
 from allure_commons.utils import platform_label
-from xmlrunner.allure_report.utils import get_file_name, fullname, name, labels, params, get_domain_name, copy_log_file
+from xmlrunner.allure_report.utils import get_file_name, get_test_name, labels, params, copy_log_file
 
 
 class AllureListener:
 
-    def __init__(self,domain=None):
+    def __init__(self, domain="Default", file_name=None):
         # need to add config here
         self._host = host_tag()
         self._thread = thread_tag()
         self.reporter = AllureReporter()
         self.test_domain = domain
+        self.file_name = file_name
         self.current_test_uuid = None
 
     def start_test(self, test):
@@ -35,7 +36,7 @@ class AllureListener:
 
     def add_failure(self, test, err, info_traceback, message="The test is failed"):
         test_case = self.reporter.get_test(None)
-        screenshot_name = get_file_name(test) + '_' + name(test)
+        screenshot_name = get_file_name(test) + '_' + get_test_name(test)
         test_case.attachments.append(
             Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
@@ -43,22 +44,25 @@ class AllureListener:
         self.reporter.schedule_test(self.current_test_uuid, test_case)
 
     def add_error(self, test, err, info_traceback, message="The test is error"):
-
-        if self.current_test_uuid == None:
+        if self.reporter.get_test(self.current_test_uuid) == None:
             self.create_test_case(test)
-        test_case = self.reporter.get_test(None)
-        screenshot_name = get_file_name(test) + '_' + name(test)
+        test_case = self.reporter.get_test(self.current_test_uuid)
+        screenshot_name = get_file_name(test) + '_' + get_test_name(test)
         test_case.attachments.append(
             Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
         test_case.status = Status.BROKEN
-        self.reporter.schedule_test(self.current_test_uuid, test_case)
+        if get_test_name(test) == "setupClass":
+            test_case.stop = now()
+            self.reporter.close_test(self.current_test_uuid)
+        else:
+            self.reporter.schedule_test(self.current_test_uuid, test_case)
 
     def create_test_case(self, test):
         self.current_test_uuid = uuid4()
         test_case = TestResult(uuid=self.current_test_uuid, start=now())
-        test_case.name = name(test)
-        test_case.fullName = fullname(test)
+        test_case.name = get_test_name(test)
+        test_case.fullName = f"{self.file_name}.{get_test_name(test)}"
         test_case.testCaseId = md5(test_case.fullName)
         test_case.historyId = md5(test.id())
         test_case.labels.extend(labels(test))
@@ -67,8 +71,8 @@ class AllureListener:
         test_case.labels.append(Label(name=LabelType.FRAMEWORK, value='unittest'))
         test_case.labels.append(Label(name=LabelType.LANGUAGE, value='python'))
         test_case.labels.append(Label(name=LabelType.LANGUAGE, value=platform_label()))
-        test_case.labels.append(Label(name=LabelType.PARENT_SUITE, value=get_domain_name(test)))
-        test_case.labels.append(Label(name=LabelType.SUB_SUITE, value=get_file_name(test)))
+        test_case.labels.append(Label(name=LabelType.PARENT_SUITE, value=self.test_domain))
+        test_case.labels.append(Label(name=LabelType.SUB_SUITE, value=self.file_name))
         test_case.status = Status.PASSED
         test_case.parameters = params(test)
         self.reporter.schedule_test(self.current_test_uuid, test_case)

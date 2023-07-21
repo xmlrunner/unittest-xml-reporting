@@ -1,6 +1,8 @@
 import argparse
 import sys
+import os
 import time
+import inspect
 
 from .unittest import TextTestRunner, TestProgram
 from .result import _XMLTestResult
@@ -37,14 +39,19 @@ class XMLTestRunner(TextTestRunner):
         else:
             self.resultclass = resultclass
 
-    def _make_result(self, domain="Default"):
+    def _make_result(self, **kwargs):
         """
         Creates a TestResult object which will be used to store
         information about the executed tests.
         """
+        if kwargs.get("domain", None) and kwargs.get("file_name", None):
+            return self.resultclass(
+                kwargs["file_name"], kwargs["domain"], self.stream, self.descriptions, self.verbosity,
+                self.elapsed_times
+            )
         # override in subclasses if necessary.
         return self.resultclass(
-            domain, self.stream, self.descriptions, self.verbosity, self.elapsed_times
+            self.stream, self.descriptions, self.verbosity, self.elapsed_times
         )
 
     def run(self, test):
@@ -54,7 +61,9 @@ class XMLTestRunner(TextTestRunner):
         try:
             # Prepare the test execution
             test_runner = test._tests[-1]._tests[0]
-            result = self._make_result(test_runner.DOMAIN)
+            file_name = os.path.basename(inspect.getfile(type(test_runner))).split(".")[0]
+            domain = test_runner.DOMAIN
+            result = self._make_result(domain=domain, file_name=file_name)
             result.failfast = self.failfast
             result.buffer = self.buffer
             if hasattr(test, 'properties'):
@@ -67,7 +76,7 @@ class XMLTestRunner(TextTestRunner):
             self.stream.writeln(result.separator2)
 
             # Running allure report
-            self.allure_hook.register_allure_plugins(test)
+            self.allure_hook.register_allure_plugins(test, file_name, domain)
 
             # Execute tests
             start_time = time.monotonic()

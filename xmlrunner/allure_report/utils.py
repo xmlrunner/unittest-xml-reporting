@@ -8,44 +8,47 @@ from allure_commons.utils import represent
 import os
 
 
-def name(test):
-    full_name = fullname(test)
-    test_params = params(test)
-    allure_name = full_name.split(".")[-1]
-    if test_params:
-        params_str = "-".join([p.value for p in test_params])
-        return f"{allure_name}[{params_str}]"
-    return allure_name
+def get_test_name(test):
+    """ Get the test name from the test case object.
 
+    :param test: The current test from TestCase Class
+    :return:     The test_name for the current test case.
 
-def fullname(test):
+    """
+    test_name = ""
     if hasattr(test, "_testFunc"):
-        suit_name = test._testFunc.__module__
         test_name = test._testFunc.__name__
-        return f"{suit_name}.{test_name}"
+        return test_name
     test_info = test.id()
-    suit_name = test_name = ""
     # check if this is a setup class
     if test_info.startswith("setUpClass"):
-        test_splits = test_info.split(" ")
-        test_name = test_splits[0]
-        suit_name = test_splits[1].strip('()').split('.')[1]
-        print(suit_name)
+        test_name = test_info.split(" ")[0]
     else:
         suit_name, test_name = test_info.split(".")[1:]
-    return f"{suit_name}.{test_name}"
+    return test_name
 
 
 def get_file_name(test):
+    """ Get the test name from the test case object.
+
+    :param test: The current test from TestCase Class
+    :return:     The current file name of the test.
+
+    """
     file_name = os.path.basename(inspect.getfile(type(test))).split(".")[0]
     return file_name
 
 
 def get_domain_name(test):
+    """ Get the test name from the test case object.
+
+    :param test: The current test from TestCase Class
+    :return:     The domain for the current test case.
+
+    """
     if test.DOMAIN is None:
         return "Default"
     return str(test.DOMAIN)
-
 
 
 def copy_log_file(test):
