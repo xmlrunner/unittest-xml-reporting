@@ -63,7 +63,9 @@ class XMLTestRunner(TextTestRunner):
             test_runner = test._tests[-1]._tests[0]
             file_name = os.path.basename(inspect.getfile(type(test_runner))).split(".")[0]
             domain = test_runner.DOMAIN
-            result = self._make_result(domain=domain, file_name=file_name)
+            if domain is None:
+                domain = "Default"
+            result = self._make_result(file_name=file_name, domain=domain)
             result.failfast = self.failfast
             result.buffer = self.buffer
             if hasattr(test, 'properties'):

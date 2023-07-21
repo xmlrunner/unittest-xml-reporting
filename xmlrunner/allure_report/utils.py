@@ -51,17 +51,16 @@ def get_domain_name(test):
     return str(test.DOMAIN)
 
 
-def copy_log_file(test):
+def copy_log_file(test_name, domain_name):
     """ Copy the log file from logs folder to specific test suite.
 
-    :param test: The current test from TestCase Class
+    :param test_name: The current test name from TestCase Class
     :return:     True (if the file is existed in the logs folder) False (if the file doesn't exist)
 
     """
-    test_name = get_file_name(test)
     org_file = posixpath.join("logs", test_name + ".log")
     if os.path.isfile(org_file):
-        des_file = posixpath.join("test-reports", "allure-results", get_domain_name(test), test_name,
+        des_file = posixpath.join("test-reports", "allure-results", domain_name, test_name,
                                   test_name + ".log")
         shutil.copy2(org_file, des_file)
         return True

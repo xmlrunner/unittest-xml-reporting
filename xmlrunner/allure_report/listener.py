@@ -13,7 +13,7 @@ from xmlrunner.allure_report.utils import get_file_name, get_test_name, labels, 
 
 class AllureListener:
 
-    def __init__(self, domain="Default", file_name=None):
+    def __init__(self, domain=None, file_name=None):
         # need to add config here
         self._host = host_tag()
         self._thread = thread_tag()
@@ -28,15 +28,15 @@ class AllureListener:
     def stop_test(self, test):
         test_case = self.reporter.get_test(None)
         # Check if the file is copied successfully.
-        if copy_log_file(test):
+        if copy_log_file(self.file_name, self.test_domain):
             test_case.attachments.append(
-                Attachment(name=f"{get_file_name(test)}.log", source=f"{get_file_name(test)}.log", type="text/plain"))
+                Attachment(name=f"{self.file_name}.log", source=f"{self.file_name}.log", type="text/plain"))
         test_case.stop = now()
         self.reporter.close_test(self.current_test_uuid)
 
     def add_failure(self, test, err, info_traceback, message="The test is failed"):
         test_case = self.reporter.get_test(None)
-        screenshot_name = get_file_name(test) + '_' + get_test_name(test)
+        screenshot_name = self.file_name + '_' + get_test_name(test)
         test_case.attachments.append(
             Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
@@ -47,14 +47,13 @@ class AllureListener:
         if self.reporter.get_test(self.current_test_uuid) == None:
             self.create_test_case(test)
         test_case = self.reporter.get_test(self.current_test_uuid)
-        screenshot_name = get_file_name(test) + '_' + get_test_name(test)
+        screenshot_name = self.file_name + '_' + get_test_name(test)
         test_case.attachments.append(
             Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
         test_case.status = Status.BROKEN
-        if get_test_name(test) == "setupClass":
-            test_case.stop = now()
-            self.reporter.close_test(self.current_test_uuid)
+        if get_test_name(test) == "setUpClass":
+            self.stop_test(test)
         else:
             self.reporter.schedule_test(self.current_test_uuid, test_case)
 
@@ -71,8 +70,8 @@ class AllureListener:
         test_case.labels.append(Label(name=LabelType.FRAMEWORK, value='unittest'))
         test_case.labels.append(Label(name=LabelType.LANGUAGE, value='python'))
         test_case.labels.append(Label(name=LabelType.LANGUAGE, value=platform_label()))
-        test_case.labels.append(Label(name=LabelType.PARENT_SUITE, value=self.test_domain))
-        test_case.labels.append(Label(name=LabelType.SUB_SUITE, value=self.file_name))
+        test_case.labels.append(Label(name=LabelType.PARENT_SUITE, value=self.file_name))
+        test_case.labels.append(Label(name=LabelType.SUB_SUITE, value=self.test_domain))
         test_case.status = Status.PASSED
         test_case.parameters = params(test)
         self.reporter.schedule_test(self.current_test_uuid, test_case)
