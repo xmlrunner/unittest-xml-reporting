@@ -40,7 +40,7 @@ def get_file_name(test):
 
 
 def get_domain_name(test):
-    """ Get the test name from the test case object.
+    """ Get the test domain from the test case object.
 
     :param test: The current test from TestCase Class
     :return:     The domain for the current test case.
