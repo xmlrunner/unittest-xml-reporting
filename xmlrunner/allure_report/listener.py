@@ -8,7 +8,8 @@ from allure_commons.model2 import Parameter, Label, Link, StatusDetails, Status,
 from allure_commons.utils import uuid4
 from allure_commons.utils import now
 from allure_commons.utils import platform_label
-from xmlrunner.allure_report.utils import get_file_name, get_test_name, labels, params, copy_log_file
+from xmlrunner.allure_report.utils import get_file_name, get_test_name, labels, params, copy_log_file, \
+    check_screenshot_exist
 
 
 class AllureListener:
@@ -37,8 +38,9 @@ class AllureListener:
     def add_failure(self, test, err, info_traceback, message="The test is failed"):
         test_case = self.reporter.get_test(None)
         screenshot_name = self.file_name + '_' + get_test_name(test)
-        test_case.attachments.append(
-            Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
+        if check_screenshot_exist(screenshot_name):
+            test_case.attachments.append(
+                Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
         test_case.status = Status.FAILED
         self.reporter.schedule_test(self.current_test_uuid, test_case)
@@ -48,8 +50,9 @@ class AllureListener:
             self.create_test_case(test)
         test_case = self.reporter.get_test(self.current_test_uuid)
         screenshot_name = self.file_name + '_' + get_test_name(test)
-        test_case.attachments.append(
-            Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
+        if check_screenshot_exist(screenshot_name):
+            test_case.attachments.append(
+                Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
         test_case.status = Status.BROKEN
         if get_test_name(test) == "setUpClass":
