@@ -57,7 +57,7 @@ def check_screenshot_exist(screenshot_name):
     :return:     True (if the file is existed in the screenshot folder) False (if the file doesn't exist)
 
     """
-    screenshot_path = posixpath.join("screenshots", screenshot_name, ".png")
+    screenshot_path = posixpath.join("test-reports","screenshots", screenshot_name + ".png")
     if os.path.isfile(screenshot_path):
         return True
     return False
