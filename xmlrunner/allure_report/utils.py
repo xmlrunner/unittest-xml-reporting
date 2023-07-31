@@ -1,54 +1,66 @@
 import inspect
 import shutil
 import posixpath
+import re
 from allure_commons.model2 import Label
 from allure_commons.model2 import Parameter
 from allure_commons.utils import represent
 import os
 
 
-def name(test):
-    full_name = fullname(test)
-    test_params = params(test)
-    allure_name = full_name.split(".")[-1]
-    if test_params:
-        params_str = "-".join([p.value for p in test_params])
-        return f"{allure_name}[{params_str}]"
-    return allure_name
+def get_test_name(test):
+    """ Get the test name from the test case object.
 
+    :param test: The current test from TestCase Class
+    :return:     The test_name for the current test case.
 
-def fullname(test):
+    """
+    test_name = ""
     if hasattr(test, "_testFunc"):
-        suit_name = test._testFunc.__module__
         test_name = test._testFunc.__name__
-        return f"{suit_name}.{test_name}"
-    test_id = test.id()
-    suit_name, test_name = test_id.split(".")[1:]
-    return f"{suit_name}.{test_name}"
+        return test_name
+    test_info = test.id()
+    # check if this is a setup class
+    if test_info.startswith("setUpClass"):
+        test_name = test_info.split(" ")[0]
+    else:
+        suit_name, test_name = test_info.split(".")[1:]
+    return test_name
 
 
 def get_file_name(test):
+    """ Get the test name from the test case object.
+
+    :param test: The current test from TestCase Class
+    :return:     The current file name of the test.
+
+    """
     file_name = os.path.basename(inspect.getfile(type(test))).split(".")[0]
     return file_name
 
 
 def get_domain_name(test):
+    """ Get the test domain from the test case object.
+
+    :param test: The current test from TestCase Class
+    :return:     The domain for the current test case.
+
+    """
     if test.DOMAIN is None:
         return "Default"
     return str(test.DOMAIN)
 
 
-def copy_log_file(test):
+def copy_log_file(test_name, domain_name):
     """ Copy the log file from logs folder to specific test suite.
 
-    :param test: The current test from TestCase Class
+    :param test_name: The current test name from TestCase Class
     :return:     True (if the file is existed in the logs folder) False (if the file doesn't exist)
 
     """
-    test_name = get_file_name(test)
     org_file = posixpath.join("logs", test_name + ".log")
     if os.path.isfile(org_file):
-        des_file = posixpath.join("test-reports", "allure-results", get_domain_name(test), test_name,
+        des_file = posixpath.join("test-reports", "allure-results", domain_name, test_name,
                                   test_name + ".log")
         shutil.copy2(org_file, des_file)
         return True

@@ -211,7 +211,6 @@ class _XMLTestResult(TextTestResult):
         self.filename = None
         self.lineno = None
         self.doc = None
-        # Adding allure listener
         self.allure_listener = AllureListener()
         if infoclass is None:
             self.infoclass = _TestInfo
