@@ -1,7 +1,6 @@
 import inspect
 import shutil
 import posixpath
-import re
 from allure_commons.model2 import Label
 from allure_commons.model2 import Parameter
 from allure_commons.utils import represent
@@ -51,10 +50,24 @@ def get_domain_name(test):
     return str(test.DOMAIN)
 
 
+def check_screenshot_exist(screenshot_name):
+    """ Copy the log file from logs folder to specific test suite.
+
+    :param screenshot_name: screenshot name which matches with the current screenshot file in the screenshot folders.
+    :return:     True (if the file is existed in the screenshot folder) False (if the file doesn't exist)
+
+    """
+    screenshot_path = posixpath.join("test-reports","screenshots", screenshot_name + ".png")
+    if os.path.isfile(screenshot_path):
+        return True
+    return False
+
+
 def copy_log_file(test_name, domain_name):
     """ Copy the log file from logs folder to specific test suite.
 
     :param test_name: The current test name from TestCase Class
+    :param domain_name: The current domain name from TestCase Class
     :return:     True (if the file is existed in the logs folder) False (if the file doesn't exist)
 
     """
