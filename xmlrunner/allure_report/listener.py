@@ -41,7 +41,7 @@ class AllureListener:
     def add_failure(self, test, err, info_traceback, message="The test is failed"):
         test_case = self.reporter.get_test(None)
         screenshot_name = self.file_name + '_' + get_test_name(test)
-        file_dir = posixpath.join(os.getcwd(), "test-reports", "custom_test_reports", screenshot_name)
+        file_dir = posixpath.join(os.getcwd(), "test-reports", "custom_test_reports", self.file_name)
         if check_screenshot_exist(screenshot_name):
             test_case.attachments.append(
                 Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
@@ -58,8 +58,7 @@ class AllureListener:
             self.create_test_case(test)
         test_case = self.reporter.get_test(self.current_test_uuid)
         screenshot_name = self.file_name + '_' + get_test_name(test)
-        file_dir2 = os.getcwd()
-        file_dir = posixpath.join(file_dir2, "test-reports", "custom_test_reports", self.file_name)
+        file_dir = posixpath.join(os.getcwd(), "test-reports", "custom_test_reports", self.file_name)
         if check_screenshot_exist(screenshot_name):
             test_case.attachments.append(
                 Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
