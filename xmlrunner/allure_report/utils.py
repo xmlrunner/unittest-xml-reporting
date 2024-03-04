@@ -57,8 +57,28 @@ def check_screenshot_exist(screenshot_name):
     :return:     True (if the file is existed in the screenshot folder) False (if the file doesn't exist)
 
     """
-    screenshot_path = posixpath.join("test-reports","screenshots", screenshot_name + ".png")
+    screenshot_path = posixpath.join("test-reports", "screenshots", screenshot_name + ".png")
     if os.path.isfile(screenshot_path):
+        return True
+    return False
+
+def check_screenshot_exist(screenshot_name):
+    """ Copy the log file from logs folder to specific test suite.
+
+    :param screenshot_name: screenshot name which matches with the current screenshot file in the screenshot folders.
+    :return:     True (if the file is existed in the screenshot folder) False (if the file doesn't exist)
+
+    """
+    screenshot_path = posixpath.join("test-reports", "screenshots", screenshot_name + ".png")
+    if os.path.isfile(screenshot_path):
+        return True
+    return False
+def check_xml_exists(xml_path):
+    """
+
+    """
+    xml_path = posixpath.join("test-reports", "screenshots", xml_path + ".png")
+    if os.path.isfile(xml_path):
         return True
     return False
 
