@@ -1,5 +1,6 @@
 import os
 import posixpath
+import shutil
 
 import allure_commons
 from allure_commons.utils import host_tag, thread_tag
@@ -41,15 +42,12 @@ class AllureListener:
     def add_failure(self, test, err, info_traceback, message="The test is failed"):
         test_case = self.reporter.get_test(None)
         screenshot_name = self.file_name + '_' + get_test_name(test)
-        file_dir = posixpath.join(os.getcwd(), "test-reports", "custom_test_reports", self.file_name)
         if check_screenshot_exist(screenshot_name):
             test_case.attachments.append(
                 Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
             test_case.attachments.append(
                 Attachment(name=f"{screenshot_name}.xml", source=f"{screenshot_name}.xml", type="text/plain"))
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
-        test_case.attachments.append(
-            Attachment(f"{screenshot_name}.html", source=f"{file_dir}.html", type="text/plain"))
         test_case.status = Status.FAILED
         self.reporter.schedule_test(self.current_test_uuid, test_case)
 
@@ -58,14 +56,11 @@ class AllureListener:
             self.create_test_case(test)
         test_case = self.reporter.get_test(self.current_test_uuid)
         screenshot_name = self.file_name + '_' + get_test_name(test)
-        file_dir = posixpath.join(os.getcwd(), "test-reports", "custom_test_reports", self.file_name)
         if check_screenshot_exist(screenshot_name):
             test_case.attachments.append(
                 Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
             test_case.attachments.append(
-                Attachment(f"{screenshot_name}.xml", source=f"{screenshot_name}.xml", type="text/plain"))
-            test_case.attachments.append(
-                Attachment(f"{screenshot_name}.html", source=f"{file_dir}.html", type="text/plain"))
+                Attachment(name = f"{screenshot_name}.xml", source=f"{screenshot_name}.xml", type="text/plain"))
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
         test_case.status = Status.BROKEN
         if get_test_name(test) == "setUpClass":
@@ -125,3 +120,4 @@ class AllureListener:
     def add_link(self, url, link_type, name):
         test_case = self.reporter.get_test(None)
         test_case.links.append(Link(link_type, url, name))
+
