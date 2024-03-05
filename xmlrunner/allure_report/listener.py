@@ -1,7 +1,3 @@
-import os
-import posixpath
-import shutil
-
 import allure_commons
 from allure_commons.utils import host_tag, thread_tag
 from allure_commons.utils import md5
