@@ -61,7 +61,7 @@ class AllureListener:
             test_case.attachments.append(
                 Attachment(name=screenshot_name, source=f"{screenshot_name}.png", type="image/png"))
             test_case.attachments.append(
-                Attachment(name = f"{screenshot_name}.xml", source=f"{screenshot_name}.xml", type="text/plain"))
+                Attachment(name=screenshot_name, source=f"{screenshot_name}.xml", type="text/plain"))
             test_case.attachments.append(
                 Attachment(name=f"{self.file_name}.html", source=f"{self.file_name}.html", type="text/plain"))
         test_case.statusDetails = StatusDetails(message=message, trace=info_traceback)
