@@ -1,3 +1,6 @@
+import os
+import shutil
+
 import allure_commons
 from allure_commons.utils import host_tag, thread_tag
 from allure_commons.utils import md5
@@ -120,4 +123,3 @@ class AllureListener:
     def add_link(self, url, link_type, name):
         test_case = self.reporter.get_test(None)
         test_case.links.append(Link(link_type, url, name))
-
