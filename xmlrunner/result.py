@@ -1,6 +1,7 @@
 
 import inspect
 import io
+import platform
 import os
 import sys
 import datetime
@@ -503,6 +504,11 @@ class _XMLTestResult(TextTestResult):
             testsuite.setAttribute(
                 'timestamp', max(map(lambda e: e.timestamp, tests))
             )
+        
+        testsuite.setAttribute(
+            'hostname', platform.node()
+        )
+
         failures = filter(lambda e: e.outcome == e.FAILURE, tests)
         testsuite.setAttribute('failures', str(len(list(failures))))
 
