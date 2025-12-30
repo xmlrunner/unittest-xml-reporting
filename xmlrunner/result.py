@@ -92,8 +92,14 @@ class _DuplicateWriter(io.TextIOBase):
         self._second = second
 
     def flush(self):
-        self._first.flush()
-        self._second.flush()
+        try:
+            self._first.flush()
+        except ValueError:
+            pass
+        try:
+            self._second.flush()
+        except ValueError:
+            pass
 
     def writable(self):
         return True

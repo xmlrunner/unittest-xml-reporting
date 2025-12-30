@@ -12,8 +12,7 @@ checkversion:
 	git show-ref --tags | grep -q $$(git log -1 --pretty=%H) || (echo "DID NOT TAG VERSION"; exit 1)
 
 dist: checkversion build/publish/bin
-	build/publish/bin/python setup.py sdist
-	build/publish/bin/python setup.py bdist_wheel
+	build/publish/bin/python -m build
 
 publish: dist/ build/publish/bin
 	build/publish/bin/twine upload dist/*

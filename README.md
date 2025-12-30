@@ -106,7 +106,7 @@ If you use Git and want to get the latest *development* version:
 ````bash
 $ git clone https://github.com/xmlrunner/unittest-xml-reporting.git
 $ cd unittest-xml-reporting
-$ sudo python setup.py install
+$ sudo python -m pip install .
 ````
 
 Or get the latest *development* version as a tarball:
@@ -115,7 +115,7 @@ Or get the latest *development* version as a tarball:
 $ wget https://github.com/xmlrunner/unittest-xml-reporting/archive/master.zip
 $ unzip master.zip
 $ cd unittest-xml-reporting
-$ sudo python setup.py install
+$ sudo python -m pip install .
 ````
 
 Or you can manually download the latest released version from
