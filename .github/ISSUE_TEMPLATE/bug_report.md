@@ -1,45 +1,38 @@
-<!--
-Thank you for your contribution and taking the time to report the issue!
-Note: Please search to see if an issue already exists for the bug you encountered.
--->
-
 ---
-name: 🐞 Bug
-about: File a bug/issue
-title: '[BUG] <title>'
-labels: Bug, Needs Triage
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: ''
 assignees: ''
 
 ---
 
+**Describe the bug**
+A clear and concise description of what the bug is.
 
-### Current Behavior:
-<!-- A concise description of what you're experiencing. -->
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
 
-### Expected Behavior:
-<!-- A concise description of what you expected to happen. -->
+**Expected behavior**
+A clear and concise description of what you expected to happen.
 
-### Steps To Reproduce:
-<!--
-Example: steps to reproduce the behavior:
-1. In this environment...
-1. With this config...
-1. Run '...'
-1. See error...
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
 
-or a minimal example
--->
+**Desktop (please complete the following information):**
+ - OS: [e.g. iOS]
+ - Browser [e.g. chrome, safari]
+ - Version [e.g. 22]
 
-### Environment:
-<!--
-Example:
-- OS: Ubuntu 20.04
-- Python: 3.14.0
-- xmlrunner: 4.0.0
-output of `pip list`
--->
+**Smartphone (please complete the following information):**
+ - Device: [e.g. iPhone6]
+ - OS: [e.g. iOS8.1]
+ - Browser [e.g. stock browser, safari]
+ - Version [e.g. 22]
 
-### Anything else:
-<!--
-Links? References? Anything that will give us more context about the issue that you are encountering!
--->
+**Additional context**
+Add any other context about the problem here.
