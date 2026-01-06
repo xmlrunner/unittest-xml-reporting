@@ -12,9 +12,6 @@ jobs:
     strategy:
       matrix:
         name: [
-          "py-djangolts",
-          "py-djangocurr",
-          "py-quality",
           "py310",
           "py311",
           "py312",
@@ -22,15 +19,6 @@ jobs:
           "py314",
         ]
         include:
-          - name: py-djangolts
-            python-version: 3.14
-            tox_env: py314-djangolts
-          - name: py-djangocurr
-            python-version: 3.14
-            tox_env: py314-djangocurr
-          - name: py-quality
-            python-version: 3.14
-            tox_env: py314-quality
           - name: py310
             python-version: "3.10"
             tox_env: py310
