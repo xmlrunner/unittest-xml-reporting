@@ -1,0 +1,61 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [
+    "setuptools>=77",
+    "setuptools-scm[toml]>=6.2.3",
+]
+
+
+[project]
+name = "unittest-xml-reporting"
+license = "BSD-2-Clause"
+license-files = [ "LICENSE" ]
+dynamic = [
+    "version",
+]
+description = "unittest-based test runner with Ant/JUnit like XML reporting."
+keywords = [
+    "pyunit",
+    "unittest",
+    "junit xml",
+    "xunit",
+    "report",
+    "testrunner",
+    "xmlrunner",
+]
+readme = "README.md"
+authors = [
+    {name = "Daniel Fernandes Martins"},
+    {name = "Damien Nozay"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Testing",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "lxml",
+]
+
+[project.urls]
+Homepage = "http://github.com/xmlrunner/unittest-xml-reporting/tree/master/"
+
+
+[tool.setuptools_scm]
+write_to = "xmlrunner/version.py"
+
+[tool.distutils.bdist_wheel]
+universal = 1
+python-tag = "py3"

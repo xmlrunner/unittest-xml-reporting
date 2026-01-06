@@ -11,21 +11,29 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        name: [
+          "py310",
+          "py311",
+          "py312",
+          "py313",
+          "py314",
+        ]
         include:
-          - python-version: 3.7
-            toxenv: py37
-          - python-version: 3.8
-            toxenv: py38
-          - python-version: 3.8
-            toxenv: py38-djangolts
-          - python-version: 3.8
-            toxenv: py38-djangocurr
-          - python-version: 3.8
-            toxenv: py38-quality
-          - python-version: 3.9
-            toxenv: py39
-          - python-version: "3.10"
-            toxenv: py310
+          - name: py310
+            python-version: "3.10"
+            tox_env: py310
+          - name: py311
+            python-version: "3.11"
+            tox_env: py311
+          - name: py312
+            python-version: "3.12"
+            tox_env: py312
+          - name: py313
+            python-version: "3.13"
+            tox_env: py313
+          - name: py314
+            python-version: "3.14"
+            tox_env: py314
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -40,19 +48,21 @@ jobs:
           lsb_release -a
       - name: Install
         env:
-          TOXENV: ${{ matrix.toxenv }}
+          TOXENV: ${{ matrix.tox_env }}
         run: |
           pip install tox-gh-actions codecov coveralls
           pip --version
           tox --version
       - name: Script
         run: |
-          tox -v
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          tox run -v
       - name: After Failure
         if: ${{ failure() }}
         run: |
           more .tox/log/* | cat
           more .tox/*/log/* | cat
+      - name: Upload to Codecov
+        run: |
+          tox -e uploadcodecov
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

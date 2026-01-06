@@ -6,7 +6,10 @@ default TextTestRunner.
 """
 
 # Allow version to be detected at runtime.
-from .version import __version__
+try:
+    from .version import __version__
+except ImportError:
+    __version__ = "unknown"
 
 from .runner import XMLTestRunner
 

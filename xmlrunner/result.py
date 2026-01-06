@@ -92,8 +92,14 @@ class _DuplicateWriter(io.TextIOBase):
         self._second = second
 
     def flush(self):
-        self._first.flush()
-        self._second.flush()
+        try:
+            self._first.flush()
+        except ValueError:
+            pass
+        try:
+            self._second.flush()
+        except ValueError:
+            pass
 
     def writable(self):
         return True
@@ -187,6 +193,9 @@ class _TestInfo(object):
         method.
         """
         return self.test_exception_info
+
+    def shortDescription(self):
+        return self.test_description
 
 
 class _XMLTestResult(TextTestResult):
@@ -673,3 +682,8 @@ class _XMLTestResult(TextTestResult):
     def _exc_info_to_string(self, err, test):
         """Converts a sys.exc_info()-style tuple of values into a string."""
         return super(_XMLTestResult, self)._exc_info_to_string(err, test)
+
+    def getDescription(self, test):
+        if isinstance(test, tuple):
+            test = test[0]
+        return super().getDescription(test)
