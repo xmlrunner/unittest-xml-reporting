@@ -5,7 +5,7 @@
 
 [![codecov.io Coverage Status](https://codecov.io/github/xmlrunner/unittest-xml-reporting/coverage.svg?branch=master)](https://codecov.io/github/xmlrunner/unittest-xml-reporting?branch=master)
 [![Coveralls Coverage Status](https://coveralls.io/repos/xmlrunner/unittest-xml-reporting/badge.svg?branch=master&service=github)](https://coveralls.io/github/xmlrunner/unittest-xml-reporting?branch=master)
-[![Requirements Status](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements.svg?branch=master)](https://requires.io/github/xmlrunner/unittest-xml-reporting/requirements/?branch=master)
+
 
 # unittest-xml-reporting (aka xmlrunner)
 
@@ -14,9 +14,21 @@ The files can be consumed by a wide range of tools, such as build systems, IDEs
 and continuous integration servers.
 
 
+## Contributing
+
+We are always looking for good contributions, so please just fork the
+repository and send pull requests (with tests please!).
+
+If you would like write access to the repository, or become a maintainer,
+feel free to get in touch.
+
+
 ## Requirements
 
-* Python 3.7+
+See [Status of Python versions](https://devguide.python.org/versions/) for python EOL information.
+
+* Python 3.10+
+* Last version supporting Python 3.7 - 3.9 was 3.2.0
 * Please note Python 3.6 end-of-life was in Dec 2021, last version supporting 3.6 was 3.1.0
 * Please note Python 3.5 end-of-life was in Sep 2020, last version supporting 3.5 was 3.1.0
 * Please note Python 2.7 end-of-life was in Jan 2020, last version supporting 2.7 was 2.5.2
@@ -240,15 +252,6 @@ Also, the following settings are provided so you can fine tune the reports:
 |`TEST_OUTPUT_DESCRIPTIONS`|`False`|`True\|False`|If your test methods contains docstrings, you can display such docstrings instead of display the test name (ex: `module.TestCase.test_method`).<br>In order to use this feature, you have to enable verbose output by setting `TEST_OUTPUT_VERBOSE = 2`.<br>Only effects stdout and not XML output.|
 |`TEST_OUTPUT_DIR`|`"."`|`<str>`|Tells the test runner where to put the XML reports. If the directory couldn't be found, the test runner will try to create it before generate the XML files.|
 |`TEST_OUTPUT_FILE_NAME`|`None`|`<str>`|Tells the test runner to output a single XML report with this filename under `os.path.join(TEST_OUTPUT_DIR, TEST_OUTPUT_FILE_NAME)`.<br>Please note that for long running tests, this will keep the results in memory for a longer time than multiple reports, and may use up more resources.|
-
-
-## Contributing
-
-We are always looking for good contributions, so please just fork the
-repository and send pull requests (with tests!).
-
-If you would like write access to the repository, or become a maintainer,
-feel free to get in touch.
 
 
 ### Testing changes with `tox`
