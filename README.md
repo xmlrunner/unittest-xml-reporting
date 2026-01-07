@@ -14,6 +14,12 @@ The files can be consumed by a wide range of tools, such as build systems, IDEs
 and continuous integration servers.
 
 
+## PyPI
+
+- PyPI page for the project: https://pypi.org/project/unittest-xml-reporting/
+- PyPI download stats: https://pypistats.org/packages/unittest-xml-reporting
+
+
 ## Contributing
 
 We are always looking for good contributions, so please just fork the

@@ -5,7 +5,7 @@ build/tox/bin:
 
 build/publish/bin:
 	python3 -m venv build/publish
-	build/publish/bin/pip install wheel twine
+	build/publish/bin/pip install build wheel twine
 
 checkversion:
 	git log -1 --oneline | grep -q "Bump version" || (echo "DID NOT DO VERSION BUMP"; exit 1)
