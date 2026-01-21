@@ -14,6 +14,7 @@ import xmlrunner
 from xmlrunner.result import _DuplicateWriter
 from xmlrunner.result import _XMLTestResult
 from xmlrunner.result import resolve_filename
+from xmlrunner.runner import annotate
 import doctest
 import tests.doctest_example
 from io import StringIO, BytesIO
@@ -194,6 +195,47 @@ class XMLTestRunnerTestCase(unittest.TestCase):
 
         @some_decorator
         def test_pass(self):
+            pass
+
+    @annotate("type", "testsuite")
+    class AnnotatedUnitTest(unittest.TestCase):
+
+        @annotate("two", "arguments")
+        def test_two_arguments(self):
+            pass
+
+        @annotate("int", 1)
+        def test_int_annotation(self):
+            pass
+
+        @annotate("float", 1.0)
+        def test_float_annotation(self):
+            1 / 0
+
+        @annotate("bool", True)
+        def test_bool_annotation(self):
+            pass
+
+        @annotate({"type": "dict"})
+        def test_dict_annotation(self):
+            pass
+
+        @annotate({"str": "test", "int": 1, "float": 1.0, "bool": True})
+        def test_dict_annotation_types(self):
+            pass
+
+        @annotate()
+        def test_empty_annotation(self):
+            pass
+
+        @unittest.expectedFailure
+        @annotate("should", "fail")
+        def test_annotated_failure(self):
+            self.assertTrue(False)
+
+        @unittest.skip("Testing annotated skip")
+        @annotate("should", "skip")
+        def test_annotated_skip(self):
             pass
 
     class DummyErrorInCallTest(unittest.TestCase):
@@ -814,6 +856,40 @@ class XMLTestRunnerTestCase(unittest.TestCase):
         gc.collect()
         countAfterTest = sys.getrefcount(self.DummyRefCountTest.dummy)
         self.assertEqual(countBeforeTest, countAfterTest)
+
+    def test_annotations(self):
+        suite = unittest.TestSuite()
+        test_methods = (
+            "test_two_arguments",
+            "test_int_annotation",
+            "test_float_annotation",
+            "test_bool_annotation",
+            "test_dict_annotation",
+            "test_dict_annotation_types",
+            "test_empty_annotation",
+            "test_annotated_failure",
+            "test_annotated_skip"
+        )
+        for method in test_methods:
+            suite.addTest(self.AnnotatedUnitTest(method))
+        outdir = BytesIO()
+
+        self._test_xmlrunner(suite, outdir=outdir)
+
+        output = outdir.getvalue()
+        xml_attributes = (
+            b'type="testsuite"',
+            b'two="arguments"',
+            b'int="1"',
+            b'float="1.0"',
+            b'bool="True"',
+            b'type="dict"',
+            b'str="test"',
+            b'should="fail"',
+            b'should="skip"'
+        )
+        for attr in xml_attributes:
+            self.assertIn(attr, output)
 
     class StderrXMLTestRunner(xmlrunner.XMLTestRunner):
         """

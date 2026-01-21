@@ -213,6 +213,35 @@ if __name__ == '__main__':
             failfast=False, buffer=False, catchbreak=False)
 ````
 
+### Custom XML attributes
+
+In order to add custom xml attributes to the xml report, use the `annotate` decorator.
+It takes a key and a value, or for more than one attribute, a dictionary.
+Keys must be strings; values must be strings, integers, floats or booleans.
+
+````python
+import unittest
+import xmlrunner
+from xmlrunner.runner import annotate
+
+@annotate("TestsuiteId", 1234567890)
+class DemonstrateAnnotations(unittest.TestCase):
+
+    @annotate({
+        "Tester": "Nova Solomon",
+        "TestTicketId": 13,
+        "UsesUnittestModule": True})
+    def test_annotation(self):
+        pass
+
+if __name__ == '__main__':
+    unittest.main(
+        testRunner=xmlrunner.XMLTestRunner(output='test-reports'),
+        # these make sure that some options that are not applicable
+        # remain hidden from the help menu.
+        failfast=False, buffer=False, catchbreak=False)
+````
+
 ### Doctest support
 
 The XMLTestRunner can also be used to report on docstrings style tests.

@@ -175,6 +175,8 @@ class _TestInfo(object):
         self.filename = filename
         self.lineno = lineno
         self.doc = doc
+        self.annotations = test_result._annotations
+        self.suite_annotations = test_result._suite_annotations
 
     def id(self):
         return self.test_id
@@ -341,6 +343,7 @@ class _XMLTestResult(TextTestResult):
         Called when a test executes successfully.
         """
         self._save_output_data()
+        self._copy_annotations(test)
         self._prepare_callback(
             self.infoclass(self, test), self.successes, 'ok', '.'
         )
@@ -351,6 +354,7 @@ class _XMLTestResult(TextTestResult):
         Called when a test method fails.
         """
         self._save_output_data()
+        self._copy_annotations(test)
         testinfo = self.infoclass(
             self, test, self.infoclass.FAILURE, err)
         self.failures.append((
@@ -365,6 +369,7 @@ class _XMLTestResult(TextTestResult):
         Called when a test method raises an error.
         """
         self._save_output_data()
+        self._copy_annotations(test)
         testinfo = self.infoclass(
             self, test, self.infoclass.ERROR, err)
         self.errors.append((
@@ -393,6 +398,7 @@ class _XMLTestResult(TextTestResult):
                 errorList = self.errors
 
             self._save_output_data()
+            self._copy_annotations(test)
 
             testinfo = self.infoclass(
                 self, testcase, errorValue, err, subTest=test)
@@ -407,6 +413,7 @@ class _XMLTestResult(TextTestResult):
         Called when a test method was skipped.
         """
         self._save_output_data()
+        self._copy_annotations(test)
         testinfo = self.infoclass(
             self, test, self.infoclass.SKIP, reason)
         testinfo.test_exception_name = 'skip'
@@ -419,6 +426,7 @@ class _XMLTestResult(TextTestResult):
         Missing in xmlrunner, copy-pasted from xmlrunner addError.
         """
         self._save_output_data()
+        self._copy_annotations(test)
 
         testinfo = self.infoclass(self, test, self.infoclass.SKIP, err)
         testinfo.test_exception_name = 'XFAIL'
@@ -433,6 +441,7 @@ class _XMLTestResult(TextTestResult):
         Missing in xmlrunner, copy-pasted from xmlrunner addSuccess.
         """
         self._save_output_data()
+        self._copy_annotations(test)
 
         testinfo = self.infoclass(self, test)  # do not set outcome here because it will need exception
         testinfo.outcome = self.infoclass.ERROR
@@ -457,6 +466,11 @@ class _XMLTestResult(TextTestResult):
             self.stream.writeln(self.separator2)
             self.stream.writeln('%s' % test_info.get_error_info())
             self.stream.flush()
+
+    def _copy_annotations(self, test):
+        test_method = getattr(test, test._testMethodName)
+        self._annotations = getattr(test_method, "_annotations", None)
+        self._suite_annotations = getattr(test, "_annotations", None)
 
     def _get_info_by_testcase(self):
         """
@@ -521,6 +535,13 @@ class _XMLTestResult(TextTestResult):
         skips = filter(lambda e: e.outcome == _TestInfo.SKIP, tests)
         testsuite.setAttribute('skipped', str(len(list(skips))))
 
+        # indexing is necessary since each test info instance
+        # carries the annotations of its test suite
+        annotations = tests[0].suite_annotations
+        if annotations:
+            for attr, value in annotations.items():
+                testsuite.setAttribute(attr, str(value))
+
         _XMLTestResult._report_testsuite_properties(
             testsuite, xml_document, properties)
 
@@ -583,6 +604,10 @@ class _XMLTestResult(TextTestResult):
 
         if test_result.lineno is not None:
             testcase.setAttribute('line', str(test_result.lineno))
+
+        if test_result.annotations:
+            for attr, value in test_result.annotations.items():
+                testcase.setAttribute(attr, str(value))
 
         if test_result.doc is not None:
             comment = str(test_result.doc)
