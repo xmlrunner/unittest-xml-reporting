@@ -91,6 +91,10 @@ class _DuplicateWriter(io.TextIOBase):
         self._first = first
         self._second = second
 
+    @property
+    def encoding(self):
+        return self._first.encoding
+
     def flush(self):
         try:
             self._first.flush()
