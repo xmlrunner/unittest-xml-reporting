@@ -176,6 +176,10 @@ class _TestInfo(object):
         self.lineno = lineno
         self.doc = doc
 
+        # 'test_method' actually represents the test class that will lead to a
+        # 'testsuite' XML node
+        self.suite_doc = test_method.__doc__
+
     def id(self):
         return self.test_id
 
@@ -474,8 +478,11 @@ class _XMLTestResult(TextTestResult):
                     test_info = test_info[0]
                 testcase_name = test_info.test_name
                 if testcase_name not in tests_by_testcase:
-                    tests_by_testcase[testcase_name] = []
-                tests_by_testcase[testcase_name].append(test_info)
+                    tests_by_testcase[testcase_name] = {
+                        'suite_doc': test_info.suite_doc,
+                        'tests': []
+                    }
+                tests_by_testcase[testcase_name]['tests'].append(test_info)
 
         return tests_by_testcase
 
@@ -491,7 +498,7 @@ class _XMLTestResult(TextTestResult):
 
     _report_testsuite_properties = staticmethod(_report_testsuite_properties)
 
-    def _report_testsuite(suite_name, tests, xml_document, parentElement,
+    def _report_testsuite(suite_name, suite_doc, tests, xml_document, parentElement,
                           properties):
         """
         Appends the testsuite section to the XML document.
@@ -520,6 +527,12 @@ class _XMLTestResult(TextTestResult):
 
         skips = filter(lambda e: e.outcome == _TestInfo.SKIP, tests)
         testsuite.setAttribute('skipped', str(len(list(skips))))
+
+        if suite_doc:
+            comment = str(suite_doc)
+            # The use of '--' is forbidden in XML comments
+            comment = comment.replace('--', '&#45;&#45;')
+            testsuite.appendChild(xml_document.createComment(safe_unicode(comment)))
 
         _XMLTestResult._report_testsuite_properties(
             testsuite, xml_document, properties)
@@ -642,7 +655,10 @@ class _XMLTestResult(TextTestResult):
             doc.appendChild(testsuite)
             parentElement = testsuite
 
-        for suite, tests in all_results.items():
+        for suite, suite_info in all_results.items():
+            suite_doc = suite_info['suite_doc']
+            tests = suite_info['tests']
+
             if outputHandledAsString:
                 doc = Document()
                 parentElement = doc
@@ -654,7 +670,7 @@ class _XMLTestResult(TextTestResult):
 
             # Build the XML file
             testsuite = _XMLTestResult._report_testsuite(
-                suite_name, tests, doc, parentElement, self.properties
+                suite_name, suite_doc, tests, doc, parentElement, self.properties
             )
 
             if outputHandledAsString:
